@@ -1,14 +1,14 @@
 package com.sms.entity;
 
 import java.math.BigDecimal;
-import java.time.Year;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,6 +32,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "kegiatans")
+@JsonIgnoreProperties({ "user", "satker", "program" })
 public class Kegiatan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

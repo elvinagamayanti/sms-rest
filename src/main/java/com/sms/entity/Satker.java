@@ -24,6 +24,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Setter
 @Getter
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Builder
 @Entity
 @Table(name = "satkers")
+@JsonIgnoreProperties({ "userList", "listKegiatans" })
 public class Satker {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

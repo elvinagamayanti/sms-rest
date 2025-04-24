@@ -4,6 +4,13 @@ import com.sms.dto.ProvinceDto;
 import com.sms.entity.Satker;
 import com.sms.repository.SatkerRepository;
 import com.sms.service.ProvinceService;
+import com.sms.payload.ApiErrorResponse;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +43,11 @@ public class ProvinceController {
      * 
      * @return list of provinces
      */
+    @Operation(summary = "Menampilkan Daftar Provinsi", description = "Menampilkan daftar seluruh provinsi yang terdaftar pada sistem")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar provinsi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProvinceDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    })
     @GetMapping
     public ResponseEntity<List<ProvinceDto>> getAllProvinces() {
         List<ProvinceDto> provinceDtos = this.provinceService.ambilDaftarProvinsi();
@@ -48,6 +60,11 @@ public class ProvinceController {
      * @param id province id
      * @return province details
      */
+    @Operation(summary = "Menampilkan Provinsi berdasarkan ID", description = "Menampilkan detail provinsi berdasarkan ID yang diberikan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan provinsi berdasarkan ID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProvinceDto.class))),
+            @ApiResponse(responseCode = "404", description = "Provinsi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ProvinceDto> getProvinceById(@PathVariable("id") Long id) {
         ProvinceDto provinceDto = provinceService.cariProvinceById(id);
@@ -60,6 +77,11 @@ public class ProvinceController {
      * @param code province code
      * @return province details
      */
+    @Operation(summary = "Menampilkan Provinsi berdasarkan Kode", description = "Menampilkan detail provinsi berdasarkan kode yang diberikan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan provinsi berdasarkan kode", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProvinceDto.class))),
+            @ApiResponse(responseCode = "404", description = "Provinsi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @GetMapping("/code/{code}")
     public ResponseEntity<ProvinceDto> getProvinceByCode(@PathVariable("code") String code) {
         ProvinceDto provinceDto = provinceService.cariProvinceByCode(code);
@@ -72,6 +94,11 @@ public class ProvinceController {
      * @param provinceDto province data
      * @return created province
      */
+    @Operation(summary = "Membuat Provinsi Baru", description = "Membuat provinsi baru dengan data yang diberikan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Provinsi berhasil dibuat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProvinceDto.class))),
+            @ApiResponse(responseCode = "400", description = "Permintaan tidak valid", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @PostMapping
     public ResponseEntity<ProvinceDto> createProvince(@Valid @RequestBody ProvinceDto provinceDto) {
         provinceService.simpanDataProvinsi(provinceDto);
@@ -85,6 +112,11 @@ public class ProvinceController {
      * @param provinceDto province data
      * @return updated province
      */
+    @Operation(summary = "Memperbarui Provinsi", description = "Memperbarui provinsi yang sudah ada dengan data yang diberikan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provinsi berhasil diperbarui", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProvinceDto.class))),
+            @ApiResponse(responseCode = "404", description = "Provinsi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ProvinceDto> updateProvince(
             @PathVariable("id") Long id,
@@ -102,6 +134,11 @@ public class ProvinceController {
      * @param id province id
      * @return success message
      */
+    @Operation(summary = "Menghapus Provinsi", description = "Menghapus provinsi berdasarkan ID yang diberikan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Provinsi berhasil dihapus", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Provinsi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteProvince(@PathVariable("id") Long id) {
         provinceService.hapusDataProvinsi(id);
@@ -114,6 +151,11 @@ public class ProvinceController {
      * @param provinceCode province code
      * @return list of satkers
      */
+    @Operation(summary = "Menampilkan Satuan Kerja berdasarkan Kode Provinsi", description = "Menampilkan daftar satuan kerja berdasarkan kode provinsi yang diberikan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan satuan kerja berdasarkan kode provinsi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Satker.class))),
+            @ApiResponse(responseCode = "404", description = "Satuan kerja tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @GetMapping("/{provinceCode}/satkers")
     public ResponseEntity<List<Satker>> getSatkersByProvinceCode(@PathVariable String provinceCode) {
         List<Satker> satkers = satkerRepository.findByCodeStartingWith(provinceCode);

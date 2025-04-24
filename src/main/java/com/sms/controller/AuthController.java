@@ -38,7 +38,7 @@ public class AuthController {
         @Autowired
         UserService userService;
 
-        @Operation(summary = "Otentikasi user untuk mendapatkan token jwt.")
+        @Operation(summary = "Otentikasi user untuk mendapatkan token jwt.", description = "Menggunakan email dan password untuk mendapatkan token jwt yang digunakan untuk mengakses endpoint yang dilindungi.")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "otentikasi berhasil", content = {
                                         @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class))

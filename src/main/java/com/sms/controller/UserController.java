@@ -3,8 +3,15 @@ package com.sms.controller;
 import com.sms.dto.UserDto;
 import com.sms.entity.Role;
 import com.sms.entity.User;
+import com.sms.payload.ApiErrorResponse;
 import com.sms.repository.RoleRepository;
 import com.sms.service.UserService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +44,11 @@ public class UserController {
      * 
      * @return list of users
      */
+    @Operation(summary = "Menampilkan Daftar Pengguna", description = "Menampilkan daftar seluruh pengguna yang terdaftar pada sistem")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    })
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> userDtos = this.userService.findAllUsers();
@@ -49,6 +61,12 @@ public class UserController {
      * @param id user id
      * @return user details
      */
+    @Operation(summary = "Menampilkan Detail Pengguna", description = "Menampilkan detail pengguna berdasarkan ID yang diberikan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
         User user = userService.findUserById(id);
@@ -61,6 +79,11 @@ public class UserController {
      * @param userDto user data
      * @return created user
      */
+    @Operation(summary = "Membuat Pengguna Baru", description = "Membuat pengguna baru dengan data yang diberikan")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User created successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "409", description = "User already exists", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDto userDto) {
         // Check if user already exists
@@ -80,6 +103,11 @@ public class UserController {
      * 
      * @return current user details
      */
+    @Operation(summary = "Menampilkan Pengguna yang Sedang Masuk", description = "Menampilkan detail pengguna yang sedang masuk ke dalam sistem")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Current user found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+    })
     @GetMapping("/current")
     public ResponseEntity<User> getCurrentUser() {
         User currentUser = userService.getCurrentUser();
@@ -96,6 +124,11 @@ public class UserController {
      * @param roleId role id
      * @return success message
      */
+    @Operation(summary = "Memberikan Peran kepada Pengguna", description = "Memberikan peran tertentu kepada pengguna berdasarkan ID pengguna dan ID peran")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role assigned successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "404", description = "User or role not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @PostMapping("/{userId}/roles/{roleId}")
     public ResponseEntity<?> assignRoleToUser(
             @PathVariable("userId") Long userId,
@@ -119,6 +152,11 @@ public class UserController {
      * @param roleId role id
      * @return success message
      */
+    @Operation(summary = "Menghapus Peran dari Pengguna", description = "Menghapus peran tertentu dari pengguna berdasarkan ID pengguna dan ID peran")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role removed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "404", description = "User or role not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @DeleteMapping("/{userId}/roles/{roleId}")
     public ResponseEntity<?> removeRoleFromUser(
             @PathVariable("userId") Long userId,
@@ -142,6 +180,11 @@ public class UserController {
      * @param roleName role name
      * @return true if user has role, false otherwise
      */
+    @Operation(summary = "Memeriksa Apakah Pengguna Memiliki Peran Tertentu", description = "Memeriksa apakah pengguna memiliki peran tertentu berdasarkan ID pengguna dan nama peran")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Role check successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
     @GetMapping("/{userId}/hasRole")
     public ResponseEntity<Map<String, Boolean>> checkUserHasRole(
             @PathVariable("userId") Long userId,

@@ -7,6 +7,8 @@ package com.sms.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,6 +35,7 @@ import lombok.Setter;
 @Entity
 @Builder
 @Table(name = "programs")
+@JsonIgnoreProperties({ "listKegiatans" })
 public class Program {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

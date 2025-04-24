@@ -36,6 +36,7 @@ import lombok.Setter;
 @Entity
 @Builder
 @Table(name = "provinces")
+@JsonIgnoreProperties({ "listSatkers" })
 public class Province {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

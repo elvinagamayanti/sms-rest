@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sms.dto.UserDto;
 
 import java.util.Collection;
@@ -37,6 +38,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "users")
+@JsonIgnoreProperties({ "roles", "listKegiatans" })
 public class User {
     private static final long serialVersionUID = 1L;
 
