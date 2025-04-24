@@ -40,19 +40,9 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/register", "/docs/**", "/css/**", "/js/**", "/images/**", "/main.css",
-                        "/*.png", "/*.ico")
+                .requestMatchers("/", "/login", "/docs/**")
                 .permitAll()
-                .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout=true")
-                        .permitAll());
-
+                .anyRequest().authenticated());
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
