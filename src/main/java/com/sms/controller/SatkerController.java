@@ -21,8 +21,9 @@ import java.util.Map;
 /**
  * REST API for Satker (Work Unit) operations
  * 
- * @author rest-api
+ * @author pinaa
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/satkers")
 public class SatkerController {

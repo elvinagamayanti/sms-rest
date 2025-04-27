@@ -22,8 +22,9 @@ import java.util.Map;
 /**
  * REST API for Kegiatan (Activity) operations
  * 
- * @author rest-api
+ * @author pinaa
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/kegiatans")
 public class KegiatanController {

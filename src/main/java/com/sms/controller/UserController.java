@@ -25,8 +25,9 @@ import java.util.Map;
 /**
  * REST API for User operations
  * 
- * @author rest-api
+ * @author pinaa
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/users")
 public class UserController {

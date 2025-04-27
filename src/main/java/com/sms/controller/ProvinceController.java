@@ -24,8 +24,9 @@ import java.util.Map;
 /**
  * REST API for Province operations
  * 
- * @author rest-api
+ * @author pinaa
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/provinces")
 public class ProvinceController {

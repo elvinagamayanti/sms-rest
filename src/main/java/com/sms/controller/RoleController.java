@@ -22,8 +22,9 @@ import java.util.Map;
 /**
  * REST API for Role operations
  * 
- * @author rest-api
+ * @author pinaa
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/roles")
 public class RoleController {

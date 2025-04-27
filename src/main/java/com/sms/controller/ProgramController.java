@@ -22,8 +22,9 @@ import java.util.Map;
 /**
  * REST API for Program operations
  * 
- * @author rest-api
+ * @author pinaa
  */
+@CrossOrigin
 @RestController
 @RequestMapping("/api/programs")
 public class ProgramController {
