@@ -1,8 +1,12 @@
 package com.sms.service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sms.dto.TahapStatusDto;
 import com.sms.entity.Kegiatan;
@@ -33,11 +37,12 @@ public class TahapService {
     private final Tahap6Repository tahap6Repository;
     private final Tahap7Repository tahap7Repository;
     private final Tahap8Repository tahap8Repository;
+    private final FileUploadService fileUploadService;
 
     public TahapService(Tahap1Repository tahap1Repository, Tahap2Repository tahap2Repository,
             Tahap3Repository tahap3Repository, Tahap4Repository tahap4Repository,
             Tahap5Repository tahap5Repository, Tahap6Repository tahap6Repository,
-            Tahap7Repository tahap7Repository, Tahap8Repository tahap8Repository) {
+            Tahap7Repository tahap7Repository, Tahap8Repository tahap8Repository, FileUploadService fileUploadService) {
         this.tahap1Repository = tahap1Repository;
         this.tahap2Repository = tahap2Repository;
         this.tahap3Repository = tahap3Repository;
@@ -46,6 +51,7 @@ public class TahapService {
         this.tahap6Repository = tahap6Repository;
         this.tahap7Repository = tahap7Repository;
         this.tahap8Repository = tahap8Repository;
+        this.fileUploadService = fileUploadService;
     }
 
     // Method to check if a specific subtask is completed
@@ -633,5 +639,188 @@ public class TahapService {
         status.setTahap8Percentage(tahap8.map(Tahap8::getCompletionPercentage).orElse(0));
 
         return status;
+    }
+
+    private Tahap1 createDefaultTahap1(Long kegiatanId) {
+        Tahap1 tahap1 = new Tahap1();
+
+        // Set the kegiatan reference
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setId(kegiatanId);
+        tahap1.setKegiatan(kegiatan);
+
+        // Initialize all subtahap flags to false
+        tahap1.setSubtahap_1(false);
+        tahap1.setSubtahap_2(false);
+        tahap1.setSubtahap_3(false);
+        tahap1.setSubtahap_4(false);
+        tahap1.setSubtahap_5(false);
+        tahap1.setSubtahap_6(false);
+
+        // Save the new entity
+        return tahap1Repository.save(tahap1);
+    }
+
+    private Tahap2 createDefaultTahap2(Long kegiatanId) {
+        Tahap2 tahap2 = new Tahap2();
+
+        // Set the kegiatan reference
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setId(kegiatanId);
+        tahap2.setKegiatan(kegiatan);
+
+        // Initialize all subtahap flags to false
+        tahap2.setSubtahap_1(false);
+        tahap2.setSubtahap_2(false);
+        tahap2.setSubtahap_3(false);
+        tahap2.setSubtahap_4(false);
+
+        // Save the new entity
+        return tahap2Repository.save(tahap2);
+    }
+
+    private Tahap3 createDefaultTahap3(Long kegiatanId) {
+        Tahap3 tahap3 = new Tahap3();
+
+        // Set the kegiatan reference
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setId(kegiatanId);
+        tahap3.setKegiatan(kegiatan);
+
+        // Initialize all subtahap flags to false
+        tahap3.setSubtahap_1(false);
+        tahap3.setSubtahap_2(false);
+        tahap3.setSubtahap_3(false);
+        tahap3.setSubtahap_4(false);
+
+        // Save the new entity
+        return tahap3Repository.save(tahap3);
+    }
+
+    private Tahap4 createDefaultTahap4(Long kegiatanId) {
+        Tahap4 tahap4 = new Tahap4();
+
+        // Set the kegiatan reference
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setId(kegiatanId);
+        tahap4.setKegiatan(kegiatan);
+
+        // Initialize all subtahap flags to false
+        tahap4.setSubtahap_1(false);
+        tahap4.setSubtahap_2(false);
+        tahap4.setSubtahap_3(false);
+        tahap4.setSubtahap_4(false);
+
+        // Save the new entity
+        return tahap4Repository.save(tahap4);
+    }
+
+    private Tahap5 createDefaultTahap5(Long kegiatanId) {
+        Tahap5 tahap5 = new Tahap5();
+
+        // Set the kegiatan reference
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setId(kegiatanId);
+        tahap5.setKegiatan(kegiatan);
+
+        // Initialize all subtahap flags to false
+        tahap5.setSubtahap_1(false);
+        tahap5.setSubtahap_2(false);
+        tahap5.setSubtahap_3(false);
+        tahap5.setSubtahap_4(false);
+
+        // Save the new entity
+        return tahap5Repository.save(tahap5);
+    }
+
+    private Tahap6 createDefaultTahap6(Long kegiatanId) {
+        Tahap6 tahap6 = new Tahap6();
+
+        // Set the kegiatan reference
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setId(kegiatanId);
+        tahap6.setKegiatan(kegiatan);
+
+        // Initialize all subtahap flags to false
+        tahap6.setSubtahap_1(false);
+        tahap6.setSubtahap_2(false);
+        tahap6.setSubtahap_3(false);
+        tahap6.setSubtahap_4(false);
+
+        // Save the new entity
+        return tahap6Repository.save(tahap6);
+    }
+
+    private Tahap7 createDefaultTahap7(Long kegiatanId) {
+        Tahap7 tahap7 = new Tahap7();
+
+        // Set the kegiatan reference
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setId(kegiatanId);
+        tahap7.setKegiatan(kegiatan);
+
+        // Initialize all subtahap flags to false
+        tahap7.setSubtahap_1(false);
+        tahap7.setSubtahap_2(false);
+        tahap7.setSubtahap_3(false);
+        tahap7.setSubtahap_4(false);
+
+        // Save the new entity
+        return tahap7Repository.save(tahap7);
+    }
+
+    private Tahap8 createDefaultTahap8(Long kegiatanId) {
+        Tahap8 tahap8 = new Tahap8();
+
+        // Set the kegiatan reference
+        Kegiatan kegiatan = new Kegiatan();
+        kegiatan.setId(kegiatanId);
+        tahap8.setKegiatan(kegiatan);
+
+        // Initialize all subtahap flags to false
+        tahap8.setSubtahap_1(false);
+        tahap8.setSubtahap_2(false);
+        tahap8.setSubtahap_3(false);
+        tahap8.setSubtahap_4(false);
+
+        // Save the new entity
+        return tahap8Repository.save(tahap8);
+    }
+
+    // Add method to handle file upload for specific tahap
+    public void uploadFileForTahap(Long kegiatanId, int tahapId, MultipartFile file) throws IOException {
+        // Validate if this tahap accepts file uploads (tahap 7 and 8)
+        if (tahapId != 7 && tahapId != 8) {
+            throw new IllegalArgumentException("File upload is only allowed for tahap 7 and 8");
+        }
+
+        // Store the file
+        String storedFilename = fileUploadService.storeFile(file, kegiatanId, tahapId);
+
+        // Update the tahap entity with file reference if needed
+        if (tahapId == 7) {
+            Tahap7 tahap7 = tahap7Repository.findByKegiatanId(kegiatanId)
+                    .orElseGet(() -> createDefaultTahap7(kegiatanId));
+
+            tahap7.setUploadFileName(file.getOriginalFilename());
+            tahap7.setUploadFilePath("/uploads/kegiatan/" + kegiatanId + "/tahap/" + tahapId + "/" + storedFilename);
+            tahap7.setUploadTimestamp(LocalDateTime.now());
+
+            tahap7Repository.save(tahap7);
+        } else if (tahapId == 8) {
+            Tahap8 tahap8 = tahap8Repository.findByKegiatanId(kegiatanId)
+                    .orElseGet(() -> createDefaultTahap8(kegiatanId));
+
+            tahap8.setUploadFileName(file.getOriginalFilename());
+            tahap8.setUploadFilePath("/uploads/kegiatan/" + kegiatanId + "/tahap/" + tahapId + "/" + storedFilename);
+            tahap8.setUploadTimestamp(LocalDateTime.now());
+
+            tahap8Repository.save(tahap8);
+        }
+    }
+
+    // Add method to get uploaded files for a tahap
+    public List<String> getUploadedFilesForTahap(Long kegiatanId, int tahapId) {
+        return fileUploadService.getUploadedFiles(kegiatanId, tahapId);
     }
 }
