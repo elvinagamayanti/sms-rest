@@ -4,18 +4,17 @@
  */
 package com.sms.service.impl;
 
-import com.sms.dto.ProvinceDto;
-import com.sms.entity.Province;
-import com.sms.mapper.ProvinceMapper;
-import com.sms.repository.ProvinceRepository;
-import com.sms.service.ProvinceService;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.sms.dto.ProvinceDto;
+import com.sms.entity.Province;
+import com.sms.mapper.ProvinceMapper;
+import com.sms.repository.ProvinceRepository;
 import com.sms.repository.SatkerRepository;
+import com.sms.service.ProvinceService;
 
 /**
  *
@@ -67,28 +66,4 @@ public class ProvinceServiceImpl implements ProvinceService {
         Province province = provinceRepository.findByCode(code).get();
         return ProvinceMapper.mapToProvinceDto(province);
     }
-    // @Override
-    // public ProvinceDto cariProvinceByCode(String code) {
-    // Province province = provinceRepository.findByCode(code)
-    // .orElseThrow(() -> new RuntimeException("Province dengan code " + code + "
-    // tidak ditemukan"));
-
-    // return ProvinceMapper.mapToProvinceDto(province);
-    // }
-
-    // @Override
-    // public ProvinceDto cariProvinceByCode(String code) {
-    // Optional<Province> optionalProvince = provinceRepository.findByCode(code);
-    // if (optionalProvince.isPresent()) {
-    // return ProvinceMapper.mapToProvinceDto(optionalProvince.get());
-    // } else {
-    // throw new IllegalArgumentException("Province with code " + code + " not
-    // found");
-    // }
-    // }
-
-    // @Override
-    // public List<Satker> getSatkersByProvinceCode(String provinceCode) {
-    // return satkerRepository.findAllSatkersByProvinceCode(provinceCode);
-    // }
 }

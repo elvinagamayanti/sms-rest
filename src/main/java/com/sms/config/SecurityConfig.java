@@ -40,8 +40,11 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/docs/**")
-                .permitAll()
+                .requestMatchers("/", "/login", "/docs/**").permitAll()
+                .requestMatchers("/api/tahap/**", "/api/kegiatan/**").hasAnyRole("ADMIN", "USER", "SUPERADMIN")
+                .requestMatchers("/api/roles/**", "/api/provinces/**", "/api/satkers/**", "/api/programs/**")
+                .hasRole("SUPERADMIN")
+                .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "SUPERADMIN")
                 .anyRequest().authenticated());
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -50,7 +50,6 @@ public class Tahap8 {
     private boolean subtahap_3;
     private boolean subtahap_4;
 
-    // New fields for file upload
     private String uploadFileName;
     private String uploadFilePath;
 
@@ -59,7 +58,7 @@ public class Tahap8 {
 
     public int getCompletionPercentage() {
         int completed = 0;
-        int total = 4; // Total number of subtahaps
+        int total = 4;
 
         if (subtahap_1)
             completed++;

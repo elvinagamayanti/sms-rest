@@ -117,7 +117,6 @@ public class UserServiceImpl implements UserService {
     public void removeRoleFromUser(Long userId, Long roleId) {
         User user = findUserById(userId);
 
-        // Ensure user has at least one role after removal
         if (user.getRoles().size() <= 1) {
             throw new RuntimeException("Cannot remove the last role. User must have at least one role.");
         }

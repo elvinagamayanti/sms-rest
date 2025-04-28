@@ -4,9 +4,9 @@
  */
 package com.sms.service;
 
-import com.sms.dto.ProvinceDto;
-
 import java.util.List;
+
+import com.sms.dto.ProvinceDto;
 
 /**
  *
@@ -24,5 +24,4 @@ public interface ProvinceService {
     ProvinceDto cariProvinceById(Long id);
 
     ProvinceDto cariProvinceByCode(String code);
-    // List<Satker> getSatkersByProvinceCode(String provinceCode);
 }

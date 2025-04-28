@@ -59,7 +59,7 @@ public class Tahap7 {
 
     public int getCompletionPercentage() {
         int completed = 0;
-        int total = 4; // Total number of subtahaps
+        int total = 4;
 
         if (subtahap_1)
             completed++;

@@ -4,14 +4,18 @@
  */
 package com.sms.service.impl;
 
-import com.sms.dto.SatkerDto;
-import com.sms.entity.Satker;
-import com.sms.mapper.SatkerMapper;
-import com.sms.repository.SatkerRepository;
-import com.sms.service.SatkerService;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
+
+import com.sms.dto.SatkerDto;
+import com.sms.entity.Satker;
+import com.sms.entity.User;
+import com.sms.mapper.SatkerMapper;
+import com.sms.repository.SatkerRepository;
+import com.sms.repository.UserRepository;
+import com.sms.service.SatkerService;
 
 /**
  *
@@ -20,9 +24,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SatkerServiceImpl implements SatkerService {
     private SatkerRepository satkerRepository;
+    private UserRepository userRepository;
 
-    public SatkerServiceImpl(SatkerRepository satkerRepository) {
+    public SatkerServiceImpl(SatkerRepository satkerRepository, UserRepository userRepository) {
         this.satkerRepository = satkerRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -49,7 +55,6 @@ public class SatkerServiceImpl implements SatkerService {
     @Override
     public void simpanDataSatker(SatkerDto satkerDto) {
         Satker satker = SatkerMapper.mapToSatker(satkerDto);
-        // System.out.println(student);
         satkerRepository.save(satker);
     }
 
@@ -57,5 +62,10 @@ public class SatkerServiceImpl implements SatkerService {
     public SatkerDto cariSatkerById(Long id) {
         Satker satker = satkerRepository.findById(id).get();
         return SatkerMapper.mapToSatkerDto(satker);
+    }
+
+    @Override
+    public List<User> getUsersBySatkerId(Long satkerId) {
+        return userRepository.findAllUsersBySatkerId(satkerId);
     }
 }

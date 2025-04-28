@@ -4,8 +4,10 @@
  */
 package com.sms.service;
 
-import com.sms.dto.SatkerDto;
 import java.util.List;
+
+import com.sms.dto.SatkerDto;
+import com.sms.entity.User;
 
 /**
  *
@@ -21,4 +23,6 @@ public interface SatkerService {
     void simpanDataSatker(SatkerDto satkerDto);
 
     SatkerDto cariSatkerById(Long id);
+
+    List<User> getUsersBySatkerId(Long satkerId);
 }

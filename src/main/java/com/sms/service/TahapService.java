@@ -283,7 +283,6 @@ public class TahapService {
         }
     }
 
-    // Method to update subtask completion status
     public void updateSubtaskStatus(Long kegiatanId, int tahap, int subtahap, boolean completed) {
         switch (tahap) {
             case 1:
@@ -601,7 +600,6 @@ public class TahapService {
         }
     }
 
-    // Get all tahap data for a kegiatan
     public TahapStatusDto getTahapStatus(Long kegiatanId) {
         TahapStatusDto status = new TahapStatusDto();
         status.setKegiatanId(kegiatanId);
@@ -819,7 +817,6 @@ public class TahapService {
         }
     }
 
-    // Add method to get uploaded files for a tahap
     public List<String> getUploadedFilesForTahap(Long kegiatanId, int tahapId) {
         return fileUploadService.getUploadedFiles(kegiatanId, tahapId);
     }

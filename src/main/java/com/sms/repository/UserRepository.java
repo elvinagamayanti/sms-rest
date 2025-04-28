@@ -5,17 +5,14 @@
 package com.sms.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.sms.entity.User;
-
-import java.util.Optional;
-// import java.util.List;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import com.sms.entity.User;
 
 /**
  *
@@ -32,4 +29,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u JOIN u.roles r WHERE r.id = :roleId")
     List<User> findAllUsersByRoleId(@Param("roleId") Long roleId);
+
+    @Query("SELECT u FROM User u WHERE u.satker.id = :satkerId")
+    List<User> findAllUsersBySatkerId(@Param("satkerId") Long satkerId);
 }

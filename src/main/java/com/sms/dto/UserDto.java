@@ -4,18 +4,16 @@
  */
 package com.sms.dto;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.sms.entity.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.sms.entity.Satker;
-import com.sms.mapper.UserMapper;
+import com.sms.entity.User;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.JoinColumn;

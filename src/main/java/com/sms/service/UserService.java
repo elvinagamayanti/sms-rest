@@ -26,7 +26,6 @@ public interface UserService {
 
     User getUserLogged();
 
-    // New methods for role management
     void assignRoleToUser(Long userId, Long roleId);
 
     void removeRoleFromUser(Long userId, Long roleId);

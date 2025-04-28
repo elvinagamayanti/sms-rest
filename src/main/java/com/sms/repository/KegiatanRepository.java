@@ -17,11 +17,8 @@ import com.sms.entity.Kegiatan;
  */
 @Repository
 public interface KegiatanRepository extends JpaRepository<Kegiatan, Long> {
-    // contoh method abstract baru.
     Optional<Kegiatan> findByCode(String code);
 
-    // tambahkan method abstract lain disini yg bisa digunakan oleh service class
-    // jika diperlukan.
     // @Query("SELECT k from Kegiatan k WHERE " +
     // " k.name LIKE CONCAT('%', :query, '%') OR " +
     // " k.id LIKE CONCAT('%', :query, '%')")

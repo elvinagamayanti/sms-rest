@@ -67,16 +67,4 @@ public class AuthController {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
         }
-
-        // @Operation(summary = "register new user")
-        // @ApiResponses(value = {
-        // @ApiResponse(responseCode = "201", description = "User registered", content =
-        // {
-        // @Content(mediaType = "application/json", schema = @Schema(implementation =
-        // UserDto.class)) }) })
-        // @PostMapping("/register")
-        // public ResponseEntity<?> register(@RequestBody UserDto request) {
-        // UserDto user = userService.createUser(request);
-        // return ResponseEntity.ok().body(user);
-        // }
 }

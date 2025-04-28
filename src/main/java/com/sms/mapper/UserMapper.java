@@ -12,9 +12,7 @@ import com.sms.entity.User;
  * @author pinaa
  */
 public class UserMapper {
-    // map User entity to User Dto
     public static UserDto mapToUserDto(User user) {
-        // Membuat dto dengan builder pattern (inject dari lombok)
         String[] str = user.getName().split(" ");
         UserDto userDto = UserDto.builder()
                 .id(user.getId())
@@ -27,7 +25,6 @@ public class UserMapper {
         return userDto;
     }
 
-    // map User Dto ke User Entity
     public static User mapToUser(UserDto userDto) {
         User user = User.builder()
                 .id(userDto.getId())

@@ -81,9 +81,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // if (principal instanceof UserDetails) {
         // UserDetails userDetailsNow = (UserDetails) principal;
-        // String emailNow = userDetailsNow.getEmail(); // Ini akan berisi email atau
-        // username pengguna.
-        // // Gunakan email sesuai kebutuhan Anda.
+        // String emailNow = userDetailsNow.getEmail();
         // }
         // }
     }
@@ -97,15 +95,12 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        // Check Authorization header
         if (hasAuthorizationBearer(request)) {
             String token = getAccessToken(request);
             if (jwtUtils.validateAccessToken(token)) {
                 setAuthenticationContext(token, request);
             }
-        }
-        // Optionally check for token in cookie
-        else if (hasCookieToken(request)) {
+        } else if (hasCookieToken(request)) {
             String token = getCookieToken(request);
             if (jwtUtils.validateAccessToken(token)) {
                 setAuthenticationContext(token, request);

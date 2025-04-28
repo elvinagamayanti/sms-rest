@@ -54,7 +54,6 @@ public class FileUploadService {
         fileEntity.setFilePath(uploadPath + "/" + storedFilename);
         fileEntity.setFileSize(file.getSize());
         fileEntity.setUploadTimestamp(LocalDateTime.now());
-        // Set uploaded_by if you have user authentication
 
         tahapUploadedFileRepository.save(fileEntity);
 

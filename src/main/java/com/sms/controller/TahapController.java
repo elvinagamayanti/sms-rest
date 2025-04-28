@@ -98,8 +98,6 @@ public class TahapController {
     public ResponseEntity<Void> completeTahap(
             @PathVariable Long kegiatanId,
             @PathVariable int tahap) {
-        // Implementation to mark all subtasks of a tahap as completed
-        // This could be useful for quickly completing an entire phase
         switch (tahap) {
             case 1 -> {
                 for (int subtahap = 1; subtahap <= 6; subtahap++) {

@@ -19,11 +19,8 @@ import com.sms.entity.Satker;
  */
 @Repository
 public interface SatkerRepository extends JpaRepository<Satker, Long> {
-    // contoh method abstract baru.
     Optional<Satker> findByCode(String code);
 
-    // tambahkan method abstract lain disini yg bisa digunakan oleh service class
-    // jika diperlukan.
     @Query("SELECT s from Satker s WHERE " +
             " s.code LIKE CONCAT('%', :query, '%') OR " +
             " s.name LIKE CONCAT('%', :query, '%')")
