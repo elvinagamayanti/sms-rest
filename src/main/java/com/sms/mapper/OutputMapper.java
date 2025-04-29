@@ -19,6 +19,7 @@ public class OutputMapper {
                 .name(output.getName())
                 .code(output.getCode())
                 .year(output.getYear())
+                .program(output.getProgram())
                 .build();
         return outputDto;
     }
@@ -29,6 +30,7 @@ public class OutputMapper {
                 .name(outputDto.getName())
                 .code(outputDto.getCode())
                 .year(outputDto.getYear())
+                .program(outputDto.getProgram())
                 .build();
         return output;
     }

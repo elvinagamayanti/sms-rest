@@ -53,6 +53,9 @@ public class Program {
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Kegiatan> listKegiatans = new ArrayList<>();
 
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Output> listOutputs = new ArrayList<>();
+
     @Override
     public String toString() {
         return "[" + code + "] " + name;
