@@ -9,6 +9,7 @@ import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.sms.entity.Output;
 import com.sms.entity.Program;
 import com.sms.entity.Satker;
 import com.sms.entity.User;
@@ -55,6 +56,10 @@ public class KegiatanDto {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "program_id", nullable = false) // Relasi ke Program
     private Program program;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "output_id", nullable = false) // Relasi ke Program
+    private Output output;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date startDate;
