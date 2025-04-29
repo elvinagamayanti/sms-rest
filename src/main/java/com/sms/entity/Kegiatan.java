@@ -67,6 +67,10 @@ public class Kegiatan {
     @JoinColumn(name = "program_id", nullable = false) // Relasi ke Program
     private Program program;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "output_id", nullable = false) // Relasi ke Program
+    private Output output;
+
     @Column(nullable = false)
     @CreationTimestamp
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -90,6 +94,10 @@ public class Kegiatan {
     }
 
     public String getNamaProgram() {
+        return program.getName();
+    }
+
+    public String getNamaOutput() {
         return program.getName();
     }
 

@@ -35,10 +35,10 @@ import lombok.NoArgsConstructor;
 public class KegiatanDto {
     private Long id;
 
-    @NotEmpty(message = "Nama Satuan Kerja tidak boleh kosong")
+    @NotEmpty(message = "Nama Kegiatan tidak boleh kosong")
     private String name;
 
-    @NotEmpty(message = "Kode Satuan Kerja tidak boleh kosong")
+    @NotEmpty(message = "Kode Kegiatan tidak boleh kosong")
     private String code;
 
     @DecimalMin(value = "0.0", inclusive = false, message = "Besar anggaran harus lebih besar dari 0.")

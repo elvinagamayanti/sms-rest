@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProgramDto {
+public class OutputDto {
     private Long id;
     @NotEmpty(message = "Kode tidak boleh kosong")
     private String code;
-    @NotEmpty(message = "Nama Aktivitas tidak boleh kosong")
+    @NotEmpty(message = "Nama Output tidak boleh kosong")
     private String name;
     @NotEmpty(message = "Tahun tidak boleh kosong")
     private String year;

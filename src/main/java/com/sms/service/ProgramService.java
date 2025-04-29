@@ -17,7 +17,7 @@ public interface ProgramService {
 
     void perbaruiDataProgram(ProgramDto programDto);
 
-    void hapusDataProgram(Long satkerId);
+    void hapusDataProgram(Long programId);
 
     void simpanDataProgram(ProgramDto programDto);
 
