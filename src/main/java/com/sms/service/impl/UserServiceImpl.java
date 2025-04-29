@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 
 import com.sms.dto.UserDto;
 import com.sms.entity.Role;
+import com.sms.entity.Satker;
 import com.sms.entity.User;
 import com.sms.mapper.UserMapper;
 import com.sms.repository.RoleRepository;
+import com.sms.repository.SatkerRepository;
 import com.sms.repository.UserRepository;
 import com.sms.service.UserService;
 
@@ -23,13 +25,16 @@ import com.sms.service.UserService;
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
+    private SatkerRepository satkerRepository;
     private PasswordEncoder passwordEncoder;
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     public UserServiceImpl(UserRepository userRepository,
             RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            SatkerRepository satkerRepository) {
+        this.satkerRepository = satkerRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -39,6 +44,10 @@ public class UserServiceImpl implements UserService {
     public void saveUser(UserDto userDto) {
         User user = UserMapper.mapToUser(userDto);
 
+        Satker satker = satkerRepository.findById(userDto.getSatker().getId())
+                .orElseThrow(() -> new RuntimeException("Satker not found with id: " + userDto.getSatker().getId()));
+
+        user.setSatker(satker);
         user.setPassword(passwordEncoder.encode(userDto.getNip()));
 
         Role role = roleRepository.findByName("ROLE_USER");
