@@ -46,19 +46,19 @@ public class KegiatanDto {
     private BigDecimal budget;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false) // Relasi ke User
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) // Relasi ke User
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "satker_id", nullable = false) // Relasi ke Satker
+    @JoinColumn(name = "satker_id", referencedColumnName = "id", nullable = false) // Relasi ke Satker
     private Satker satker;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "program_id", nullable = false) // Relasi ke Program
+    @JoinColumn(name = "program_id", referencedColumnName = "id", nullable = false) // Relasi ke Program
     private Program program;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "output_id", nullable = false) // Relasi ke Program
+    @JoinColumn(name = "output_id", referencedColumnName = "id", nullable = false) // Relasi ke Program
     private Output output;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

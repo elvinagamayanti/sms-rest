@@ -24,6 +24,7 @@ public class KegiatanMapper {
                 .user(kegiatan.getUser())
                 .satker(kegiatan.getSatker())
                 .program(kegiatan.getProgram())
+                .output(kegiatan.getOutput())
                 .createdOn(kegiatan.getCreatedOn())
                 .updatedOn(kegiatan.getUpdatedOn())
                 .build();
@@ -41,6 +42,7 @@ public class KegiatanMapper {
                 .user(kegiatanDto.getUser())
                 .satker(kegiatanDto.getSatker())
                 .program(kegiatanDto.getProgram())
+                .output(kegiatanDto.getOutput())
                 .createdOn(kegiatanDto.getCreatedOn())
                 .updatedOn(kegiatanDto.getUpdatedOn())
                 .build();

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -35,7 +36,7 @@ import lombok.Setter;
 @Entity
 @Builder
 @Table(name = "provinces")
-@JsonIgnoreProperties({ "listSatkers" })
+// @JsonIgnoreProperties({ "listSatkers" })
 public class Province {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

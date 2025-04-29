@@ -22,7 +22,10 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Setter
 @Getter
@@ -31,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Builder
 @Entity
 @Table(name = "satkers")
-@JsonIgnoreProperties({ "userList", "listKegiatans" })
+// @JsonIgnoreProperties({ "userList", "listKegiatans" })
 public class Satker {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,7 +74,7 @@ public class Satker {
     @JoinColumn(name = "province_code", referencedColumnName = "code", nullable = false)
     private Province province;
 
-    @Column(nullable = false)
+    @Column(name = "is_province", nullable = false)
     private Boolean isProvince;
 
     @Override

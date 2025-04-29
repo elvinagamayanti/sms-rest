@@ -8,8 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,7 +30,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "kegiatans")
-@JsonIgnoreProperties({ "user", "satker", "program" })
+// @JsonIgnoreProperties({ "user", "satker", "program" })
 public class Kegiatan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,19 +54,19 @@ public class Kegiatan {
     private Date endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false) // Relasi ke User
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "satker_id", nullable = false) // Relasi ke Satker
+    @JoinColumn(name = "satker_id", referencedColumnName = "id", nullable = false)
     private Satker satker;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "program_id", nullable = false) // Relasi ke Program
+    @JoinColumn(name = "program_id", referencedColumnName = "id", nullable = false)
     private Program program;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "output_id", nullable = false) // Relasi ke Program
+    @JoinColumn(name = "output_id", referencedColumnName = "id", nullable = false)
     private Output output;
 
     @Column(nullable = false)
@@ -98,7 +96,7 @@ public class Kegiatan {
     }
 
     public String getNamaOutput() {
-        return program.getName();
+        return output.getName();
     }
 
     public String getYear() {

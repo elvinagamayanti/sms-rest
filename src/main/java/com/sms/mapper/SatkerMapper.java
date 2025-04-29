@@ -22,6 +22,7 @@ public class SatkerMapper {
                 .number(satker.getNumber())
                 .email(satker.getEmail())
                 .province(satker.getProvince())
+                .isProvince(satker.getIsProvince())
                 .createdOn(satker.getCreatedOn())
                 .updatedOn(satker.getUpdatedOn())
                 .build();
@@ -37,6 +38,7 @@ public class SatkerMapper {
                 .number(satkerDto.getNumber())
                 .email(satkerDto.getEmail())
                 .province(satkerDto.getProvince())
+                .isProvince(satkerDto.getIsProvince())
                 .createdOn(satkerDto.getCreatedOn())
                 .updatedOn(satkerDto.getUpdatedOn())
                 .build();

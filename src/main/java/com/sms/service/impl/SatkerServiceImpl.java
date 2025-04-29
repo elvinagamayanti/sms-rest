@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.sms.dto.SatkerDto;
+import com.sms.entity.Province;
 import com.sms.entity.Satker;
 import com.sms.entity.User;
 import com.sms.mapper.SatkerMapper;
+import com.sms.repository.ProvinceRepository;
 import com.sms.repository.SatkerRepository;
 import com.sms.repository.UserRepository;
 import com.sms.service.SatkerService;
@@ -25,8 +27,11 @@ import com.sms.service.SatkerService;
 public class SatkerServiceImpl implements SatkerService {
     private SatkerRepository satkerRepository;
     private UserRepository userRepository;
+    private ProvinceRepository provinceRepository;
 
-    public SatkerServiceImpl(SatkerRepository satkerRepository, UserRepository userRepository) {
+    public SatkerServiceImpl(SatkerRepository satkerRepository, UserRepository userRepository,
+            ProvinceRepository provinceRepository) {
+        this.provinceRepository = provinceRepository;
         this.satkerRepository = satkerRepository;
         this.userRepository = userRepository;
     }
@@ -55,6 +60,13 @@ public class SatkerServiceImpl implements SatkerService {
     @Override
     public void simpanDataSatker(SatkerDto satkerDto) {
         Satker satker = SatkerMapper.mapToSatker(satkerDto);
+
+        Province province = provinceRepository.findById(satkerDto.getProvince().getId())
+                .orElseThrow(
+                        () -> new RuntimeException("Province not found with id: " + satkerDto.getProvince().getId()));
+
+        satker.setProvince(province);
+
         satkerRepository.save(satker);
     }
 

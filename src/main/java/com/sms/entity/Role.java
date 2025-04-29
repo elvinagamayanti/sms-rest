@@ -6,8 +6,6 @@ package com.sms.entity;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +31,7 @@ import lombok.Setter;
 @Entity
 @Builder
 @Table(name = "roles")
-@JsonIgnoreProperties({ "users" })
+// @JsonIgnoreProperties({ "users" })
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
