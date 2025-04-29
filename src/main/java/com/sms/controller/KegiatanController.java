@@ -1,5 +1,20 @@
 package com.sms.controller;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.sms.dto.KegiatanDto;
 import com.sms.entity.Kegiatan;
 import com.sms.payload.ApiErrorResponse;
@@ -10,14 +25,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Map;
 
 /**
  * REST API for Kegiatan (Activity) operations
@@ -95,10 +103,16 @@ public class KegiatanController {
             @ApiResponse(responseCode = "201", description = "Kegiatan berhasil dibuat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
             @ApiResponse(responseCode = "400", description = "Permintaan tidak valid", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
+    // @PostMapping
+    // public ResponseEntity<KegiatanDto> createKegiatan(@Valid @RequestBody
+    // KegiatanDto kegiatanDto) {
+    // kegiatanService.simpanDataKegiatan(kegiatanDto);
+    // return new ResponseEntity<>(kegiatanDto, HttpStatus.CREATED);
+    // }
     @PostMapping
     public ResponseEntity<KegiatanDto> createKegiatan(@Valid @RequestBody KegiatanDto kegiatanDto) {
-        kegiatanService.simpanDataKegiatan(kegiatanDto);
-        return new ResponseEntity<>(kegiatanDto, HttpStatus.CREATED);
+        KegiatanDto savedKegiatan = kegiatanService.simpanDataKegiatan(kegiatanDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedKegiatan);
     }
 
     /**

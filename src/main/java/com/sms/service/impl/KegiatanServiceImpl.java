@@ -4,26 +4,24 @@
  */
 package com.sms.service.impl;
 
-import com.sms.entity.Kegiatan;
-import com.sms.entity.Output;
-import com.sms.entity.Program;
-import com.sms.entity.Province;
-import com.sms.entity.Satker;
-import com.sms.entity.User;
-import com.sms.dto.KegiatanDto;
-import com.sms.mapper.KegiatanMapper;
-import com.sms.repository.KegiatanRepository;
-import com.sms.repository.OutputRepository;
-import com.sms.repository.ProgramRepository;
-import com.sms.repository.SatkerRepository;
-import com.sms.service.KegiatanService;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.sms.dto.KegiatanDto;
+import com.sms.entity.Kegiatan;
+import com.sms.entity.Output;
+import com.sms.entity.Program;
+import com.sms.entity.Satker;
+import com.sms.entity.User;
+import com.sms.mapper.KegiatanMapper;
+import com.sms.repository.KegiatanRepository;
+import com.sms.repository.OutputRepository;
+import com.sms.repository.ProgramRepository;
+import com.sms.repository.SatkerRepository;
 import com.sms.repository.UserRepository;
+import com.sms.service.KegiatanService;
 
 /**
  *
@@ -68,29 +66,39 @@ public class KegiatanServiceImpl implements KegiatanService {
     }
 
     @Override
-    public void simpanDataKegiatan(KegiatanDto kegiatanDto) {
+    public KegiatanDto simpanDataKegiatan(KegiatanDto kegiatanDto) {
         Kegiatan kegiatan = KegiatanMapper.mapToKegiatan(kegiatanDto);
         User user = userRepository.findById(kegiatanDto.getUser().getId())
                 .orElseThrow(
                         () -> new RuntimeException("User not found with id: " + kegiatanDto.getUser().getId()));
+        System.out.println("User: " + user);
 
-        Satker satker = satkerRepository.findById(kegiatanDto.getSatker().getId())
+        Satker satker = satkerRepository.findById(user.getSatker().getId())
                 .orElseThrow(
-                        () -> new RuntimeException("Satker not found with id: " + kegiatanDto.getSatker().getId()));
-
-        Program program = programRepository.findById(kegiatanDto.getProgram().getId())
-                .orElseThrow(
-                        () -> new RuntimeException("Program not found with id: " + kegiatanDto.getProgram().getId()));
+                        () -> new RuntimeException(
+                                "Satker not found with id: " + user.getSatker().getId()));
+        System.out.println("Satker: " + satker);
 
         Output output = outputRepository.findById(kegiatanDto.getOutput().getId())
                 .orElseThrow(
                         () -> new RuntimeException("Output not found with id: " + kegiatanDto.getOutput().getId()));
 
+        Program program = programRepository.findById(output.getProgram().getId())
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Program not found with id: " + output.getProgram().getId()));
+
         kegiatan.setUser(user);
+        System.out.println(kegiatan.getUser().getId());
         kegiatan.setSatker(satker);
+        System.out.println(kegiatan.getSatker().getId());
         kegiatan.setProgram(program);
+        System.out.println(kegiatan.getProgram().getId());
         kegiatan.setOutput(output);
-        kegiatanRepository.save(kegiatan);
+        System.out.println(kegiatan.getOutput().getId());
+        // kegiatanRepository.save(kegiatan);
+        Kegiatan saved = kegiatanRepository.save(kegiatan);
+        return KegiatanMapper.mapToKegiatanDto(saved);
     }
 
     @Override

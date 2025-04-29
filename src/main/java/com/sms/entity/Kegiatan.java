@@ -58,11 +58,11 @@ public class Kegiatan {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "satker_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "satker_id", referencedColumnName = "id", nullable = true)
     private Satker satker;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "program_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "program_id", referencedColumnName = "id", nullable = true)
     private Program program;
 
     @ManyToOne(fetch = FetchType.LAZY)

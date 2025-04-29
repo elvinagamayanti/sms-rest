@@ -50,11 +50,11 @@ public class KegiatanDto {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "satker_id", referencedColumnName = "id", nullable = false) // Relasi ke Satker
+    @JoinColumn(name = "satker_id", referencedColumnName = "id", nullable = true) // Relasi ke Satker
     private Satker satker;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "program_id", referencedColumnName = "id", nullable = false) // Relasi ke Program
+    @JoinColumn(name = "program_id", referencedColumnName = "id", nullable = true) // Relasi ke Program
     private Program program;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -4,9 +4,10 @@
  */
 package com.sms.service;
 
+import java.util.List;
+
 import com.sms.dto.KegiatanDto;
 import com.sms.entity.Kegiatan;
-import java.util.List;
 
 /**
  *
@@ -19,7 +20,7 @@ public interface KegiatanService {
 
     void hapusDataKegiatan(Long kegiatanId);
 
-    void simpanDataKegiatan(KegiatanDto kegiatanDto);
+    KegiatanDto simpanDataKegiatan(KegiatanDto kegiatanDto);
 
     KegiatanDto cariKegiatanById(Long id);
 
