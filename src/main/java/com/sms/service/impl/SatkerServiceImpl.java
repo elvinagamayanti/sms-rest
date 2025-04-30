@@ -61,11 +61,18 @@ public class SatkerServiceImpl implements SatkerService {
     public void simpanDataSatker(SatkerDto satkerDto) {
         Satker satker = SatkerMapper.mapToSatker(satkerDto);
 
-        Province province = provinceRepository.findById(satkerDto.getProvince().getId())
-                .orElseThrow(
-                        () -> new RuntimeException("Province not found with id: " + satkerDto.getProvince().getId()));
+        // Extract the first 2 digits of the satker code if code has at least 2
+        // characters
+        if (satkerDto.getCode() != null && satkerDto.getCode().length() >= 2) {
+            String provinceCode = satkerDto.getCode().substring(0, 2);
 
-        satker.setProvince(province);
+            // Find the province by code
+            Province province = provinceRepository.findByCode(provinceCode)
+                    .orElseThrow(() -> new RuntimeException("Province not found with code: " + provinceCode));
+
+            // Set the province to the satker
+            satker.setProvince(province);
+        }
 
         satkerRepository.save(satker);
     }

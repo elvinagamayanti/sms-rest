@@ -71,7 +71,7 @@ public class Satker {
     private List<Kegiatan> listKegiatans = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "province_code", referencedColumnName = "code", nullable = false)
+    @JoinColumn(name = "province_code", referencedColumnName = "code", nullable = true)
     private Province province;
 
     @Column(name = "is_province", nullable = false)
