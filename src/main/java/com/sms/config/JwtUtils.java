@@ -57,7 +57,8 @@ public class JwtUtils implements Serializable {
         return parseClaims(token).getSubject();
     }
 
-    private Claims parseClaims(String token) {
+    // Ubah method ini menjadi public agar bisa diakses dari TokenBlacklistService
+    public Claims parseClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)

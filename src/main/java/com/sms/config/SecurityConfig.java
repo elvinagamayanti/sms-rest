@@ -39,8 +39,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        // DISABLE default logout behavior
+        http.logout(logout -> logout.disable());
+
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/docs/**").permitAll()
+                .requestMatchers("/", "/login", "/logout", "/docs/**", "/error").permitAll()
                 .requestMatchers("/api/tahap/**", "/api/kegiatan/**").hasAnyRole("ADMIN", "USER", "SUPERADMIN")
                 .requestMatchers("/api/roles/**", "/api/provinces/**", "/api/satkers/**", "/api/programs/**",
                         "/api/outputs/**")
