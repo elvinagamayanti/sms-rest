@@ -50,6 +50,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    // Menambahkan field status untuk aktif/non-aktif
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean isActive = true;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "users_roles", joinColumns = {
             @JoinColumn(name = "USER_ID", referencedColumnName = "ID") }, inverseJoinColumns = {
@@ -65,6 +70,21 @@ public class User {
 
     public String getNamaSatker() {
         return "Badan Pusat Statistik " + satker.getName();
+    }
+
+    // Method helper untuk status
+    public String getStatusText() {
+        return isActive ? "Aktif" : "Non-Aktif";
+    }
+
+    // Method untuk mengaktifkan user
+    public void activate() {
+        this.isActive = true;
+    }
+
+    // Method untuk menonaktifkan user
+    public void deactivate() {
+        this.isActive = false;
     }
 
     @Override

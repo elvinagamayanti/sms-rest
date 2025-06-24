@@ -20,6 +20,8 @@ public class UserMapper {
                 .lastName(str[1])
                 .nip(user.getNip())
                 .email(user.getEmail())
+                .isActive(user.getIsActive())
+                .statusText(user.getStatusText())
                 .satker(user.getSatker())
                 .build();
         return userDto;
@@ -31,6 +33,7 @@ public class UserMapper {
                 .name(userDto.getFirstName() + " " + userDto.getLastName())
                 .nip(userDto.getNip())
                 .email(userDto.getEmail())
+                .isActive(userDto.getIsActive() != null ? userDto.getIsActive() : true)
                 .satker(userDto.getSatker())
                 .build();
         return user;

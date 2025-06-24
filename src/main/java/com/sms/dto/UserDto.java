@@ -53,6 +53,11 @@ public class UserDto implements UserDetails {
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
+    // Menambahkan field untuk status
+    @Builder.Default
+    private Boolean isActive = true; // Default aktif
+    private String statusText; // Untuk menampilkan "Aktif" atau "Non-Aktif"
+
     public static UserDto build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
@@ -66,6 +71,8 @@ public class UserDto implements UserDetails {
                 user.getEmail(),
                 user.getPassword(),
                 authorities,
+                user.getIsActive(), // Add status
+                user.getStatusText(),
                 user.getSatker());
     }
 

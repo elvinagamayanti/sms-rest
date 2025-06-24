@@ -49,6 +49,8 @@ public class UserServiceImpl implements UserService {
 
         user.setSatker(satker);
         user.setPassword(passwordEncoder.encode(userDto.getNip()));
+        // Set status - default true jika tidak ada
+        user.setIsActive(userDto.getIsActive() != null ? userDto.getIsActive() : true);
 
         Role role = roleRepository.findByName("ROLE_USER");
         if (role == null) {
@@ -141,5 +143,48 @@ public class UserServiceImpl implements UserService {
     public boolean hasRole(User user, String roleName) {
         return user.getRoles().stream()
                 .anyMatch(role -> role.getName().equals(roleName));
+    }
+
+    // Implementation method baru untuk status management
+    @Override
+    public void activateUser(Long userId) {
+        User user = findUserById(userId);
+        user.activate();
+        userRepository.save(user);
+        logger.info("User dengan ID {} telah diaktifkan", userId);
+    }
+
+    @Override
+    public void deactivateUser(Long userId) {
+        User user = findUserById(userId);
+        user.deactivate();
+        userRepository.save(user);
+        logger.info("User dengan ID {} telah dinonaktifkan", userId);
+    }
+
+    @Override
+    public void updateUserStatus(Long userId, Boolean isActive) {
+        User user = findUserById(userId);
+        user.setIsActive(isActive);
+        userRepository.save(user);
+        logger.info("Status user dengan ID {} telah diupdate menjadi {}", userId, isActive ? "aktif" : "non-aktif");
+    }
+
+    @Override
+    public List<UserDto> findActiveUsers() {
+        return findUsersByStatus(true);
+    }
+
+    @Override
+    public List<UserDto> findInactiveUsers() {
+        return findUsersByStatus(false);
+    }
+
+    @Override
+    public List<UserDto> findUsersByStatus(Boolean isActive) {
+        List<User> users = userRepository.findByIsActive(isActive);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
     }
 }

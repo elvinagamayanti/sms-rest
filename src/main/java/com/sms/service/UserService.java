@@ -31,4 +31,16 @@ public interface UserService {
     void removeRoleFromUser(Long userId, Long roleId);
 
     boolean hasRole(User user, String roleName);
+
+    void activateUser(Long userId);
+
+    void deactivateUser(Long userId);
+
+    void updateUserStatus(Long userId, Boolean isActive);
+
+    List<UserDto> findActiveUsers();
+
+    List<UserDto> findInactiveUsers();
+
+    List<UserDto> findUsersByStatus(Boolean isActive);
 }
