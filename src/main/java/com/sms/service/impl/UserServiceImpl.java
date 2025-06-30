@@ -12,10 +12,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sms.dto.UserDto;
+import com.sms.entity.Direktorat;
 import com.sms.entity.Role;
 import com.sms.entity.Satker;
 import com.sms.entity.User;
 import com.sms.mapper.UserMapper;
+import com.sms.repository.DirektoratRepository;
 import com.sms.repository.RoleRepository;
 import com.sms.repository.SatkerRepository;
 import com.sms.repository.UserRepository;
@@ -26,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private SatkerRepository satkerRepository;
+    private DirektoratRepository direktoratRepository;
     private PasswordEncoder passwordEncoder;
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -33,11 +36,13 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(UserRepository userRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
-            SatkerRepository satkerRepository) {
+            SatkerRepository satkerRepository,
+            DirektoratRepository direktoratRepository) {
         this.satkerRepository = satkerRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.direktoratRepository = direktoratRepository;
     }
 
     @Override
@@ -183,6 +188,99 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> findUsersByStatus(Boolean isActive) {
         List<User> users = userRepository.findByIsActive(isActive);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void assignDirektoratToUser(Long userId, Long direktoratId) {
+        User user = findUserById(userId);
+        Direktorat direktorat = direktoratRepository.findById(direktoratId)
+                .orElseThrow(() -> new RuntimeException("Direktorat not found with ID: " + direktoratId));
+
+        user.setDirektorat(direktorat);
+        userRepository.save(user);
+        logger.info("Direktorat {} assigned to user dengan ID {}", direktorat.getName(), userId);
+    }
+
+    @Override
+    public void removeDirektoratFromUser(Long userId) {
+        User user = findUserById(userId);
+        user.setDirektorat(null);
+        userRepository.save(user);
+        logger.info("Direktorat removed from user dengan ID {}", userId);
+    }
+
+    @Override
+    public List<UserDto> findUsersByDirektoratId(Long direktoratId) {
+        List<User> users = userRepository.findAllUsersByDirektoratId(direktoratId);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> findUsersByDeputiId(Long deputiId) {
+        List<User> users = userRepository.findAllUsersByDeputiId(deputiId);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> findActiveUsersByDirektoratId(Long direktoratId) {
+        List<User> users = userRepository.findActiveByDirektoratId(direktoratId);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> findActiveUsersByDeputiId(Long deputiId) {
+        List<User> users = userRepository.findActiveByDeputiId(deputiId);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> findUsersByDirektoratCode(String direktoratCode) {
+        List<User> users = userRepository.findAllUsersByDirektoratCode(direktoratCode);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> findUsersByDeputiCode(String deputiCode) {
+        List<User> users = userRepository.findAllUsersByDeputiCode(deputiCode);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Long countUsersByDirektoratId(Long direktoratId) {
+        return userRepository.countUsersByDirektoratId(direktoratId);
+    }
+
+    @Override
+    public Long countUsersByDeputiId(Long deputiId) {
+        return userRepository.countUsersByDeputiId(deputiId);
+    }
+
+    @Override
+    public List<UserDto> findUsersByStatusAndDirektoratId(Boolean isActive, Long direktoratId) {
+        List<User> users = userRepository.findByIsActiveAndDirektoratId(isActive, direktoratId);
+        return users.stream()
+                .map((user) -> UserMapper.mapToUserDto(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> findUsersByStatusAndDeputiId(Boolean isActive, Long deputiId) {
+        List<User> users = userRepository.findByIsActiveAndDeputiId(isActive, deputiId);
         return users.stream()
                 .map((user) -> UserMapper.mapToUserDto(user))
                 .collect(Collectors.toList());

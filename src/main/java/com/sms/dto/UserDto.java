@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.sms.entity.Direktorat;
 import com.sms.entity.Satker;
 import com.sms.entity.User;
 
@@ -73,12 +74,17 @@ public class UserDto implements UserDetails {
                 authorities,
                 user.getIsActive(), // Add status
                 user.getStatusText(),
-                user.getSatker());
+                user.getSatker(),
+                user.getDirektorat());
     }
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "satker_id")
     private Satker satker;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "direktorat_id")
+    private Direktorat direktorat;
 
     public String getNamaSatker() {
         return "Badan Pusat Statistik " + satker.getName();

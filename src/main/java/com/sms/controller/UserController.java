@@ -217,4 +217,184 @@ public class UserController {
         List<User> users = satkerService.getUsersBySatkerId(id);
         return ResponseEntity.ok(users);
     }
+
+    /**
+     * Assign direktorat to user
+     * 
+     * @param userId       user id
+     * @param direktoratId direktorat id
+     * @return success message
+     */
+    @Operation(summary = "Memberikan Direktorat kepada Pengguna", description = "Memberikan direktorat tertentu kepada pengguna berdasarkan ID pengguna dan ID direktorat")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Direktorat assigned successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "404", description = "User or direktorat not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PostMapping("/{userId}/direktorat/{direktoratId}")
+    public ResponseEntity<?> assignDirektoratToUser(
+            @PathVariable("userId") Long userId,
+            @PathVariable("direktoratId") Long direktoratId) {
+
+        try {
+            userService.assignDirektoratToUser(userId, direktoratId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Direktorat assigned successfully to user with ID " + userId));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Remove direktorat from user
+     * 
+     * @param userId user id
+     * @return success message
+     */
+    @Operation(summary = "Menghapus Direktorat dari Pengguna", description = "Menghapus direktorat dari pengguna berdasarkan ID pengguna")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Direktorat removed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @DeleteMapping("/{userId}/direktorat")
+    public ResponseEntity<?> removeDirektoratFromUser(@PathVariable("userId") Long userId) {
+        try {
+            userService.removeDirektoratFromUser(userId);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Direktorat removed successfully from user with ID " + userId));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    /**
+     * Get users by direktorat ID
+     * 
+     * @param direktoratId direktorat id
+     * @return list of users
+     */
+    @Operation(summary = "Menampilkan Pengguna Berdasarkan Direktorat", description = "Menampilkan daftar pengguna berdasarkan ID direktorat")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan direktorat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/direktorat/{direktoratId}")
+    public ResponseEntity<List<UserDto>> getUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId) {
+        List<UserDto> users = userService.findUsersByDirektoratId(direktoratId);
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Get users by deputi ID
+     * 
+     * @param deputiId deputi id
+     * @return list of users
+     */
+    @Operation(summary = "Menampilkan Pengguna Berdasarkan Deputi", description = "Menampilkan daftar pengguna berdasarkan ID deputi")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "404", description = "Deputi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/deputi/{deputiId}")
+    public ResponseEntity<List<UserDto>> getUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
+        List<UserDto> users = userService.findUsersByDeputiId(deputiId);
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Get active users by direktorat ID
+     * 
+     * @param direktoratId direktorat id
+     * @return list of active users
+     */
+    @Operation(summary = "Menampilkan Pengguna Aktif Berdasarkan Direktorat", description = "Menampilkan daftar pengguna aktif berdasarkan ID direktorat")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna aktif berdasarkan direktorat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/direktorat/{direktoratId}/active")
+    public ResponseEntity<List<UserDto>> getActiveUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId) {
+        List<UserDto> users = userService.findActiveUsersByDirektoratId(direktoratId);
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Get active users by deputi ID
+     * 
+     * @param deputiId deputi id
+     * @return list of active users
+     */
+    @Operation(summary = "Menampilkan Pengguna Aktif Berdasarkan Deputi", description = "Menampilkan daftar pengguna aktif berdasarkan ID deputi")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna aktif berdasarkan deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "404", description = "Deputi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/deputi/{deputiId}/active")
+    public ResponseEntity<List<UserDto>> getActiveUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
+        List<UserDto> users = userService.findActiveUsersByDeputiId(deputiId);
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Get users by direktorat code
+     * 
+     * @param code direktorat code
+     * @return list of users
+     */
+    @Operation(summary = "Menampilkan Pengguna Berdasarkan Kode Direktorat", description = "Menampilkan daftar pengguna berdasarkan kode direktorat")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan kode direktorat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/direktorat/code/{code}")
+    public ResponseEntity<List<UserDto>> getUsersByDirektoratCode(@PathVariable("code") String code) {
+        List<UserDto> users = userService.findUsersByDirektoratCode(code);
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Get users by deputi code
+     * 
+     * @param code deputi code
+     * @return list of users
+     */
+    @Operation(summary = "Menampilkan Pengguna Berdasarkan Kode Deputi", description = "Menampilkan daftar pengguna berdasarkan kode deputi")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan kode deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+            @ApiResponse(responseCode = "404", description = "Deputi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/deputi/code/{code}")
+    public ResponseEntity<List<UserDto>> getUsersByDeputiCode(@PathVariable("code") String code) {
+        List<UserDto> users = userService.findUsersByDeputiCode(code);
+        return ResponseEntity.ok(users);
+    }
+
+    /**
+     * Count users by direktorat
+     * 
+     * @param direktoratId direktorat id
+     * @return count of users
+     */
+    @Operation(summary = "Menghitung Jumlah Pengguna Berdasarkan Direktorat", description = "Menghitung jumlah pengguna berdasarkan ID direktorat")
+    @GetMapping("/direktorat/{direktoratId}/count")
+    public ResponseEntity<Map<String, Long>> countUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId) {
+        Long count = userService.countUsersByDirektoratId(direktoratId);
+        return ResponseEntity.ok(Map.of("count", count));
+    }
+
+    /**
+     * Count users by deputi
+     * 
+     * @param deputiId deputi id
+     * @return count of users
+     */
+    @Operation(summary = "Menghitung Jumlah Pengguna Berdasarkan Deputi", description = "Menghitung jumlah pengguna berdasarkan ID deputi")
+    @GetMapping("/deputi/{deputiId}/count")
+    public ResponseEntity<Map<String, Long>> countUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
+        Long count = userService.countUsersByDeputiId(deputiId);
+        return ResponseEntity.ok(Map.of("count", count));
+    }
 }

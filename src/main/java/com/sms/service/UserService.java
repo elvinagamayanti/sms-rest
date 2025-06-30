@@ -43,4 +43,40 @@ public interface UserService {
     List<UserDto> findInactiveUsers();
 
     List<UserDto> findUsersByStatus(Boolean isActive);
+
+    // Assign direktorat to user
+    void assignDirektoratToUser(Long userId, Long direktoratId);
+
+    // Remove direktorat from user
+    void removeDirektoratFromUser(Long userId);
+
+    // Find users by direktorat
+    List<UserDto> findUsersByDirektoratId(Long direktoratId);
+
+    // Find users by deputi
+    List<UserDto> findUsersByDeputiId(Long deputiId);
+
+    // Find active users by direktorat
+    List<UserDto> findActiveUsersByDirektoratId(Long direktoratId);
+
+    // Find active users by deputi
+    List<UserDto> findActiveUsersByDeputiId(Long deputiId);
+
+    // Find users by direktorat code
+    List<UserDto> findUsersByDirektoratCode(String direktoratCode);
+
+    // Find users by deputi code
+    List<UserDto> findUsersByDeputiCode(String deputiCode);
+
+    // Count users by direktorat
+    Long countUsersByDirektoratId(Long direktoratId);
+
+    // Count users by deputi
+    Long countUsersByDeputiId(Long deputiId);
+
+    // Find users by status and direktorat
+    List<UserDto> findUsersByStatusAndDirektoratId(Boolean isActive, Long direktoratId);
+
+    // Find users by status and deputi
+    List<UserDto> findUsersByStatusAndDeputiId(Boolean isActive, Long deputiId);
 }

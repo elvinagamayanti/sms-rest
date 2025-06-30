@@ -50,7 +50,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    // Menambahkan field status untuk aktif/non-aktif
     @Column(nullable = false)
     @Builder.Default
     private Boolean isActive = true;
@@ -65,6 +64,10 @@ public class User {
     @JoinColumn(name = "satker_id")
     private Satker satker;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "direktorat_id", referencedColumnName = "id", nullable = true)
+    private Direktorat direktorat;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Kegiatan> listKegiatans = new ArrayList<>();
 
@@ -72,7 +75,14 @@ public class User {
         return "Badan Pusat Statistik " + satker.getName();
     }
 
-    // Method helper untuk status
+    public String getNamaDirektorat() {
+        return direktorat != null ? direktorat.getName() : "";
+    }
+
+    public String getNamaDeputi() {
+        return direktorat != null && direktorat.getDeputi() != null ? direktorat.getDeputi().getName() : "";
+    }
+
     public String getStatusText() {
         return isActive ? "Aktif" : "Non-Aktif";
     }

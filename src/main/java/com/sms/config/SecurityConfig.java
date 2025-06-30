@@ -46,6 +46,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/login", "/logout", "/docs/**", "/error").permitAll()
                 .requestMatchers("/api/tahap/**", "/api/kegiatan/**").hasAnyRole("ADMIN", "USER", "SUPERADMIN")
+                .requestMatchers("/api/direktorats/**", "/api/deputis/**").hasAnyRole("ADMIN", "SUPERADMIN")
                 .requestMatchers("/api/roles/**", "/api/provinces/**", "/api/satkers/**", "/api/programs/**",
                         "/api/outputs/**")
                 .hasRole("SUPERADMIN")

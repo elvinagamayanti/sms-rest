@@ -23,6 +23,7 @@ public class UserMapper {
                 .isActive(user.getIsActive())
                 .statusText(user.getStatusText())
                 .satker(user.getSatker())
+                .direktorat(user.getDirektorat())
                 .build();
         return userDto;
     }
@@ -35,6 +36,7 @@ public class UserMapper {
                 .email(userDto.getEmail())
                 .isActive(userDto.getIsActive() != null ? userDto.getIsActive() : true)
                 .satker(userDto.getSatker())
+                .direktorat(userDto.getDirektorat())
                 .build();
         return user;
     }
