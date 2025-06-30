@@ -5,6 +5,7 @@
 package com.sms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sms.dto.UserDto;
 import com.sms.entity.User;
@@ -79,4 +80,16 @@ public interface UserService {
 
     // Find users by status and deputi
     List<UserDto> findUsersByStatusAndDeputiId(Boolean isActive, Long deputiId);
+
+    // change password methods
+    void changePassword(Long userId, String oldPassword, String newPassword);
+
+    // change current user password
+    void changeCurrentUserPassword(String oldPassword, String newPassword);
+
+    // reset user password
+    void resetUserPassword(Long userId, String newPassword);
+
+    // Validate password strength
+    Map<String, Object> validatePasswordStrength(String password);
 }

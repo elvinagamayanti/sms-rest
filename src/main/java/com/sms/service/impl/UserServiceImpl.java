@@ -1,7 +1,9 @@
 package com.sms.service.impl;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -284,5 +286,113 @@ public class UserServiceImpl implements UserService {
         return users.stream()
                 .map((user) -> UserMapper.mapToUserDto(user))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        User user = findUserById(userId);
+
+        // Verifikasi password lama
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Password lama tidak valid");
+        }
+
+        // Validasi password baru tidak sama dengan password lama
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new RuntimeException("Password baru tidak boleh sama dengan password lama");
+        }
+
+        // Validasi panjang password baru
+        if (newPassword.length() < 6) {
+            throw new RuntimeException("Password harus memiliki minimal 6 karakter");
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        logger.info("Password changed successfully for user ID: {}", userId);
+    }
+
+    @Override
+    public void changeCurrentUserPassword(String oldPassword, String newPassword) {
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            throw new RuntimeException("User tidak terautentikasi");
+        }
+
+        changePassword(currentUser.getId(), oldPassword, newPassword);
+    }
+
+    @Override
+    public void resetUserPassword(Long userId, String newPassword) {
+        User user = findUserById(userId);
+
+        // Validasi panjang password baru
+        if (newPassword.length() < 6) {
+            throw new RuntimeException("Password harus memiliki minimal 6 karakter");
+        }
+
+        // Update password tanpa verifikasi password lama (untuk reset oleh admin)
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        logger.info("Password reset successfully for user ID: {} by admin", userId);
+    }
+
+    @Override
+    public Map<String, Object> validatePasswordStrength(String password) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (password == null || password.trim().isEmpty()) {
+            result.put("isValid", false);
+            result.put("message", "Password tidak boleh kosong");
+            return result;
+        }
+
+        // Validasi panjang minimal
+        if (password.length() < 6) {
+            result.put("isValid", false);
+            result.put("message", "Password harus memiliki minimal 6 karakter");
+            return result;
+        }
+
+        // Validasi kompleksitas
+        boolean hasUpperCase = password.matches(".*[A-Z].*");
+        boolean hasLowerCase = password.matches(".*[a-z].*");
+        boolean hasDigit = password.matches(".*\\d.*");
+        boolean hasSpecialChar = password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
+
+        int strength = 0;
+        if (hasUpperCase)
+            strength++;
+        if (hasLowerCase)
+            strength++;
+        if (hasDigit)
+            strength++;
+        if (hasSpecialChar)
+            strength++;
+
+        String strengthText;
+        if (strength <= 1) {
+            strengthText = "Lemah";
+        } else if (strength <= 2) {
+            strengthText = "Sedang";
+        } else if (strength <= 3) {
+            strengthText = "Kuat";
+        } else {
+            strengthText = "Sangat Kuat";
+        }
+
+        result.put("isValid", true);
+        result.put("strength", strengthText);
+        result.put("score", strength);
+        result.put("hasUpperCase", hasUpperCase);
+        result.put("hasLowerCase", hasLowerCase);
+        result.put("hasDigit", hasDigit);
+        result.put("hasSpecialChar", hasSpecialChar);
+        result.put("message", "Password valid");
+
+        return result;
     }
 }

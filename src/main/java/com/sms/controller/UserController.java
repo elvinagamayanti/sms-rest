@@ -397,4 +397,78 @@ public class UserController {
         Long count = userService.countUsersByDeputiId(deputiId);
         return ResponseEntity.ok(Map.of("count", count));
     }
+
+    /**
+     * Reset password user (untuk admin)
+     * 
+     * @param userId  ID user yang akan direset passwordnya
+     * @param request berisi password baru
+     * @return success message
+     */
+    @Operation(summary = "Reset Password User", description = "Reset password user oleh admin (tidak memerlukan password lama)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password berhasil direset", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "404", description = "User tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Tidak memiliki akses untuk reset password", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PostMapping("/{userId}/reset-password")
+    public ResponseEntity<?> resetUserPassword(
+            @PathVariable("userId") Long userId,
+            @RequestBody Map<String, String> request) {
+
+        try {
+            String newPassword = request.get("newPassword");
+
+            if (newPassword == null || newPassword.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("error", "Password baru tidak boleh kosong"));
+            }
+
+            userService.resetUserPassword(userId, newPassword);
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Password user berhasil direset",
+                    "userId", userId,
+                    "timestamp", System.currentTimeMillis()));
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
+    }
+
+    /**
+     * Reset password user ke NIP (default password)
+     * 
+     * @param userId ID user yang akan direset passwordnya
+     * @return success message
+     */
+    @Operation(summary = "Reset Password ke NIP", description = "Reset password user ke NIP sebagai password default")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password berhasil direset ke NIP", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "404", description = "User tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PostMapping("/{userId}/reset-to-nip")
+    public ResponseEntity<?> resetPasswordToNip(@PathVariable("userId") Long userId) {
+        try {
+            User user = userService.findUserById(userId);
+            userService.resetUserPassword(userId, user.getNip());
+
+            return ResponseEntity.ok(Map.of(
+                    "message", "Password berhasil direset ke NIP",
+                    "userId", userId,
+                    "hint", "Password sekarang sama dengan NIP user",
+                    "timestamp", System.currentTimeMillis()));
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
+    }
 }
