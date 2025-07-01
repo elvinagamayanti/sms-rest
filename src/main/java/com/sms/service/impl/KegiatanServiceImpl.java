@@ -4,7 +4,10 @@
  */
 package com.sms.service.impl;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -110,5 +113,100 @@ public class KegiatanServiceImpl implements KegiatanService {
     @Override
     public Kegiatan findKegiatanById(Long id) {
         return kegiatanRepository.findById(id).orElseThrow(() -> new RuntimeException("Survey not found"));
+    }
+
+    @Override
+    public KegiatanDto patchKegiatan(Long kegiatanId, Map<String, Object> updates) {
+        final Kegiatan[] kegiatanHolder = new Kegiatan[1];
+        kegiatanHolder[0] = kegiatanRepository.findById(kegiatanId)
+                .orElseThrow(() -> new RuntimeException("Kegiatan not found with id: " + kegiatanId));
+
+        // Update only the fields that are provided
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        kegiatanHolder[0].setName((String) value);
+                }
+                case "code" -> {
+                    if (value != null)
+                        kegiatanHolder[0].setCode((String) value);
+                }
+                case "budget" -> {
+                    if (value != null && value instanceof Number) {
+                        kegiatanHolder[0].setBudget(new BigDecimal(value.toString()));
+                    }
+                }
+                case "startDate" -> {
+                    if (value != null) {
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            kegiatanHolder[0].setStartDate(sdf.parse((String) value));
+                        } catch (Exception e) {
+                            throw new RuntimeException(
+                                    "Invalid date format for startDate. Use yyyy-MM-dd format. Error: "
+                                            + e.getMessage());
+                        }
+                    }
+                }
+                case "endDate" -> {
+                    if (value != null) {
+                        try {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            kegiatanHolder[0].setEndDate(sdf.parse((String) value));
+                        } catch (Exception e) {
+                            throw new RuntimeException(
+                                    "Invalid date format for endDate. Use yyyy-MM-dd format. Error: " + e.getMessage());
+                        }
+                    }
+                }
+                case "user" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> userData = (Map<String, Object>) value;
+                        Long userId = Long.valueOf(userData.get("id").toString());
+                        User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                        kegiatanHolder[0].setUser(user);
+                    }
+                }
+                case "satker" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> satkerData = (Map<String, Object>) value;
+                        Long satkerId = Long.valueOf(satkerData.get("id").toString());
+                        Satker satker = satkerRepository.findById(satkerId)
+                                .orElseThrow(() -> new RuntimeException("Satker not found with id: " + satkerId));
+                        kegiatanHolder[0].setSatker(satker);
+                    }
+                }
+                case "program" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> programData = (Map<String, Object>) value;
+                        Long programId = Long.valueOf(programData.get("id").toString());
+                        Program program = programRepository.findById(programId)
+                                .orElseThrow(() -> new RuntimeException("Program not found with id: " + programId));
+                        kegiatanHolder[0].setProgram(program);
+                    }
+                }
+                case "output" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> outputData = (Map<String, Object>) value;
+                        Long outputId = Long.valueOf(outputData.get("id").toString());
+                        Output output = outputRepository.findById(outputId)
+                                .orElseThrow(() -> new RuntimeException("Output not found with id: " + outputId));
+                        kegiatanHolder[0].setOutput(output);
+                    }
+                }
+                default -> {
+                    // Ignore unknown fields
+                }
+            }
+        });
+
+        kegiatanHolder[0] = kegiatanRepository.save(kegiatanHolder[0]);
+        return KegiatanMapper.mapToKegiatanDto(kegiatanHolder[0]);
     }
 }

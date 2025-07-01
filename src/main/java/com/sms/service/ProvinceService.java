@@ -5,6 +5,7 @@
 package com.sms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sms.dto.ProvinceDto;
 
@@ -24,4 +25,6 @@ public interface ProvinceService {
     ProvinceDto cariProvinceById(Long id);
 
     ProvinceDto cariProvinceByCode(String code);
+
+    ProvinceDto patchProvince(Long provinceId, Map<String, Object> updates);
 }

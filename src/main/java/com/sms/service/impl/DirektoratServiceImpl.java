@@ -1,6 +1,7 @@
 package com.sms.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -94,5 +95,42 @@ public class DirektoratServiceImpl implements DirektoratService {
     @Override
     public List<User> getUsersByDirektoratId(Long direktoratId) {
         return userRepository.findAllUsersByDirektoratId(direktoratId);
+    }
+
+    @Override
+    public DirektoratDto patchDirektorat(Long direktoratId, Map<String, Object> updates) {
+        final Direktorat[] direktoratHolder = new Direktorat[1];
+        direktoratHolder[0] = direktoratRepository.findById(direktoratId)
+                .orElseThrow(() -> new RuntimeException("Direktorat not found with id: " + direktoratId));
+
+        // Update only the fields that are provided
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        direktoratHolder[0].setName((String) value);
+                }
+                case "code" -> {
+                    if (value != null)
+                        direktoratHolder[0].setCode((String) value);
+                }
+                case "deputi" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> deputiData = (Map<String, Object>) value;
+                        Long deputiId = Long.valueOf(deputiData.get("id").toString());
+                        Deputi deputi = deputiRepository.findById(deputiId)
+                                .orElseThrow(() -> new RuntimeException("Deputi not found with id: " + deputiId));
+                        direktoratHolder[0].setDeputi(deputi);
+                    }
+                }
+                default -> {
+                    // Ignore unknown fields
+                }
+            }
+        });
+
+        direktoratHolder[0] = direktoratRepository.save(direktoratHolder[0]);
+        return DirektoratMapper.mapToDirektoratDto(direktoratHolder[0]);
     }
 }

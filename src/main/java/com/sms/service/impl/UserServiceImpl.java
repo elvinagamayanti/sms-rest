@@ -395,4 +395,65 @@ public class UserServiceImpl implements UserService {
 
         return result;
     }
+
+    @Override
+    public UserDto patchUser(Long userId, Map<String, Object> updates) {
+        final User[] userHolder = new User[1];
+        userHolder[0] = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        userHolder[0].setName((String) value);
+                }
+                case "nip" -> {
+                    if (value != null)
+                        userHolder[0].setNip((String) value);
+                }
+                case "email" -> {
+                    if (value != null) {
+                        // Check if email already exists for another user
+                        User existingUser = userRepository.findByEmail((String) value);
+                        if (existingUser != null && !existingUser.getId().equals(userId)) {
+                            throw new RuntimeException("Email already exists for another user");
+                        }
+                        userHolder[0].setEmail((String) value);
+                    }
+                }
+                case "isActive" -> {
+                    if (value != null)
+                        userHolder[0].setIsActive((Boolean) value);
+                }
+                case "satker" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> satkerData = (Map<String, Object>) value;
+                        Long satkerId = Long.valueOf(satkerData.get("id").toString());
+                        Satker satker = satkerRepository.findById(satkerId)
+                                .orElseThrow(() -> new RuntimeException("Satker not found with id: " + satkerId));
+                        userHolder[0].setSatker(satker);
+                    }
+                }
+                case "direktorat" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> direktoratData = (Map<String, Object>) value;
+                        Long direktoratId = Long.valueOf(direktoratData.get("id").toString());
+                        Direktorat direktorat = direktoratRepository.findById(direktoratId)
+                                .orElseThrow(
+                                        () -> new RuntimeException("Direktorat not found with id: " + direktoratId));
+                        userHolder[0].setDirektorat(direktorat);
+                    }
+                }
+                default -> {
+                    // Ignore unknown fields
+                }
+            }
+        });
+
+        userHolder[0] = userRepository.save(userHolder[0]);
+        return UserMapper.mapToUserDto(userHolder[0]);
+    }
 }

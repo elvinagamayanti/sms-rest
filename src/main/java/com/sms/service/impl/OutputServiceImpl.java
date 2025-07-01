@@ -5,14 +5,17 @@
 package com.sms.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.sms.dto.OutputDto;
 import com.sms.entity.Output;
+import com.sms.entity.Program;
 import com.sms.mapper.OutputMapper;
 import com.sms.repository.OutputRepository;
+import com.sms.repository.ProgramRepository;
 import com.sms.service.OutputService;
 
 /**
@@ -23,8 +26,11 @@ import com.sms.service.OutputService;
 public class OutputServiceImpl implements OutputService {
     private OutputRepository outputRepository;
 
-    public OutputServiceImpl(OutputRepository outputRepository) {
+    private final ProgramRepository programRepository;
+
+    public OutputServiceImpl(OutputRepository outputRepository, ProgramRepository programRepository) {
         this.outputRepository = outputRepository;
+        this.programRepository = programRepository;
     }
 
     @Override
@@ -58,5 +64,45 @@ public class OutputServiceImpl implements OutputService {
     public OutputDto cariOutputById(Long id) {
         Output output = outputRepository.findById(id).get();
         return OutputMapper.mapToOutputDto(output);
+    }
+
+    @Override
+    public OutputDto patchOutput(Long outputId, Map<String, Object> updates) {
+        final Output[] outputHolder = new Output[1];
+        outputHolder[0] = outputRepository.findById(outputId)
+                .orElseThrow(() -> new RuntimeException("Output not found with id: " + outputId));
+
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        outputHolder[0].setName((String) value);
+                }
+                case "code" -> {
+                    if (value != null)
+                        outputHolder[0].setCode((String) value);
+                }
+                case "year" -> {
+                    if (value != null)
+                        outputHolder[0].setYear((String) value);
+                }
+                case "program" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> programData = (Map<String, Object>) value;
+                        Long programId = Long.valueOf(programData.get("id").toString());
+                        Program program = programRepository.findById(programId)
+                                .orElseThrow(() -> new RuntimeException("Program not found with id: " + programId));
+                        outputHolder[0].setProgram(program);
+                    }
+                }
+                default -> {
+                    // Ignore unknown fields
+                }
+            }
+        });
+
+        outputHolder[0] = outputRepository.save(outputHolder[0]);
+        return OutputMapper.mapToOutputDto(outputHolder[0]);
     }
 }

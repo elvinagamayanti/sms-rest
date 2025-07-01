@@ -5,6 +5,7 @@
 package com.sms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sms.dto.KegiatanDto;
 import com.sms.entity.Kegiatan;
@@ -25,4 +26,6 @@ public interface KegiatanService {
     KegiatanDto cariKegiatanById(Long id);
 
     Kegiatan findKegiatanById(Long id);
+
+    KegiatanDto patchKegiatan(Long kegiatanId, Map<String, Object> updates);
 }

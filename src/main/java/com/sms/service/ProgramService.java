@@ -5,6 +5,7 @@
 package com.sms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sms.dto.ProgramDto;
 
@@ -22,4 +23,6 @@ public interface ProgramService {
     void simpanDataProgram(ProgramDto programDto);
 
     ProgramDto cariProgramById(Long id);
+
+    ProgramDto patchProgram(Long programId, Map<String, Object> updates);
 }

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -129,5 +130,19 @@ public class OutputController {
     public ResponseEntity<Map<String, String>> deleteOutput(@PathVariable("id") Long id) {
         outputService.hapusDataOutput(id);
         return ResponseEntity.ok(Map.of("message", "Output with ID " + id + " deleted successfully"));
+    }
+
+    @Operation(summary = "Update Sebagian Data Output", description = "Memperbarui sebagian field output tanpa harus mengisi semua field")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data output", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OutputDto.class))),
+            @ApiResponse(responseCode = "404", description = "Output tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<OutputDto> patchOutput(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        OutputDto outputDto = outputService.patchOutput(id, updates);
+        return ResponseEntity.ok(outputDto);
     }
 }

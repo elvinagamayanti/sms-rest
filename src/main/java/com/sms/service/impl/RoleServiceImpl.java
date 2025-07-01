@@ -5,6 +5,7 @@
 package com.sms.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -67,5 +68,27 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<User> getUsersByRoleId(Long roleId) {
         return userRepository.findAllUsersByRoleId(roleId);
+    }
+
+    @Override
+    public RoleDto patchRole(Long roleId, Map<String, Object> updates) {
+        final Role[] roleHolder = new Role[1];
+        roleHolder[0] = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found with id: " + roleId));
+
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        roleHolder[0].setName((String) value);
+                }
+                default -> {
+                    // Ignore unknown fields
+                }
+            }
+        });
+
+        roleHolder[0] = roleRepository.save(roleHolder[0]);
+        return RoleMapper.mapToRoleDto(roleHolder[0]);
     }
 }

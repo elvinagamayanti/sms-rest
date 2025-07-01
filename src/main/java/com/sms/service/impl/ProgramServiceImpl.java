@@ -5,6 +5,7 @@
 package com.sms.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -58,5 +59,36 @@ public class ProgramServiceImpl implements ProgramService {
     public ProgramDto cariProgramById(Long id) {
         Program program = programRepository.findById(id).get();
         return ProgramMapper.mapToProgramDto(program);
+    }
+
+    @Override
+    public ProgramDto patchProgram(Long programId, Map<String, Object> updates) {
+        final Program[] programHolder = new Program[1];
+        programHolder[0] = programRepository.findById(programId)
+                .orElseThrow(() -> new RuntimeException("Program not found with id: " + programId));
+
+        // Update only the fields that are provided
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        programHolder[0].setName((String) value);
+                }
+                case "code" -> {
+                    if (value != null)
+                        programHolder[0].setCode((String) value);
+                }
+                case "year" -> {
+                    if (value != null)
+                        programHolder[0].setYear((String) value);
+                }
+                default -> {
+                }
+            }
+            // Ignore unknown fields
+        });
+
+        programHolder[0] = programRepository.save(programHolder[0]);
+        return ProgramMapper.mapToProgramDto(programHolder[0]);
     }
 }

@@ -5,6 +5,7 @@
 package com.sms.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -66,4 +67,31 @@ public class ProvinceServiceImpl implements ProvinceService {
         Province province = provinceRepository.findByCode(code).get();
         return ProvinceMapper.mapToProvinceDto(province);
     }
+
+    @Override
+    public ProvinceDto patchProvince(Long provinceId, Map<String, Object> updates) {
+        final Province[] provinceHolder = new Province[1];
+        provinceHolder[0] = provinceRepository.findById(provinceId)
+                .orElseThrow(() -> new RuntimeException("Province not found with id: " + provinceId));
+
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        provinceHolder[0].setName((String) value);
+                }
+                case "code" -> {
+                    if (value != null)
+                        provinceHolder[0].setCode((String) value);
+                }
+                default -> {
+                    // Ignore unknown fields
+                }
+            }
+        });
+
+        provinceHolder[0] = provinceRepository.save(provinceHolder[0]);
+        return ProvinceMapper.mapToProvinceDto(provinceHolder[0]);
+    }
+
 }

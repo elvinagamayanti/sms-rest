@@ -4,10 +4,11 @@
  */
 package com.sms.service;
 
+import java.util.List;
+import java.util.Map;
+
 import com.sms.dto.RoleDto;
 import com.sms.entity.User;
-
-import java.util.List;
 
 /**
  *
@@ -25,4 +26,7 @@ public interface RoleService {
     RoleDto cariRoleById(Long id);
 
     List<User> getUsersByRoleId(Long roleId);
+
+    RoleDto patchRole(Long roleId, Map<String, Object> updates);
+
 }

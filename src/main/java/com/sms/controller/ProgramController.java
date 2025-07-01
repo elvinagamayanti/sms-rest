@@ -123,4 +123,25 @@ public class ProgramController {
         programService.hapusDataProgram(id);
         return ResponseEntity.ok(Map.of("message", "Program with ID " + id + " deleted successfully"));
     }
+
+    /**
+     * Partially update existing program
+     * 
+     * @param id      program id
+     * @param updates map of fields to update
+     * @return updated program
+     */
+    @Operation(summary = "Update Sebagian Data Program", description = "Memperbarui sebagian field program tanpa harus mengisi semua field")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data program", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProgramDto.class))),
+            @ApiResponse(responseCode = "404", description = "Program tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProgramDto> patchProgram(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        ProgramDto programDto = programService.patchProgram(id, updates);
+        return ResponseEntity.ok(programDto);
+    }
 }

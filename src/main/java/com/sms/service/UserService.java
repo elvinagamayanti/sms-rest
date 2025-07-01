@@ -92,4 +92,7 @@ public interface UserService {
 
     // Validate password strength
     Map<String, Object> validatePasswordStrength(String password);
+
+    // Patch user data
+    UserDto patchUser(Long userId, Map<String, Object> updates);
 }

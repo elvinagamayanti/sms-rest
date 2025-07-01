@@ -5,6 +5,7 @@
 package com.sms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sms.dto.OutputDto;
 
@@ -22,4 +23,6 @@ public interface OutputService {
     void simpanDataOutput(OutputDto outputDto);
 
     OutputDto cariOutputById(Long id);
+
+    OutputDto patchOutput(Long outputId, Map<String, Object> updates);
 }

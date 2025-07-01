@@ -1,6 +1,7 @@
 package com.sms.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -71,5 +72,32 @@ public class DeputiServiceImpl implements DeputiService {
     @Override
     public List<User> getUsersByDeputiId(Long deputiId) {
         return userRepository.findAllUsersByDeputiId(deputiId);
+    }
+
+    @Override
+    public DeputiDto patchDeputi(Long deputiId, Map<String, Object> updates) {
+        final Deputi[] deputiHolder = new Deputi[1];
+        deputiHolder[0] = deputiRepository.findById(deputiId)
+                .orElseThrow(() -> new RuntimeException("Deputi not found with id: " + deputiId));
+
+        // Update only the fields that are provided
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        deputiHolder[0].setName((String) value);
+                }
+                case "code" -> {
+                    if (value != null)
+                        deputiHolder[0].setCode((String) value);
+                }
+                default -> {
+                    // Ignore unknown fields
+                }
+            }
+        });
+
+        deputiHolder[0] = deputiRepository.save(deputiHolder[0]);
+        return DeputiMapper.mapToDeputiDto(deputiHolder[0]);
     }
 }

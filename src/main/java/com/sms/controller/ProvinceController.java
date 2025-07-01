@@ -162,4 +162,18 @@ public class ProvinceController {
         List<Satker> satkers = satkerRepository.findByCodeStartingWith(provinceCode);
         return ResponseEntity.ok(satkers);
     }
+
+    @Operation(summary = "Update Sebagian Data Provinsi", description = "Memperbarui sebagian field provinsi tanpa harus mengisi semua field")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data provinsi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProvinceDto.class))),
+            @ApiResponse(responseCode = "404", description = "Provinsi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProvinceDto> patchProvince(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        ProvinceDto provinceDto = provinceService.patchProvince(id, updates);
+        return ResponseEntity.ok(provinceDto);
+    }
 }

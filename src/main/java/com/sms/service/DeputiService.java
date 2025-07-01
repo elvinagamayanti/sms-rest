@@ -1,6 +1,7 @@
 package com.sms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sms.dto.DeputiDto;
 import com.sms.entity.User;
@@ -24,4 +25,6 @@ public interface DeputiService {
     DeputiDto cariDeputiByCode(String code);
 
     List<User> getUsersByDeputiId(Long deputiId);
+
+    DeputiDto patchDeputi(Long deputiId, Map<String, Object> updates);
 }

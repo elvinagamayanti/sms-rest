@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -129,5 +130,19 @@ public class SatkerController {
     public ResponseEntity<Map<String, String>> deleteSatker(@PathVariable("id") Long id) {
         satkerService.hapusDataSatker(id);
         return ResponseEntity.ok(Map.of("message", "Satker with ID " + id + " deleted successfully"));
+    }
+
+    @Operation(summary = "Update Sebagian Data Satuan Kerja", description = "Memperbarui sebagian field satuan kerja tanpa harus mengisi semua field")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data satuan kerja", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SatkerDto.class))),
+            @ApiResponse(responseCode = "404", description = "Satuan kerja tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<SatkerDto> patchSatker(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        SatkerDto satkerDto = satkerService.patchSatker(id, updates);
+        return ResponseEntity.ok(satkerDto);
     }
 }

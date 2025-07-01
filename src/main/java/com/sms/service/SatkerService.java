@@ -5,6 +5,7 @@
 package com.sms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sms.dto.SatkerDto;
 import com.sms.entity.User;
@@ -25,4 +26,6 @@ public interface SatkerService {
     SatkerDto cariSatkerById(Long id);
 
     List<User> getUsersBySatkerId(Long satkerId);
+
+    SatkerDto patchSatker(Long satkerId, Map<String, Object> updates);
 }

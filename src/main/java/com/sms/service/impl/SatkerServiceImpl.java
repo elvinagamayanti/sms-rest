@@ -5,6 +5,7 @@
 package com.sms.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -86,5 +87,67 @@ public class SatkerServiceImpl implements SatkerService {
     @Override
     public List<User> getUsersBySatkerId(Long satkerId) {
         return userRepository.findAllUsersBySatkerId(satkerId);
+    }
+
+    @Override
+    public SatkerDto patchSatker(Long satkerId, Map<String, Object> updates) {
+        final Satker[] satkerHolder = new Satker[1];
+        satkerHolder[0] = satkerRepository.findById(satkerId)
+                .orElseThrow(() -> new RuntimeException("Satker not found with id: " + satkerId));
+
+        updates.forEach((field, value) -> {
+            switch (field) {
+                case "name" -> {
+                    if (value != null)
+                        satkerHolder[0].setName((String) value);
+                }
+                case "code" -> {
+                    if (value != null) {
+                        satkerHolder[0].setCode((String) value);
+                        // Update province based on new code
+                        String newCode = (String) value;
+                        if (newCode.length() >= 2) {
+                            String provinceCode = newCode.substring(0, 2);
+                            Province province = provinceRepository.findByCode(provinceCode)
+                                    .orElse(null);
+                            satkerHolder[0].setProvince(province);
+                        }
+                    }
+                }
+                case "address" -> {
+                    if (value != null)
+                        satkerHolder[0].setAddress((String) value);
+                }
+                case "number" -> {
+                    if (value != null)
+                        satkerHolder[0].setNumber((String) value);
+                }
+                case "email" -> {
+                    if (value != null)
+                        satkerHolder[0].setEmail((String) value);
+                }
+                case "isProvince" -> {
+                    if (value != null)
+                        satkerHolder[0].setIsProvince((Boolean) value);
+                }
+                case "province" -> {
+                    if (value != null) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> provinceData = (Map<String, Object>) value;
+                        String provinceCode = (String) provinceData.get("code");
+                        Province province = provinceRepository.findByCode(provinceCode)
+                                .orElseThrow(
+                                        () -> new RuntimeException("Province not found with code: " + provinceCode));
+                        satkerHolder[0].setProvince(province);
+                    }
+                }
+                default -> {
+                    // Ignore unknown fields
+                }
+            }
+        });
+
+        satkerHolder[0] = satkerRepository.save(satkerHolder[0]);
+        return SatkerMapper.mapToSatkerDto(satkerHolder[0]);
     }
 }

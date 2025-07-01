@@ -1,6 +1,7 @@
 package com.sms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.sms.dto.DirektoratDto;
 import com.sms.entity.User;
@@ -26,4 +27,6 @@ public interface DirektoratService {
     List<DirektoratDto> getDirektoratsByDeputiId(Long deputiId);
 
     List<User> getUsersByDirektoratId(Long direktoratId);
+
+    DirektoratDto patchDirektorat(Long direktoratId, Map<String, Object> updates);
 }

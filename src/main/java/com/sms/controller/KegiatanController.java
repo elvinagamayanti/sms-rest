@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -153,5 +154,19 @@ public class KegiatanController {
     public ResponseEntity<Map<String, String>> deleteKegiatan(@PathVariable("id") Long id) {
         kegiatanService.hapusDataKegiatan(id);
         return ResponseEntity.ok(Map.of("message", "Kegiatan with ID " + id + " deleted successfully"));
+    }
+
+    @Operation(summary = "Update Sebagian Data Kegiatan", description = "Memperbarui sebagian field kegiatan tanpa harus mengisi semua field")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
+            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<KegiatanDto> patchKegiatan(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        KegiatanDto kegiatanDto = kegiatanService.patchKegiatan(id, updates);
+        return ResponseEntity.ok(kegiatanDto);
     }
 }

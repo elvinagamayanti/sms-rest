@@ -141,4 +141,18 @@ public class RoleController {
         List<User> users = roleService.getUsersByRoleId(id);
         return ResponseEntity.ok(users);
     }
+
+    @Operation(summary = "Update Sebagian Data Role", description = "Memperbarui sebagian field role tanpa harus mengisi semua field")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data role", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoleDto.class))),
+            @ApiResponse(responseCode = "404", description = "Role tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<RoleDto> patchRole(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, Object> updates) {
+
+        RoleDto roleDto = roleService.patchRole(id, updates);
+        return ResponseEntity.ok(roleDto);
+    }
 }
