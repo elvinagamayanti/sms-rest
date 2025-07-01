@@ -69,6 +69,10 @@ public class Kegiatan {
     @JoinColumn(name = "output_id", referencedColumnName = "id", nullable = false)
     private Output output;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "direktorat_pj_id", referencedColumnName = "id", nullable = true)
+    private Direktorat direktoratPenanggungJawab;
+
     @Column(nullable = false)
     @CreationTimestamp
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -97,6 +101,20 @@ public class Kegiatan {
 
     public String getNamaOutput() {
         return output.getName();
+    }
+
+    public String getNamaDirektoratPJ() {
+        return direktoratPenanggungJawab != null ? direktoratPenanggungJawab.getName() : "";
+    }
+
+    public String getKodeDirektoratPJ() {
+        return direktoratPenanggungJawab != null ? direktoratPenanggungJawab.getCode() : "";
+    }
+
+    public String getNamaDeputiPJ() {
+        return direktoratPenanggungJawab != null && direktoratPenanggungJawab.getDeputi() != null
+                ? direktoratPenanggungJawab.getDeputi().getName()
+                : "";
     }
 
     public String getYear() {

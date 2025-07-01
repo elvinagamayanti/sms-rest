@@ -25,6 +25,7 @@ public class KegiatanMapper {
                 .satker(kegiatan.getSatker())
                 .program(kegiatan.getProgram())
                 .output(kegiatan.getOutput())
+                .direktoratPenanggungJawab(kegiatan.getDirektoratPenanggungJawab())
                 .createdOn(kegiatan.getCreatedOn())
                 .updatedOn(kegiatan.getUpdatedOn())
                 .build();
@@ -43,6 +44,7 @@ public class KegiatanMapper {
                 .satker(kegiatanDto.getSatker())
                 .program(kegiatanDto.getProgram())
                 .output(kegiatanDto.getOutput())
+                .direktoratPenanggungJawab(kegiatanDto.getDirektoratPenanggungJawab())
                 .createdOn(kegiatanDto.getCreatedOn())
                 .updatedOn(kegiatanDto.getUpdatedOn())
                 .build();

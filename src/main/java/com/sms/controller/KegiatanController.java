@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.dto.KegiatanDto;
@@ -168,5 +169,125 @@ public class KegiatanController {
 
         KegiatanDto kegiatanDto = kegiatanService.patchKegiatan(id, updates);
         return ResponseEntity.ok(kegiatanDto);
+    }
+
+    @Operation(summary = "Menampilkan Kegiatan berdasarkan Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan direktorat penanggung jawab")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan kegiatan berdasarkan direktorat PJ", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
+            @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan")
+    })
+    @GetMapping("/direktorat/{direktoratId}")
+    public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJ(
+            @PathVariable("direktoratId") Long direktoratId) {
+        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJ(direktoratId);
+        return ResponseEntity.ok(kegiatanDtos);
+    }
+
+    @Operation(summary = "Menampilkan Kegiatan berdasarkan Kode Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan kode direktorat penanggung jawab")
+    @GetMapping("/direktorat/code/{direktoratCode}")
+    public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJCode(
+            @PathVariable("direktoratCode") String direktoratCode) {
+        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJCode(direktoratCode);
+        return ResponseEntity.ok(kegiatanDtos);
+    }
+
+    @Operation(summary = "Menampilkan Kegiatan berdasarkan Deputi PJ", description = "Menampilkan daftar kegiatan berdasarkan deputi penanggung jawab")
+    @GetMapping("/deputi/{deputiId}")
+    public ResponseEntity<List<KegiatanDto>> getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
+        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJ(deputiId);
+        return ResponseEntity.ok(kegiatanDtos);
+    }
+
+    @Operation(summary = "Menampilkan Kegiatan berdasarkan Kode Deputi PJ", description = "Menampilkan daftar kegiatan berdasarkan kode deputi penanggung jawab")
+    @GetMapping("/deputi/code/{deputiCode}")
+    public ResponseEntity<List<KegiatanDto>> getKegiatanByDeputiPJCode(@PathVariable("deputiCode") String deputiCode) {
+        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJCode(deputiCode);
+        return ResponseEntity.ok(kegiatanDtos);
+    }
+
+    @Operation(summary = "Menampilkan Kegiatan berdasarkan Tahun dan Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan tahun dan direktorat penanggung jawab")
+    @GetMapping("/direktorat/{direktoratId}/year/{year}")
+    public ResponseEntity<List<KegiatanDto>> getKegiatanByYearAndDirektoratPJ(
+            @PathVariable("direktoratId") Long direktoratId,
+            @PathVariable("year") int year) {
+        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByYearAndDirektoratPJ(year, direktoratId);
+        return ResponseEntity.ok(kegiatanDtos);
+    }
+
+    @Operation(summary = "Statistik Kegiatan per Direktorat", description = "Menampilkan statistik jumlah kegiatan per direktorat")
+    @GetMapping("/statistics/direktorat")
+    public ResponseEntity<Map<String, Object>> getStatisticsByDirektorat() {
+        Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsByDirektorat();
+        return ResponseEntity.ok(statistics);
+    }
+
+    @Operation(summary = "Statistik Kegiatan per Deputi", description = "Menampilkan statistik jumlah kegiatan per deputi")
+    @GetMapping("/statistics/deputi")
+    public ResponseEntity<Map<String, Object>> getStatisticsByDeputi() {
+        Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsByDeputi();
+        return ResponseEntity.ok(statistics);
+    }
+
+    @Operation(summary = "Statistik Anggaran per Direktorat", description = "Menampilkan statistik total anggaran per direktorat")
+    @GetMapping("/budget/direktorat")
+    public ResponseEntity<Map<String, Object>> getBudgetByDirektorat() {
+        Map<String, Object> budgetStats = kegiatanService.getBudgetStatisticsByDirektorat();
+        return ResponseEntity.ok(budgetStats);
+    }
+
+    @Operation(summary = "Statistik Anggaran per Deputi", description = "Menampilkan statistik total anggaran per deputi")
+    @GetMapping("/budget/deputi")
+    public ResponseEntity<Map<String, Object>> getBudgetByDeputi() {
+        Map<String, Object> budgetStats = kegiatanService.getBudgetStatisticsByDeputi();
+        return ResponseEntity.ok(budgetStats);
+    }
+
+    @Operation(summary = "Kegiatan tanpa Direktorat PJ", description = "Menampilkan daftar kegiatan yang belum memiliki direktorat penanggung jawab")
+    @GetMapping("/no-direktorat-pj")
+    public ResponseEntity<List<KegiatanDto>> getKegiatanWithoutDirektoratPJ() {
+        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanWithoutDirektoratPJ();
+        return ResponseEntity.ok(kegiatanDtos);
+    }
+
+    @Operation(summary = "Search Kegiatan", description = "Mencari kegiatan berdasarkan nama atau kode")
+    @GetMapping("/search")
+    public ResponseEntity<List<KegiatanDto>> searchKegiatan(@RequestParam("q") String query) {
+        List<KegiatanDto> kegiatanDtos = kegiatanService.searchKegiatan(query);
+        return ResponseEntity.ok(kegiatanDtos);
+    }
+
+    @Operation(summary = "Filter Kegiatan", description = "Filter kegiatan berdasarkan direktorat, tahun, dan program")
+    @GetMapping("/filter")
+    public ResponseEntity<List<KegiatanDto>> filterKegiatan(
+            @RequestParam(value = "direktoratId", required = false) Long direktoratId,
+            @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "programId", required = false) Long programId) {
+        List<KegiatanDto> kegiatanDtos = kegiatanService.filterKegiatan(direktoratId, year, programId);
+        return ResponseEntity.ok(kegiatanDtos);
+    }
+
+    @Operation(summary = "Statistik Bulanan per Direktorat", description = "Menampilkan statistik kegiatan per bulan untuk direktorat tertentu")
+    @GetMapping("/statistics/monthly/{direktoratId}/{year}")
+    public ResponseEntity<Map<String, Object>> getMonthlyStatistics(
+            @PathVariable("direktoratId") Long direktoratId,
+            @PathVariable("year") int year) {
+        Map<String, Object> monthlyStats = kegiatanService.getMonthlyStatistics(year, direktoratId);
+        return ResponseEntity.ok(monthlyStats);
+    }
+
+    @Operation(summary = "Assign Direktorat PJ", description = "Mengubah direktorat penanggung jawab kegiatan secara manual")
+    @PostMapping("/{kegiatanId}/assign-direktorat/{direktoratId}")
+    public ResponseEntity<Map<String, String>> assignDirektoratPJ(
+            @PathVariable("kegiatanId") Long kegiatanId,
+            @PathVariable("direktoratId") Long direktoratId) {
+        kegiatanService.assignDirektoratPJ(kegiatanId, direktoratId);
+        return ResponseEntity.ok(Map.of("message", "Direktorat PJ berhasil di-assign ke kegiatan"));
+    }
+
+    @Operation(summary = "Sync Direktorat PJ dari User", description = "Sinkronisasi direktorat PJ dengan direktorat user untuk semua kegiatan")
+    @PostMapping("/sync-direktorat-pj")
+    public ResponseEntity<Map<String, Object>> syncDirektoratPJFromUser() {
+        Map<String, Object> result = kegiatanService.syncDirektoratPJFromUser();
+        return ResponseEntity.ok(result);
     }
 }

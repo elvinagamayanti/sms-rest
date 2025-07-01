@@ -9,6 +9,7 @@ import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.sms.entity.Direktorat;
 import com.sms.entity.Output;
 import com.sms.entity.Program;
 import com.sms.entity.Satker;
@@ -61,6 +62,10 @@ public class KegiatanDto {
     @JoinColumn(name = "output_id", referencedColumnName = "id", nullable = false) // Relasi ke Program
     private Output output;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "direktorat_pj_id", referencedColumnName = "id", nullable = true)
+    private Direktorat direktoratPenanggungJawab;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date startDate;
 
@@ -79,6 +84,14 @@ public class KegiatanDto {
 
     public String getNamaUser() {
         return user.getName();
+    }
+
+    public String getNamaDirektoratPJ() {
+        return direktoratPenanggungJawab != null ? direktoratPenanggungJawab.getName() : "";
+    }
+
+    public String getKodeDirektoratPJ() {
+        return direktoratPenanggungJawab != null ? direktoratPenanggungJawab.getCode() : "";
     }
 
 }
