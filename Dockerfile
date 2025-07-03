@@ -4,7 +4,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:24-jdk-alpine
-VOLUME /tmp
+#VOLUME /tmp
 ARG JAVA_OPTS
 ENV JAVA_OPTS=$JAVA_OPTS
 COPY target/sms-0.0.1-SNAPSHOT.jar sms.jar
