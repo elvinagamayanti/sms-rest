@@ -5,9 +5,10 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:24-jdk
 #VOLUME /tmp
+WORKDIR /app
 ARG JAVA_OPTS
 ENV JAVA_OPTS=$JAVA_OPTS
-COPY target/sms-0.0.1-SNAPSHOT.jar sms.jar
+COPY --from=build /app/target/sms-0.0.1-SNAPSHOT.jar sms.jar
 EXPOSE 8080
 ENTRYPOINT exec java $JAVA_OPTS -jar sms.jar
 # For Spring-Boot project, use the entrypoint below to reduce Tomcat startup time.
