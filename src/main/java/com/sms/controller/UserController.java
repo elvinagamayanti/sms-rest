@@ -1,5 +1,6 @@
 package com.sms.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,8 @@ import com.sms.dto.UserDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
+import com.sms.entity.Deputi;
+import com.sms.entity.Direktorat;
 import com.sms.entity.User;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.repository.RoleRepository;
@@ -523,5 +526,145 @@ public class UserController {
 
         UserDto userDto = userService.patchUser(id, updates);
         return ResponseEntity.ok(userDto);
+    }
+
+    /**
+     * Get direktorat of specific user
+     * 
+     * @param userId user id
+     * @return direktorat details or null if user has no direktorat
+     */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get user direktorat", severity = LogSeverity.LOW)
+    @Operation(summary = "Menampilkan Direktorat Pengguna", description = "Menampilkan direktorat dari pengguna berdasarkan ID pengguna")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan direktorat pengguna", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Direktorat.class))),
+            @ApiResponse(responseCode = "404", description = "Pengguna tidak ditemukan atau tidak memiliki direktorat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/{userId}/direktorat")
+    public ResponseEntity<?> getUserDirektorat(@PathVariable("userId") Long userId) {
+        try {
+            User user = userService.findUserById(userId);
+
+            if (user.getDirektorat() == null) {
+                return ResponseEntity.ok(Map.of(
+                        "message", "User tidak memiliki direktorat",
+                        "userId", userId,
+                        "direktorat", (Object) null));
+            }
+
+            return ResponseEntity.ok(user.getDirektorat());
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User tidak ditemukan dengan ID: " + userId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
+    }
+
+    /**
+     * Get deputi of specific user (through direktorat)
+     * 
+     * @param userId user id
+     * @return deputi details or null if user has no direktorat/deputi
+     */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get user deputi", severity = LogSeverity.LOW)
+    @Operation(summary = "Menampilkan Deputi Pengguna", description = "Menampilkan deputi dari pengguna berdasarkan ID pengguna (melalui direktorat)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan deputi pengguna", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Deputi.class))),
+            @ApiResponse(responseCode = "404", description = "Pengguna tidak ditemukan atau tidak memiliki deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/{userId}/deputi")
+    public ResponseEntity<?> getUserDeputi(@PathVariable("userId") Long userId) {
+        try {
+            User user = userService.findUserById(userId);
+
+            if (user.getDirektorat() == null) {
+                return ResponseEntity.ok(Map.of(
+                        "message", "User tidak memiliki direktorat",
+                        "userId", userId,
+                        "direktorat", (Object) null,
+                        "deputi", (Object) null));
+            }
+
+            if (user.getDirektorat().getDeputi() == null) {
+                return ResponseEntity.ok(Map.of(
+                        "message", "Direktorat user tidak memiliki deputi",
+                        "userId", userId,
+                        "direktorat", user.getDirektorat().getName(),
+                        "deputi", (Object) null));
+            }
+
+            return ResponseEntity.ok(user.getDirektorat().getDeputi());
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User tidak ditemukan dengan ID: " + userId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
+    }
+
+    /**
+     * Get complete organizational info of specific user (direktorat + deputi)
+     * 
+     * @param userId user id
+     * @return complete organizational information
+     */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get complete organizational info of user", severity = LogSeverity.LOW)
+    @Operation(summary = "Menampilkan Info Organisasi Lengkap Pengguna", description = "Menampilkan informasi organisasi lengkap (direktorat dan deputi) dari pengguna")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan info organisasi pengguna", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
+            @ApiResponse(responseCode = "404", description = "Pengguna tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    @GetMapping("/{userId}/organizational-info")
+    public ResponseEntity<?> getUserOrganizationalInfo(@PathVariable("userId") Long userId) {
+        try {
+            User user = userService.findUserById(userId);
+
+            Map<String, Object> orgInfo = new HashMap<>();
+            orgInfo.put("userId", userId);
+            orgInfo.put("userName", user.getName());
+            orgInfo.put("userEmail", user.getEmail());
+
+            if (user.getDirektorat() != null) {
+                orgInfo.put("direktorat", Map.of(
+                        "id", user.getDirektorat().getId(),
+                        "code", user.getDirektorat().getCode(),
+                        "name", user.getDirektorat().getName()));
+
+                if (user.getDirektorat().getDeputi() != null) {
+                    orgInfo.put("deputi", Map.of(
+                            "id", user.getDirektorat().getDeputi().getId(),
+                            "code", user.getDirektorat().getDeputi().getCode(),
+                            "name", user.getDirektorat().getDeputi().getName()));
+                } else {
+                    orgInfo.put("deputi", null);
+                }
+            } else {
+                orgInfo.put("direktorat", null);
+                orgInfo.put("deputi", null);
+            }
+
+            if (user.getSatker() != null) {
+                orgInfo.put("satker", Map.of(
+                        "id", user.getSatker().getId(),
+                        "code", user.getSatker().getCode(),
+                        "name", user.getSatker().getName()));
+            } else {
+                orgInfo.put("satker", null);
+            }
+
+            return ResponseEntity.ok(orgInfo);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User tidak ditemukan dengan ID: " + userId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
     }
 }
