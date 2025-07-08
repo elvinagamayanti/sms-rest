@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sms.annotation.LogActivity;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.User;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.payload.ChangePasswordRequest;
@@ -59,6 +63,7 @@ public class ChangePasswordController {
      *                              password
      * @return response berhasil atau error
      */
+    @LogActivity(description = "User changed password", activityType = ActivityType.UPDATE, entityType = EntityType.USER, severity = LogSeverity.HIGH)
     @Operation(summary = "Mengubah Password", description = "Mengubah password user yang sedang login dengan memverifikasi password lama")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password berhasil diubah", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
@@ -135,6 +140,7 @@ public class ChangePasswordController {
      * @param password password yang akan divalidasi
      * @return hasil validasi password
      */
+    @LogActivity(description = "User validated password strength", activityType = ActivityType.VIEW, entityType = EntityType.USER, severity = LogSeverity.LOW)
     @Operation(summary = "Validasi Kekuatan Password", description = "Memvalidasi kekuatan password sebelum mengubah password")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Hasil validasi password", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class)))

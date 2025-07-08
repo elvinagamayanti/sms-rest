@@ -16,7 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sms.annotation.LogActivity;
 import com.sms.dto.OutputDto;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.OutputService;
 
@@ -47,6 +51,7 @@ public class OutputController {
      * 
      * @return list of outputs
      */
+    @LogActivity(description = "Retrieved all output list", activityType = ActivityType.VIEW, entityType = EntityType.OUTPUT, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Daftar Output", description = "Menampilkan daftar seluruh output yang terdaftar pada sistem")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar output", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OutputDto.class))),
@@ -64,6 +69,7 @@ public class OutputController {
      * @param id output id
      * @return output details
      */
+    @LogActivity(description = "Retrieved output by ID", activityType = ActivityType.VIEW, entityType = EntityType.OUTPUT, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Output berdasarkan ID", description = "Menampilkan detail output berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan output berdasarkan ID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OutputDto.class))),
@@ -81,6 +87,7 @@ public class OutputController {
      * @param outputDto output data
      * @return created output
      */
+    @LogActivity(description = "Created new output", activityType = ActivityType.CREATE, entityType = EntityType.OUTPUT, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Membuat Output Baru", description = "Membuat output baru dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Berhasil membuat output baru", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OutputDto.class))),
@@ -99,6 +106,7 @@ public class OutputController {
      * @param outputDto output data
      * @return updated output
      */
+    @LogActivity(description = "Updated output by ID", activityType = ActivityType.UPDATE, entityType = EntityType.OUTPUT, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Memperbarui Output", description = "Memperbarui output yang sudah ada dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil memperbarui output", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OutputDto.class))),
@@ -121,6 +129,7 @@ public class OutputController {
      * @param id output id
      * @return success message
      */
+    @LogActivity(description = "Deleted output by ID", activityType = ActivityType.DELETE, entityType = EntityType.OUTPUT, severity = LogSeverity.HIGH)
     @Operation(summary = "Menghapus Output", description = "Menghapus output berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menghapus output", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
@@ -132,6 +141,14 @@ public class OutputController {
         return ResponseEntity.ok(Map.of("message", "Output with ID " + id + " deleted successfully"));
     }
 
+    /**
+     * Update partial output data
+     * 
+     * @param id      output id
+     * @param updates fields to update
+     * @return updated output
+     */
+    @LogActivity(description = "Partially updated output by ID", activityType = ActivityType.UPDATE, entityType = EntityType.OUTPUT, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Update Sebagian Data Output", description = "Memperbarui sebagian field output tanpa harus mengisi semua field")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data output", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OutputDto.class))),

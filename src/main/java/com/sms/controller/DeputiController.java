@@ -16,7 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sms.annotation.LogActivity;
 import com.sms.dto.DeputiDto;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.User;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.DeputiService;
@@ -43,6 +47,12 @@ public class DeputiController {
         this.deputiService = deputiService;
     }
 
+    /**
+     * Get all deputis
+     * 
+     * @return list of deputis
+     */
+    @LogActivity(description = "Retrieved all deputis list", activityType = ActivityType.VIEW, entityType = EntityType.DEPUTI, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Daftar Deputi", description = "Menampilkan daftar seluruh deputi yang terdaftar pada sistem")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeputiDto.class))),
@@ -54,6 +64,13 @@ public class DeputiController {
         return ResponseEntity.ok(deputiDtos);
     }
 
+    /**
+     * Get deputi by ID
+     * 
+     * @param id the ID of the deputi
+     * @return the deputi with the specified ID
+     */
+    @LogActivity(description = "Retrieved deputi by ID", activityType = ActivityType.VIEW, entityType = EntityType.DEPUTI, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Deputi berdasarkan ID", description = "Menampilkan detail deputi berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan deputi berdasarkan ID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeputiDto.class))),
@@ -65,6 +82,13 @@ public class DeputiController {
         return ResponseEntity.ok(deputiDto);
     }
 
+    /**
+     * Get deputi by code
+     * 
+     * @param code the code of the deputi
+     * @return the deputi with the specified code
+     */
+    @LogActivity(description = "Retrieved deputi by code", activityType = ActivityType.VIEW, entityType = EntityType.DEPUTI, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Deputi berdasarkan Kode", description = "Menampilkan detail deputi berdasarkan kode yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan deputi berdasarkan kode", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeputiDto.class))),
@@ -76,6 +100,13 @@ public class DeputiController {
         return ResponseEntity.ok(deputiDto);
     }
 
+    /**
+     * Create a new deputi
+     * 
+     * @param deputiDto the deputi data to create
+     * @return the created deputi
+     */
+    @LogActivity(description = "Created new deputi", activityType = ActivityType.CREATE, entityType = EntityType.DEPUTI, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Membuat Deputi Baru", description = "Membuat deputi baru dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Deputi berhasil dibuat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeputiDto.class))),
@@ -87,6 +118,14 @@ public class DeputiController {
         return new ResponseEntity<>(deputiDto, HttpStatus.CREATED);
     }
 
+    /**
+     * Update an existing deputi
+     * 
+     * @param id        the ID of the deputi to update
+     * @param deputiDto the updated deputi data
+     * @return the updated deputi
+     */
+    @LogActivity(description = "Updated deputi by ID", activityType = ActivityType.UPDATE, entityType = EntityType.DEPUTI, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Memperbarui Deputi", description = "Memperbarui deputi yang sudah ada dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Deputi berhasil diperbarui", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeputiDto.class))),
@@ -101,6 +140,13 @@ public class DeputiController {
         return ResponseEntity.ok(deputiDto);
     }
 
+    /**
+     * Delete a deputi by ID
+     * 
+     * @param id the ID of the deputi to delete
+     * @return a message indicating success
+     */
+    @LogActivity(description = "Deleted deputi by ID", activityType = ActivityType.DELETE, entityType = EntityType.DEPUTI, severity = LogSeverity.HIGH)
     @Operation(summary = "Menghapus Deputi", description = "Menghapus deputi berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Deputi berhasil dihapus"),
@@ -112,6 +158,13 @@ public class DeputiController {
         return ResponseEntity.ok(Map.of("message", "Deputi with ID " + id + " deleted successfully"));
     }
 
+    /**
+     * Get users by deputi ID
+     * 
+     * @param id the ID of the deputi
+     * @return list of users associated with the deputi
+     */
+    @LogActivity(description = "Retrieved users by deputi ID", activityType = ActivityType.VIEW, entityType = EntityType.DEPUTI, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna berdasarkan ID Deputi", description = "Menampilkan daftar pengguna yang tergabung dalam deputi tertentu")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan pengguna berdasarkan ID deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -123,6 +176,14 @@ public class DeputiController {
         return ResponseEntity.ok(users);
     }
 
+    /**
+     * Update partial deputi data
+     * 
+     * @param id      the ID of the deputi to update
+     * @param updates the fields to update
+     * @return the updated deputi
+     */
+    @LogActivity(description = "Partially updated deputi by ID", activityType = ActivityType.UPDATE, entityType = EntityType.DEPUTI, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Update Sebagian Data Deputi", description = "Memperbarui sebagian field deputi tanpa harus mengisi semua field")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = DeputiDto.class))),

@@ -17,7 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sms.annotation.LogActivity;
 import com.sms.dto.KegiatanDto;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.Kegiatan;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.KegiatanService;
@@ -49,6 +53,7 @@ public class KegiatanController {
      * 
      * @return list of kegiatans
      */
+    @LogActivity(description = "Retrieved all kegiatan list", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Daftar Kegiatan", description = "Menampilkan daftar seluruh kegiatan yang terdaftar pada sistem")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
@@ -66,6 +71,7 @@ public class KegiatanController {
      * @param id kegiatan id
      * @return kegiatan details
      */
+    @LogActivity(description = "Retrieved kegiatan by ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan ID", description = "Menampilkan detail kegiatan berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan kegiatan berdasarkan ID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
@@ -83,6 +89,7 @@ public class KegiatanController {
      * @param id kegiatan id
      * @return kegiatan entity with all relationships
      */
+    @LogActivity(description = "Retrieved kegiatan entity by ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Detail Kegiatan", description = "Menampilkan detail kegiatan berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan detail kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Kegiatan.class))),
@@ -100,6 +107,7 @@ public class KegiatanController {
      * @param kegiatanDto kegiatan data
      * @return created kegiatan
      */
+    @LogActivity(description = "Created new kegiatan", activityType = ActivityType.CREATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Membuat Kegiatan Baru", description = "Membuat kegiatan baru dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Kegiatan berhasil dibuat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
@@ -124,6 +132,7 @@ public class KegiatanController {
      * @param kegiatanDto kegiatan data
      * @return updated kegiatan
      */
+    @LogActivity(description = "Updated kegiatan by ID", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Memperbarui Kegiatan", description = "Memperbarui kegiatan yang sudah ada dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Kegiatan berhasil diperbarui", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
@@ -146,6 +155,7 @@ public class KegiatanController {
      * @param id kegiatan id
      * @return success message
      */
+    @LogActivity(description = "Deleted kegiatan by ID", activityType = ActivityType.DELETE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
     @Operation(summary = "Menghapus Kegiatan", description = "Menghapus kegiatan berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Kegiatan berhasil dihapus", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
@@ -157,6 +167,14 @@ public class KegiatanController {
         return ResponseEntity.ok(Map.of("message", "Kegiatan with ID " + id + " deleted successfully"));
     }
 
+    /**
+     * Update partial kegiatan data
+     * 
+     * @param id      kegiatan id
+     * @param updates map of field updates
+     * @return updated kegiatan
+     */
+    @LogActivity(description = "Partially updated kegiatan by ID", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Update Sebagian Data Kegiatan", description = "Memperbarui sebagian field kegiatan tanpa harus mengisi semua field")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
@@ -171,6 +189,13 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDto);
     }
 
+    /**
+     * Get kegiatan by program ID
+     * 
+     * @param programId program ID
+     * @return list of kegiatan for the given program
+     */
+    @LogActivity(description = "Retrieved kegiatan by program ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan direktorat penanggung jawab")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan kegiatan berdasarkan direktorat PJ", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
@@ -183,6 +208,7 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDtos);
     }
 
+    @LogActivity(description = "Retrieved kegiatan by direktorat PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Kode Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan kode direktorat penanggung jawab")
     @GetMapping("/direktorat/code/{direktoratCode}")
     public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJCode(
@@ -191,6 +217,7 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDtos);
     }
 
+    @LogActivity(description = "Retrieved kegiatan by deputi PJ ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Deputi PJ", description = "Menampilkan daftar kegiatan berdasarkan deputi penanggung jawab")
     @GetMapping("/deputi/{deputiId}")
     public ResponseEntity<List<KegiatanDto>> getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
@@ -198,6 +225,7 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDtos);
     }
 
+    @LogActivity(description = "Retrieved kegiatan by deputi PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Kode Deputi PJ", description = "Menampilkan daftar kegiatan berdasarkan kode deputi penanggung jawab")
     @GetMapping("/deputi/code/{deputiCode}")
     public ResponseEntity<List<KegiatanDto>> getKegiatanByDeputiPJCode(@PathVariable("deputiCode") String deputiCode) {
@@ -205,6 +233,7 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDtos);
     }
 
+    @LogActivity(description = "Retrieved kegiatan by year and direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Tahun dan Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan tahun dan direktorat penanggung jawab")
     @GetMapping("/direktorat/{direktoratId}/year/{year}")
     public ResponseEntity<List<KegiatanDto>> getKegiatanByYearAndDirektoratPJ(
@@ -214,6 +243,7 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDtos);
     }
 
+    @LogActivity(description = "Retrieved kegiatan by year and deputi PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Statistik Kegiatan per Direktorat", description = "Menampilkan statistik jumlah kegiatan per direktorat")
     @GetMapping("/statistics/direktorat")
     public ResponseEntity<Map<String, Object>> getStatisticsByDirektorat() {
@@ -221,6 +251,7 @@ public class KegiatanController {
         return ResponseEntity.ok(statistics);
     }
 
+    @LogActivity(description = "Retrieved kegiatan statistics by deputi", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Statistik Kegiatan per Deputi", description = "Menampilkan statistik jumlah kegiatan per deputi")
     @GetMapping("/statistics/deputi")
     public ResponseEntity<Map<String, Object>> getStatisticsByDeputi() {
@@ -228,6 +259,7 @@ public class KegiatanController {
         return ResponseEntity.ok(statistics);
     }
 
+    @LogActivity(description = "Retrieved budget statistics by direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Statistik Anggaran per Direktorat", description = "Menampilkan statistik total anggaran per direktorat")
     @GetMapping("/budget/direktorat")
     public ResponseEntity<Map<String, Object>> getBudgetByDirektorat() {
@@ -235,6 +267,7 @@ public class KegiatanController {
         return ResponseEntity.ok(budgetStats);
     }
 
+    @LogActivity(description = "Retrieved budget statistics by deputi", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Statistik Anggaran per Deputi", description = "Menampilkan statistik total anggaran per deputi")
     @GetMapping("/budget/deputi")
     public ResponseEntity<Map<String, Object>> getBudgetByDeputi() {
@@ -242,6 +275,7 @@ public class KegiatanController {
         return ResponseEntity.ok(budgetStats);
     }
 
+    @LogActivity(description = "Retrieved kegiatan without direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Kegiatan tanpa Direktorat PJ", description = "Menampilkan daftar kegiatan yang belum memiliki direktorat penanggung jawab")
     @GetMapping("/no-direktorat-pj")
     public ResponseEntity<List<KegiatanDto>> getKegiatanWithoutDirektoratPJ() {
@@ -249,6 +283,7 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDtos);
     }
 
+    @LogActivity(description = "Searched kegiatan by query", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Search Kegiatan", description = "Mencari kegiatan berdasarkan nama atau kode")
     @GetMapping("/search")
     public ResponseEntity<List<KegiatanDto>> searchKegiatan(@RequestParam("q") String query) {
@@ -256,6 +291,7 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDtos);
     }
 
+    @LogActivity(description = "Filtered kegiatan by direktorat, year, and program", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Filter Kegiatan", description = "Filter kegiatan berdasarkan direktorat, tahun, dan program")
     @GetMapping("/filter")
     public ResponseEntity<List<KegiatanDto>> filterKegiatan(
@@ -266,6 +302,7 @@ public class KegiatanController {
         return ResponseEntity.ok(kegiatanDtos);
     }
 
+    @LogActivity(description = "Retrieved monthly statistics for a specific direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Statistik Bulanan per Direktorat", description = "Menampilkan statistik kegiatan per bulan untuk direktorat tertentu")
     @GetMapping("/statistics/monthly/{direktoratId}/{year}")
     public ResponseEntity<Map<String, Object>> getMonthlyStatistics(
@@ -275,6 +312,7 @@ public class KegiatanController {
         return ResponseEntity.ok(monthlyStats);
     }
 
+    @LogActivity(description = "Assigned direktorat PJ to a kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Assign Direktorat PJ", description = "Mengubah direktorat penanggung jawab kegiatan secara manual")
     @PostMapping("/{kegiatanId}/assign-direktorat/{direktoratId}")
     public ResponseEntity<Map<String, String>> assignDirektoratPJ(
@@ -284,6 +322,7 @@ public class KegiatanController {
         return ResponseEntity.ok(Map.of("message", "Direktorat PJ berhasil di-assign ke kegiatan"));
     }
 
+    @LogActivity(description = "Synced direktorat PJ from user", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Sync Direktorat PJ dari User", description = "Sinkronisasi direktorat PJ dengan direktorat user untuk semua kegiatan")
     @PostMapping("/sync-direktorat-pj")
     public ResponseEntity<Map<String, Object>> syncDirektoratPJFromUser() {

@@ -16,7 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sms.annotation.LogActivity;
 import com.sms.dto.SatkerDto;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.SatkerService;
 
@@ -47,6 +51,7 @@ public class SatkerController {
      * 
      * @return list of satkers
      */
+    @LogActivity(description = "Retrieved all satkers list", activityType = ActivityType.VIEW, entityType = EntityType.SATKER, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Daftar Satuan Kerja", description = "Menampilkan daftar seluruh satuan kerja yang terdaftar pada sistem")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar satuan kerja", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SatkerDto.class))),
@@ -64,6 +69,7 @@ public class SatkerController {
      * @param id satker id
      * @return satker details
      */
+    @LogActivity(description = "Retrieved satker by ID", activityType = ActivityType.VIEW, entityType = EntityType.SATKER, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Satuan Kerja berdasarkan ID", description = "Menampilkan detail satuan kerja berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan satuan kerja berdasarkan ID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SatkerDto.class))),
@@ -81,6 +87,7 @@ public class SatkerController {
      * @param satkerDto satker data
      * @return created satker
      */
+    @LogActivity(description = "Created a new satker", activityType = ActivityType.CREATE, entityType = EntityType.SATKER, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Membuat Satuan Kerja Baru", description = "Membuat satuan kerja baru dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Satuan kerja berhasil dibuat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SatkerDto.class))),
@@ -99,6 +106,7 @@ public class SatkerController {
      * @param satkerDto satker data
      * @return updated satker
      */
+    @LogActivity(description = "Updated satker by ID", activityType = ActivityType.UPDATE, entityType = EntityType.SATKER, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Memperbarui Satuan Kerja", description = "Memperbarui data satuan kerja yang sudah ada")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Satuan kerja berhasil diperbarui", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SatkerDto.class))),
@@ -121,6 +129,7 @@ public class SatkerController {
      * @param id satker id
      * @return success message
      */
+    @LogActivity(description = "Deleted satker by ID", activityType = ActivityType.DELETE, entityType = EntityType.SATKER, severity = LogSeverity.HIGH)
     @Operation(summary = "Menghapus Satuan Kerja", description = "Menghapus satuan kerja berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Satuan kerja berhasil dihapus", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
@@ -132,6 +141,14 @@ public class SatkerController {
         return ResponseEntity.ok(Map.of("message", "Satker with ID " + id + " deleted successfully"));
     }
 
+    /**
+     * Update partial satker data
+     * 
+     * @param id      satker id
+     * @param updates fields to update
+     * @return updated satker
+     */
+    @LogActivity(description = "Partially updated satker by ID", activityType = ActivityType.UPDATE, entityType = EntityType.SATKER, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Update Sebagian Data Satuan Kerja", description = "Memperbarui sebagian field satuan kerja tanpa harus mengisi semua field")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data satuan kerja", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SatkerDto.class))),

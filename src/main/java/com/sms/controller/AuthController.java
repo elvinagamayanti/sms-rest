@@ -21,8 +21,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sms.annotation.LogActivity;
 import com.sms.config.JwtUtils;
 import com.sms.dto.UserDto;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.payload.AuthRequest;
 import com.sms.payload.AuthResponse;
@@ -55,6 +59,13 @@ public class AuthController {
         @Autowired(required = false)
         TokenBlacklistService tokenBlacklistService;
 
+        /**
+         * Endpoint untuk otentikasi user dan mendapatkan token JWT.
+         * 
+         * @param request berisi email dan password
+         * @return token JWT jika otentikasi berhasil
+         */
+        @LogActivity(description = "User authentication attempt", activityType = ActivityType.LOGIN, entityType = EntityType.USER, severity = LogSeverity.MEDIUM)
         @Operation(summary = "Otentikasi user untuk mendapatkan token jwt.", description = "Menggunakan email dan password untuk mendapatkan token jwt yang digunakan untuk mengakses endpoint yang dilindungi.")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "otentikasi berhasil", content = {
@@ -86,6 +97,16 @@ public class AuthController {
                 }
         }
 
+        /**
+         * Endpoint untuk logout user, menghapus token dari security context dan
+         * blacklist token jika service tersedia.
+         * 
+         * @param request  HttpServletRequest untuk mendapatkan token dari header atau
+         *                 cookie
+         * @param response HttpServletResponse untuk menghapus cookie jika ada
+         * @return ResponseEntity dengan status OK dan pesan logout berhasil
+         */
+        @LogActivity(description = "User logout attempt", activityType = ActivityType.LOGOUT, entityType = EntityType.USER, severity = LogSeverity.MEDIUM)
         @Operation(summary = "Logout user", description = "Logout user dan blacklist token")
         @PostMapping("logout")
         public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {

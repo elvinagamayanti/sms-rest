@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sms.annotation.LogActivity;
 import com.sms.dto.TahapStatusDto;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.service.FileUploadService;
 import com.sms.service.TahapService;
 
@@ -36,6 +40,13 @@ public class TahapController {
         this.fileUploadService = fileUploadService;
     }
 
+    /**
+     * Menampilkan status tahap kegiatan berdasarkan ID kegiatan.
+     *
+     * @param kegiatanId ID dari kegiatan yang ingin ditampilkan status tahapanya.
+     * @return ResponseEntity yang berisi status tahapan kegiatan.
+     */
+    @LogActivity(description = "Retrieved tahap status for kegiatan", activityType = ActivityType.VIEW, entityType = EntityType.TAHAP, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Tahap Status", description = "Menampilkan status kegiatan pada semua tahapan berdasarkan ID kegiatan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan status tahap kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TahapStatusDto.class))),
@@ -47,6 +58,15 @@ public class TahapController {
         return ResponseEntity.ok(status);
     }
 
+    /**
+     * Menampilkan persentase penyelesaian tahap kegiatan berdasarkan ID kegiatan
+     * dan tahap.
+     *
+     * @param kegiatanId ID dari kegiatan yang ingin ditampilkan persentasenya.
+     * @param tahap      Tahap dari kegiatan yang ingin ditampilkan persentasenya.
+     * @return ResponseEntity yang berisi persentase penyelesaian tahap kegiatan.
+     */
+    @LogActivity(description = "Retrieved tahap completion percentage for kegiatan", activityType = ActivityType.VIEW, entityType = EntityType.TAHAP, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Persentase Tahap", description = "Menampilkan persentase penyelesaian tahap berdasarkan ID kegiatan dan tahap")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan persentase tahap kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Integer.class))),
@@ -60,6 +80,17 @@ public class TahapController {
         return ResponseEntity.ok(percentage);
     }
 
+    /**
+     * Menampilkan status subtahap kegiatan berdasarkan ID kegiatan, tahap, dan
+     * subtahap.
+     *
+     * @param kegiatanId ID dari kegiatan yang ingin ditampilkan status subtahapnya.
+     * @param tahap      Tahap dari kegiatan yang ingin ditampilkan status
+     *                   subtahapnya.
+     * @param subtahap   Subtahap dari kegiatan yang ingin ditampilkan statusnya.
+     * @return ResponseEntity yang berisi status penyelesaian subtahap kegiatan.
+     */
+    @LogActivity(description = "Retrieved subtahap completion status for kegiatan", activityType = ActivityType.VIEW, entityType = EntityType.TAHAP, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Status Subtahap", description = "Menampilkan status subtahap berdasarkan ID kegiatan, tahap, dan subtahap")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan status subtahap kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Boolean.class))),
@@ -74,6 +105,18 @@ public class TahapController {
         return ResponseEntity.ok(completed);
     }
 
+    /**
+     * Mengupdate status subtahap kegiatan berdasarkan ID kegiatan, tahap, dan
+     * subtahap.
+     *
+     * @param kegiatanId ID dari kegiatan yang ingin diupdate status subtahapnya.
+     * @param tahap      Tahap dari kegiatan yang ingin diupdate status subtahapnya.
+     * @param subtahap   Subtahap dari kegiatan yang ingin diupdate statusnya.
+     * @param completed  Status penyelesaian subtahap (true jika selesai, false jika
+     *                   belum).
+     * @return ResponseEntity yang berisi status HTTP 200 OK jika berhasil.
+     */
+    @LogActivity(description = "Updated subtahap completion status for kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.TAHAP, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Mengupdate Status Subtahap", description = "Mengupdate status subtahap berdasarkan ID kegiatan, tahap, dan subtahap")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil mengupdate status subtahap kegiatan"),
@@ -89,6 +132,16 @@ public class TahapController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Menandai tahap tertentu sebagai selesai dengan menandai semua subtahapnya
+     * sebagai selesai.
+     *
+     * @param kegiatanId ID dari kegiatan yang ingin ditandai tahapnya sebagai
+     *                   selesai.
+     * @param tahap      Tahap dari kegiatan yang ingin ditandai sebagai selesai.
+     * @return ResponseEntity yang berisi status HTTP 200 OK jika berhasil.
+     */
+    @LogActivity(description = "Completed all subtahap for kegiatan tahap", activityType = ActivityType.COMPLETE, entityType = EntityType.TAHAP, severity = LogSeverity.HIGH)
     @Operation(summary = "Menandai Tahap Sebagai Selesai", description = "Menandai semua subtahap dari tahap tertentu sebagai selesai")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menandai tahap sebagai selesai"),
@@ -146,6 +199,15 @@ public class TahapController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Mengupload file untuk tahap tertentu.
+     *
+     * @param kegiatanId ID dari kegiatan yang ingin diupload filenya.
+     * @param tahapId    ID dari tahap yang ingin diupload filenya.
+     * @param file       File yang akan diupload.
+     * @return ResponseEntity yang berisi pesan sukses atau error.
+     */
+    @LogActivity(description = "Uploaded file for tahap", activityType = ActivityType.UPLOAD, entityType = EntityType.TAHAP, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Mengupload File untuk Tahap", description = "Mengupload file untuk tahap tertentu")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil mengupload file"),
@@ -167,6 +229,14 @@ public class TahapController {
         }
     }
 
+    /**
+     * Mengambil daftar file yang diupload untuk tahap tertentu.
+     *
+     * @param kegiatanId ID dari kegiatan yang ingin diambil daftarnya.
+     * @param tahapId    ID dari tahap yang ingin diambil daftarnya.
+     * @return ResponseEntity yang berisi daftar nama file yang diupload.
+     */
+    @LogActivity(description = "Retrieved uploaded files for tahap", activityType = ActivityType.VIEW, entityType = EntityType.TAHAP, severity = LogSeverity.LOW)
     @Operation(summary = "Mengambil Daftar File yang Diupload", description = "Mengambil daftar file yang diupload untuk tahap tertentu")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil mengambil daftar file"),
@@ -181,6 +251,15 @@ public class TahapController {
         return ResponseEntity.ok(files);
     }
 
+    /**
+     * Mengunduh file yang diupload untuk tahap tertentu.
+     *
+     * @param kegiatanId ID dari kegiatan yang ingin diunduh filenya.
+     * @param tahapId    ID dari tahap yang ingin diunduh filenya.
+     * @param filename   Nama file yang akan diunduh.
+     * @return ResponseEntity yang berisi file sebagai resource.
+     */
+    @LogActivity(description = "Downloaded file for tahap", activityType = ActivityType.DOWNLOAD, entityType = EntityType.TAHAP, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Mengunduh File yang Diupload", description = "Mengunduh file yang diupload untuk tahap tertentu")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil mengunduh file"),

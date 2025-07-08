@@ -17,7 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sms.annotation.LogActivity;
 import com.sms.dto.UserDto;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.User;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.repository.RoleRepository;
@@ -56,6 +60,7 @@ public class UserController {
      * 
      * @return list of users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get all users", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Daftar Pengguna", description = "Menampilkan daftar seluruh pengguna yang terdaftar pada sistem")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
@@ -73,6 +78,7 @@ public class UserController {
      * @param id user id
      * @return user details
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get user by ID", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Detail Pengguna", description = "Menampilkan detail pengguna berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -91,6 +97,7 @@ public class UserController {
      * @param userDto user data
      * @return created user
      */
+    @LogActivity(activityType = ActivityType.CREATE, entityType = EntityType.USER, description = "Create new user", severity = LogSeverity.MEDIUM)
     @Operation(summary = "Membuat Pengguna Baru", description = "Membuat pengguna baru dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User created successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
@@ -115,6 +122,7 @@ public class UserController {
      * 
      * @return current user details
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get current authenticated user", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna yang Sedang Masuk", description = "Menampilkan detail pengguna yang sedang masuk ke dalam sistem")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Current user found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -136,6 +144,7 @@ public class UserController {
      * @param roleId role id
      * @return success message
      */
+    @LogActivity(activityType = ActivityType.UPDATE, entityType = EntityType.USER, description = "Assign role to user", severity = LogSeverity.MEDIUM)
     @Operation(summary = "Memberikan Peran kepada Pengguna", description = "Memberikan peran tertentu kepada pengguna berdasarkan ID pengguna dan ID peran")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Role assigned successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -164,6 +173,7 @@ public class UserController {
      * @param roleId role id
      * @return success message
      */
+    @LogActivity(activityType = ActivityType.UPDATE, entityType = EntityType.USER, description = "Remove role from user", severity = LogSeverity.MEDIUM)
     @Operation(summary = "Menghapus Peran dari Pengguna", description = "Menghapus peran tertentu dari pengguna berdasarkan ID pengguna dan ID peran")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Role removed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -192,6 +202,7 @@ public class UserController {
      * @param roleName role name
      * @return true if user has role, false otherwise
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Check if user has role", severity = LogSeverity.LOW)
     @Operation(summary = "Memeriksa Apakah Pengguna Memiliki Peran Tertentu", description = "Memeriksa apakah pengguna memiliki peran tertentu berdasarkan ID pengguna dan nama peran")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Role check successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
@@ -208,6 +219,13 @@ public class UserController {
         return ResponseEntity.ok(Map.of("hasRole", hasRole));
     }
 
+    /**
+     * Get users by satker ID
+     * 
+     * @param id satuan kerja id
+     * @return list of users
+     */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get users by satker ID", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna Berdasarkan Satuan Kerja", description = "Menampilkan daftar pengguna berdasarkan ID satuan kerja")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan satuan kerja", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -226,6 +244,7 @@ public class UserController {
      * @param direktoratId direktorat id
      * @return success message
      */
+    @LogActivity(activityType = ActivityType.UPDATE, entityType = EntityType.USER, description = "Assign direktorat to user", severity = LogSeverity.MEDIUM)
     @Operation(summary = "Memberikan Direktorat kepada Pengguna", description = "Memberikan direktorat tertentu kepada pengguna berdasarkan ID pengguna dan ID direktorat")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Direktorat assigned successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -253,6 +272,7 @@ public class UserController {
      * @param userId user id
      * @return success message
      */
+    @LogActivity(activityType = ActivityType.UPDATE, entityType = EntityType.USER, description = "Remove direktorat from user", severity = LogSeverity.MEDIUM)
     @Operation(summary = "Menghapus Direktorat dari Pengguna", description = "Menghapus direktorat dari pengguna berdasarkan ID pengguna")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Direktorat removed successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -277,6 +297,7 @@ public class UserController {
      * @param direktoratId direktorat id
      * @return list of users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get users by direktorat ID", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna Berdasarkan Direktorat", description = "Menampilkan daftar pengguna berdasarkan ID direktorat")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan direktorat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
@@ -294,6 +315,7 @@ public class UserController {
      * @param deputiId deputi id
      * @return list of users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get users by deputi ID", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna Berdasarkan Deputi", description = "Menampilkan daftar pengguna berdasarkan ID deputi")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
@@ -311,6 +333,7 @@ public class UserController {
      * @param direktoratId direktorat id
      * @return list of active users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get active users by direktorat ID", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna Aktif Berdasarkan Direktorat", description = "Menampilkan daftar pengguna aktif berdasarkan ID direktorat")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna aktif berdasarkan direktorat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
@@ -328,6 +351,7 @@ public class UserController {
      * @param deputiId deputi id
      * @return list of active users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get active users by deputi ID", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna Aktif Berdasarkan Deputi", description = "Menampilkan daftar pengguna aktif berdasarkan ID deputi")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna aktif berdasarkan deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
@@ -345,6 +369,7 @@ public class UserController {
      * @param code direktorat code
      * @return list of users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get users by direktorat code", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna Berdasarkan Kode Direktorat", description = "Menampilkan daftar pengguna berdasarkan kode direktorat")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan kode direktorat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
@@ -362,6 +387,7 @@ public class UserController {
      * @param code deputi code
      * @return list of users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Get users by deputi code", severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna Berdasarkan Kode Deputi", description = "Menampilkan daftar pengguna berdasarkan kode deputi")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna berdasarkan kode deputi", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
@@ -379,6 +405,7 @@ public class UserController {
      * @param direktoratId direktorat id
      * @return count of users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Count users by direktorat ID", severity = LogSeverity.LOW)
     @Operation(summary = "Menghitung Jumlah Pengguna Berdasarkan Direktorat", description = "Menghitung jumlah pengguna berdasarkan ID direktorat")
     @GetMapping("/direktorat/{direktoratId}/count")
     public ResponseEntity<Map<String, Long>> countUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId) {
@@ -392,6 +419,7 @@ public class UserController {
      * @param deputiId deputi id
      * @return count of users
      */
+    @LogActivity(activityType = ActivityType.VIEW, entityType = EntityType.USER, description = "Count users by deputi ID", severity = LogSeverity.LOW)
     @Operation(summary = "Menghitung Jumlah Pengguna Berdasarkan Deputi", description = "Menghitung jumlah pengguna berdasarkan ID deputi")
     @GetMapping("/deputi/{deputiId}/count")
     public ResponseEntity<Map<String, Long>> countUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
@@ -406,6 +434,7 @@ public class UserController {
      * @param request berisi password baru
      * @return success message
      */
+    @LogActivity(activityType = ActivityType.UPDATE, entityType = EntityType.USER, description = "Reset user password by admin", severity = LogSeverity.HIGH)
     @Operation(summary = "Reset Password User", description = "Reset password user oleh admin (tidak memerlukan password lama)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password berhasil direset", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
@@ -447,6 +476,7 @@ public class UserController {
      * @param userId ID user yang akan direset passwordnya
      * @return success message
      */
+    @LogActivity(activityType = ActivityType.UPDATE, entityType = EntityType.USER, description = "Reset user password to NIP", severity = LogSeverity.HIGH)
     @Operation(summary = "Reset Password ke NIP", description = "Reset password user ke NIP sebagai password default")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Password berhasil direset ke NIP", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))),
@@ -473,6 +503,14 @@ public class UserController {
         }
     }
 
+    /**
+     * Update user partially
+     * 
+     * @param id      user id
+     * @param updates fields to update
+     * @return updated user
+     */
+    @LogActivity(activityType = ActivityType.UPDATE, entityType = EntityType.USER, description = "Update user partially", severity = LogSeverity.MEDIUM)
     @Operation(summary = "Update Sebagian Data User", description = "Memperbarui sebagian field user tanpa harus mengisi semua field")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),

@@ -1,23 +1,36 @@
 package com.sms.controller;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sms.annotation.LogActivity;
 import com.sms.dto.RoleDto;
-import com.sms.entity.Role;
+import com.sms.entity.ActivityLog.ActivityType;
+import com.sms.entity.ActivityLog.EntityType;
+import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.User;
-import com.sms.service.RoleService;
 import com.sms.payload.ApiErrorResponse;
+import com.sms.service.RoleService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Map;
 
 /**
  * REST API for Role operations
@@ -39,6 +52,7 @@ public class RoleController {
      * 
      * @return list of roles
      */
+    @LogActivity(description = "Retrieved all roles list", activityType = ActivityType.VIEW, entityType = EntityType.ROLE, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Daftar Role")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar role", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoleDto.class))),
@@ -56,6 +70,7 @@ public class RoleController {
      * @param id role id
      * @return role details
      */
+    @LogActivity(description = "Retrieved role by ID", activityType = ActivityType.VIEW, entityType = EntityType.ROLE, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Role berdasarkan ID", description = "Menampilkan detail role berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan role berdasarkan ID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoleDto.class))),
@@ -74,6 +89,7 @@ public class RoleController {
      * @return created role
      */
 
+    @LogActivity(description = "Created a new role", activityType = ActivityType.CREATE, entityType = EntityType.ROLE, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Membuat Role Baru", description = "Membuat role baru dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Role berhasil dibuat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoleDto.class))),
@@ -92,6 +108,7 @@ public class RoleController {
      * @param roleDto role data
      * @return updated role
      */
+    @LogActivity(description = "Updated an existing role", activityType = ActivityType.UPDATE, entityType = EntityType.ROLE, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Memperbarui Role", description = "Memperbarui role yang sudah ada dengan data yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Role berhasil diperbarui", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoleDto.class))),
@@ -114,6 +131,7 @@ public class RoleController {
      * @param id role id
      * @return success message
      */
+    @LogActivity(description = "Deleted a role by ID", activityType = ActivityType.DELETE, entityType = EntityType.ROLE, severity = LogSeverity.HIGH)
     @Operation(summary = "Menghapus Role", description = "Menghapus role berdasarkan ID yang diberikan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Role berhasil dihapus", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))),
@@ -131,6 +149,7 @@ public class RoleController {
      * @param id role id
      * @return list of users
      */
+    @LogActivity(description = "Retrieved users by role ID", activityType = ActivityType.VIEW, entityType = EntityType.ROLE, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Pengguna berdasarkan ID Role", description = "Menampilkan daftar pengguna yang memiliki role tertentu berdasarkan ID role")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan pengguna berdasarkan ID role", content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
@@ -142,6 +161,14 @@ public class RoleController {
         return ResponseEntity.ok(users);
     }
 
+    /**
+     * Update partial role data
+     * 
+     * @param id      role id
+     * @param updates map of fields to update
+     * @return updated role
+     */
+    @LogActivity(description = "Partially updated role data", activityType = ActivityType.UPDATE, entityType = EntityType.ROLE, severity = LogSeverity.MEDIUM)
     @Operation(summary = "Update Sebagian Data Role", description = "Memperbarui sebagian field role tanpa harus mengisi semua field")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data role", content = @Content(mediaType = "application/json", schema = @Schema(implementation = RoleDto.class))),
