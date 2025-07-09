@@ -1,8 +1,10 @@
 package com.sms.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sms.annotation.LogActivity;
+import com.sms.dto.SubtahapDateRequest;
 import com.sms.dto.TahapStatusDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
@@ -280,5 +283,102 @@ public class TahapController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * Update tanggal perencanaan subtahap
+     */
+    @LogActivity(description = "Updated subtahap planning date", activityType = ActivityType.UPDATE, entityType = EntityType.TAHAP, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Update Tanggal Perencanaan Subtahap", description = "Update tanggal perencanaan untuk subtahap tertentu")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil update tanggal perencanaan"),
+            @ApiResponse(responseCode = "404", description = "Activity, stage, or substage not found")
+    })
+    @PostMapping("/{kegiatanId}/{tahap}/{subtahap}/tanggal-perencanaan")
+    public ResponseEntity<Void> updateTanggalPerencanaan(
+            @PathVariable Long kegiatanId,
+            @PathVariable int tahap,
+            @PathVariable int subtahap,
+            @RequestBody @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tanggal) {
+        tahapService.updateSubtahapTanggalPerencanaan(kegiatanId, tahap, subtahap, tanggal);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Update tanggal realisasi subtahap
+     */
+    @LogActivity(description = "Updated subtahap realization date", activityType = ActivityType.UPDATE, entityType = EntityType.TAHAP, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Update Tanggal Realisasi Subtahap", description = "Update tanggal realisasi untuk subtahap tertentu")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil update tanggal realisasi"),
+            @ApiResponse(responseCode = "404", description = "Activity, stage, or substage not found")
+    })
+    @PostMapping("/{kegiatanId}/{tahap}/{subtahap}/tanggal-realisasi")
+    public ResponseEntity<Void> updateTanggalRealisasi(
+            @PathVariable Long kegiatanId,
+            @PathVariable int tahap,
+            @PathVariable int subtahap,
+            @RequestBody @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tanggal) {
+        tahapService.updateSubtahapTanggalRealisasi(kegiatanId, tahap, subtahap, tanggal);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Get tanggal perencanaan subtahap
+     */
+    @LogActivity(description = "Retrieved subtahap planning date", activityType = ActivityType.VIEW, entityType = EntityType.TAHAP, severity = LogSeverity.LOW)
+    @Operation(summary = "Get Tanggal Perencanaan Subtahap", description = "Mendapatkan tanggal perencanaan untuk subtahap tertentu")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil mendapatkan tanggal perencanaan"),
+            @ApiResponse(responseCode = "404", description = "Activity, stage, or substage not found")
+    })
+    @GetMapping("/{kegiatanId}/{tahap}/{subtahap}/tanggal-perencanaan")
+    public ResponseEntity<LocalDate> getTanggalPerencanaan(
+            @PathVariable Long kegiatanId,
+            @PathVariable int tahap,
+            @PathVariable int subtahap) {
+        LocalDate tanggal = tahapService.getSubtahapTanggalPerencanaan(kegiatanId, tahap, subtahap);
+        return ResponseEntity.ok(tanggal);
+    }
+
+    /**
+     * Get tanggal realisasi subtahap
+     */
+    @LogActivity(description = "Retrieved subtahap realization date", activityType = ActivityType.VIEW, entityType = EntityType.TAHAP, severity = LogSeverity.LOW)
+    @Operation(summary = "Get Tanggal Realisasi Subtahap", description = "Mendapatkan tanggal realisasi untuk subtahap tertentu")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil mendapatkan tanggal realisasi"),
+            @ApiResponse(responseCode = "404", description = "Activity, stage, or substage not found")
+    })
+    @GetMapping("/{kegiatanId}/{tahap}/{subtahap}/tanggal-realisasi")
+    public ResponseEntity<LocalDate> getTanggalRealisasi(
+            @PathVariable Long kegiatanId,
+            @PathVariable int tahap,
+            @PathVariable int subtahap) {
+        LocalDate tanggal = tahapService.getSubtahapTanggalRealisasi(kegiatanId, tahap, subtahap);
+        return ResponseEntity.ok(tanggal);
+    }
+
+    /**
+     * Update multiple dates for a subtahap at once
+     */
+    @LogActivity(description = "Updated subtahap dates", activityType = ActivityType.UPDATE, entityType = EntityType.TAHAP, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Update Tanggal Subtahap", description = "Update tanggal perencanaan dan realisasi untuk subtahap sekaligus")
+    @PostMapping("/{kegiatanId}/{tahap}/{subtahap}/tanggal")
+    public ResponseEntity<Void> updateSubtahapDates(
+            @PathVariable Long kegiatanId,
+            @PathVariable int tahap,
+            @PathVariable int subtahap,
+            @RequestBody SubtahapDateRequest request) {
+
+        if (request.getTanggalPerencanaan() != null) {
+            tahapService.updateSubtahapTanggalPerencanaan(kegiatanId, tahap, subtahap, request.getTanggalPerencanaan());
+        }
+
+        if (request.getTanggalRealisasi() != null) {
+            tahapService.updateSubtahapTanggalRealisasi(kegiatanId, tahap, subtahap, request.getTanggalRealisasi());
+        }
+
+        return ResponseEntity.ok().build();
     }
 }

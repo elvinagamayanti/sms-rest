@@ -1,8 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.sms.entity;
+
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -21,7 +19,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- *
+ * Entity untuk Tahap 6 dengan tanggal perencanaan dan realisasi per subtahap
+ * 
  * @author pinaa
  */
 
@@ -42,10 +41,25 @@ public class Tahap6 {
     @JoinColumn(name = "id_kegiatan", nullable = false)
     private Kegiatan kegiatan;
 
+    // Subtahap 1
     private boolean subtahap_1;
+    private LocalDate subtahap_1_tanggal_perencanaan;
+    private LocalDate subtahap_1_tanggal_realisasi;
+
+    // Subtahap 2
     private boolean subtahap_2;
+    private LocalDate subtahap_2_tanggal_perencanaan;
+    private LocalDate subtahap_2_tanggal_realisasi;
+
+    // Subtahap 3
     private boolean subtahap_3;
+    private LocalDate subtahap_3_tanggal_perencanaan;
+    private LocalDate subtahap_3_tanggal_realisasi;
+
+    // Subtahap 4
     private boolean subtahap_4;
+    private LocalDate subtahap_4_tanggal_perencanaan;
+    private LocalDate subtahap_4_tanggal_realisasi;
 
     public int getCompletionPercentage() {
         int completed = 0;

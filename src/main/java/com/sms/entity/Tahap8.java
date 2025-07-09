@@ -4,6 +4,7 @@
  */
 package com.sms.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -45,10 +46,25 @@ public class Tahap8 {
     @JoinColumn(name = "id_kegiatan", nullable = false)
     private Kegiatan kegiatan;
 
+    // Subtahap 1
     private boolean subtahap_1;
+    private LocalDate subtahap_1_tanggal_perencanaan;
+    private LocalDate subtahap_1_tanggal_realisasi;
+
+    // Subtahap 2
     private boolean subtahap_2;
+    private LocalDate subtahap_2_tanggal_perencanaan;
+    private LocalDate subtahap_2_tanggal_realisasi;
+
+    // Subtahap 3
     private boolean subtahap_3;
+    private LocalDate subtahap_3_tanggal_perencanaan;
+    private LocalDate subtahap_3_tanggal_realisasi;
+
+    // Subtahap 4
     private boolean subtahap_4;
+    private LocalDate subtahap_4_tanggal_perencanaan;
+    private LocalDate subtahap_4_tanggal_realisasi;
 
     private String uploadFileName;
     private String uploadFilePath;

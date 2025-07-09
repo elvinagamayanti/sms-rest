@@ -1,6 +1,7 @@
 package com.sms.service;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -655,6 +656,20 @@ public class TahapService {
         tahap1.setSubtahap_5(false);
         tahap1.setSubtahap_6(false);
 
+        // Initialize all planning and realization dates to null
+        tahap1.setSubtahap_1_tanggal_perencanaan(null);
+        tahap1.setSubtahap_1_tanggal_realisasi(null);
+        tahap1.setSubtahap_2_tanggal_perencanaan(null);
+        tahap1.setSubtahap_2_tanggal_realisasi(null);
+        tahap1.setSubtahap_3_tanggal_perencanaan(null);
+        tahap1.setSubtahap_3_tanggal_realisasi(null);
+        tahap1.setSubtahap_4_tanggal_perencanaan(null);
+        tahap1.setSubtahap_4_tanggal_realisasi(null);
+        tahap1.setSubtahap_5_tanggal_perencanaan(null);
+        tahap1.setSubtahap_5_tanggal_realisasi(null);
+        tahap1.setSubtahap_6_tanggal_perencanaan(null);
+        tahap1.setSubtahap_6_tanggal_realisasi(null);
+
         // Save the new entity
         return tahap1Repository.save(tahap1);
     }
@@ -672,6 +687,16 @@ public class TahapService {
         tahap2.setSubtahap_2(false);
         tahap2.setSubtahap_3(false);
         tahap2.setSubtahap_4(false);
+
+        // Initialize all planning and realization dates to null
+        tahap2.setSubtahap_1_tanggal_perencanaan(null);
+        tahap2.setSubtahap_1_tanggal_realisasi(null);
+        tahap2.setSubtahap_2_tanggal_perencanaan(null);
+        tahap2.setSubtahap_2_tanggal_realisasi(null);
+        tahap2.setSubtahap_3_tanggal_perencanaan(null);
+        tahap2.setSubtahap_3_tanggal_realisasi(null);
+        tahap2.setSubtahap_4_tanggal_perencanaan(null);
+        tahap2.setSubtahap_4_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap2Repository.save(tahap2);
@@ -691,6 +716,16 @@ public class TahapService {
         tahap3.setSubtahap_3(false);
         tahap3.setSubtahap_4(false);
 
+        // Initialize all planning and realization dates to null
+        tahap3.setSubtahap_1_tanggal_perencanaan(null);
+        tahap3.setSubtahap_1_tanggal_realisasi(null);
+        tahap3.setSubtahap_2_tanggal_perencanaan(null);
+        tahap3.setSubtahap_2_tanggal_realisasi(null);
+        tahap3.setSubtahap_3_tanggal_perencanaan(null);
+        tahap3.setSubtahap_3_tanggal_realisasi(null);
+        tahap3.setSubtahap_4_tanggal_perencanaan(null);
+        tahap3.setSubtahap_4_tanggal_realisasi(null);
+
         // Save the new entity
         return tahap3Repository.save(tahap3);
     }
@@ -708,6 +743,16 @@ public class TahapService {
         tahap4.setSubtahap_2(false);
         tahap4.setSubtahap_3(false);
         tahap4.setSubtahap_4(false);
+
+        // Initialize all planning and realization dates to null
+        tahap4.setSubtahap_1_tanggal_perencanaan(null);
+        tahap4.setSubtahap_1_tanggal_realisasi(null);
+        tahap4.setSubtahap_2_tanggal_perencanaan(null);
+        tahap4.setSubtahap_2_tanggal_realisasi(null);
+        tahap4.setSubtahap_3_tanggal_perencanaan(null);
+        tahap4.setSubtahap_3_tanggal_realisasi(null);
+        tahap4.setSubtahap_4_tanggal_perencanaan(null);
+        tahap4.setSubtahap_4_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap4Repository.save(tahap4);
@@ -727,6 +772,16 @@ public class TahapService {
         tahap5.setSubtahap_3(false);
         tahap5.setSubtahap_4(false);
 
+        // Initialize all planning and realization dates to null
+        tahap5.setSubtahap_1_tanggal_perencanaan(null);
+        tahap5.setSubtahap_1_tanggal_realisasi(null);
+        tahap5.setSubtahap_2_tanggal_perencanaan(null);
+        tahap5.setSubtahap_2_tanggal_realisasi(null);
+        tahap5.setSubtahap_3_tanggal_perencanaan(null);
+        tahap5.setSubtahap_3_tanggal_realisasi(null);
+        tahap5.setSubtahap_4_tanggal_perencanaan(null);
+        tahap5.setSubtahap_4_tanggal_realisasi(null);
+
         // Save the new entity
         return tahap5Repository.save(tahap5);
     }
@@ -744,6 +799,16 @@ public class TahapService {
         tahap6.setSubtahap_2(false);
         tahap6.setSubtahap_3(false);
         tahap6.setSubtahap_4(false);
+
+        // Initialize all planning and realization dates to null
+        tahap6.setSubtahap_1_tanggal_perencanaan(null);
+        tahap6.setSubtahap_1_tanggal_realisasi(null);
+        tahap6.setSubtahap_2_tanggal_perencanaan(null);
+        tahap6.setSubtahap_2_tanggal_realisasi(null);
+        tahap6.setSubtahap_3_tanggal_perencanaan(null);
+        tahap6.setSubtahap_3_tanggal_realisasi(null);
+        tahap6.setSubtahap_4_tanggal_perencanaan(null);
+        tahap6.setSubtahap_4_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap6Repository.save(tahap6);
@@ -763,6 +828,16 @@ public class TahapService {
         tahap7.setSubtahap_3(false);
         tahap7.setSubtahap_4(false);
 
+        // Initialize all planning and realization dates to null
+        tahap7.setSubtahap_1_tanggal_perencanaan(null);
+        tahap7.setSubtahap_1_tanggal_realisasi(null);
+        tahap7.setSubtahap_2_tanggal_perencanaan(null);
+        tahap7.setSubtahap_2_tanggal_realisasi(null);
+        tahap7.setSubtahap_3_tanggal_perencanaan(null);
+        tahap7.setSubtahap_3_tanggal_realisasi(null);
+        tahap7.setSubtahap_4_tanggal_perencanaan(null);
+        tahap7.setSubtahap_4_tanggal_realisasi(null);
+
         // Save the new entity
         return tahap7Repository.save(tahap7);
     }
@@ -780,6 +855,16 @@ public class TahapService {
         tahap8.setSubtahap_2(false);
         tahap8.setSubtahap_3(false);
         tahap8.setSubtahap_4(false);
+
+        // Initialize all planning and realization dates to null
+        tahap8.setSubtahap_1_tanggal_perencanaan(null);
+        tahap8.setSubtahap_1_tanggal_realisasi(null);
+        tahap8.setSubtahap_2_tanggal_perencanaan(null);
+        tahap8.setSubtahap_2_tanggal_realisasi(null);
+        tahap8.setSubtahap_3_tanggal_perencanaan(null);
+        tahap8.setSubtahap_3_tanggal_realisasi(null);
+        tahap8.setSubtahap_4_tanggal_perencanaan(null);
+        tahap8.setSubtahap_4_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap8Repository.save(tahap8);
@@ -820,4 +905,658 @@ public class TahapService {
     public List<String> getUploadedFilesForTahap(Long kegiatanId, int tahapId) {
         return fileUploadService.getUploadedFiles(kegiatanId, tahapId);
     }
+
+    /**
+     * Update tanggal perencanaan untuk subtahap tertentu
+     */
+    public void updateSubtahapTanggalPerencanaan(Long kegiatanId, int tahap, int subtahap, LocalDate tanggal) {
+        switch (tahap) {
+            case 1 -> updateTahap1TanggalPerencanaan(kegiatanId, subtahap, tanggal);
+            case 2 -> updateTahap2TanggalPerencanaan(kegiatanId, subtahap, tanggal);
+            case 3 -> updateTahap3TanggalPerencanaan(kegiatanId, subtahap, tanggal);
+            case 4 -> updateTahap4TanggalPerencanaan(kegiatanId, subtahap, tanggal);
+            case 5 -> updateTahap5TanggalPerencanaan(kegiatanId, subtahap, tanggal);
+            case 6 -> updateTahap6TanggalPerencanaan(kegiatanId, subtahap, tanggal);
+            case 7 -> updateTahap7TanggalPerencanaan(kegiatanId, subtahap, tanggal);
+            case 8 -> updateTahap8TanggalPerencanaan(kegiatanId, subtahap, tanggal);
+            default -> throw new IllegalArgumentException("Invalid tahap: " + tahap);
+        }
+    }
+
+    /**
+     * Update tanggal realisasi untuk subtahap tertentu
+     */
+    public void updateSubtahapTanggalRealisasi(Long kegiatanId, int tahap, int subtahap, LocalDate tanggal) {
+        switch (tahap) {
+            case 1 -> updateTahap1TanggalRealisasi(kegiatanId, subtahap, tanggal);
+            case 2 -> updateTahap2TanggalRealisasi(kegiatanId, subtahap, tanggal);
+            case 3 -> updateTahap3TanggalRealisasi(kegiatanId, subtahap, tanggal);
+            case 4 -> updateTahap4TanggalRealisasi(kegiatanId, subtahap, tanggal);
+            case 5 -> updateTahap5TanggalRealisasi(kegiatanId, subtahap, tanggal);
+            case 6 -> updateTahap6TanggalRealisasi(kegiatanId, subtahap, tanggal);
+            case 7 -> updateTahap7TanggalRealisasi(kegiatanId, subtahap, tanggal);
+            case 8 -> updateTahap8TanggalRealisasi(kegiatanId, subtahap, tanggal);
+            default -> throw new IllegalArgumentException("Invalid tahap: " + tahap);
+        }
+    }
+
+    /**
+     * Update tanggal perencanaan untuk Tahap 1
+     */
+    private void updateTahap1TanggalPerencanaan(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap1 tahap1 = tahap1Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap1(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap1.setSubtahap_1_tanggal_perencanaan(tanggal);
+            case 2 -> tahap1.setSubtahap_2_tanggal_perencanaan(tanggal);
+            case 3 -> tahap1.setSubtahap_3_tanggal_perencanaan(tanggal);
+            case 4 -> tahap1.setSubtahap_4_tanggal_perencanaan(tanggal);
+            case 5 -> tahap1.setSubtahap_5_tanggal_perencanaan(tanggal);
+            case 6 -> tahap1.setSubtahap_6_tanggal_perencanaan(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap1Repository.save(tahap1);
+    }
+
+    /**
+     * Update tanggal realisasi untuk Tahap 1
+     */
+    private void updateTahap1TanggalRealisasi(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap1 tahap1 = tahap1Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap1(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap1.setSubtahap_1_tanggal_realisasi(tanggal);
+            case 2 -> tahap1.setSubtahap_2_tanggal_realisasi(tanggal);
+            case 3 -> tahap1.setSubtahap_3_tanggal_realisasi(tanggal);
+            case 4 -> tahap1.setSubtahap_4_tanggal_realisasi(tanggal);
+            case 5 -> tahap1.setSubtahap_5_tanggal_realisasi(tanggal);
+            case 6 -> tahap1.setSubtahap_6_tanggal_realisasi(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap1Repository.save(tahap1);
+    }
+
+    /**
+     * Update tanggal perencanaan untuk Tahap 2
+     */
+    private void updateTahap2TanggalPerencanaan(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap2 tahap2 = tahap2Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap2(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap2.setSubtahap_1_tanggal_perencanaan(tanggal);
+            case 2 -> tahap2.setSubtahap_2_tanggal_perencanaan(tanggal);
+            case 3 -> tahap2.setSubtahap_3_tanggal_perencanaan(tanggal);
+            case 4 -> tahap2.setSubtahap_4_tanggal_perencanaan(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap2Repository.save(tahap2);
+    }
+
+    /**
+     * Update tanggal realisasi untuk Tahap 2
+     */
+    private void updateTahap2TanggalRealisasi(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap2 tahap2 = tahap2Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap2(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap2.setSubtahap_1_tanggal_realisasi(tanggal);
+            case 2 -> tahap2.setSubtahap_2_tanggal_realisasi(tanggal);
+            case 3 -> tahap2.setSubtahap_3_tanggal_realisasi(tanggal);
+            case 4 -> tahap2.setSubtahap_4_tanggal_realisasi(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap2Repository.save(tahap2);
+
+    }
+
+    /**
+     * Update tanggal perencanaan untuk Tahap 3
+     */
+    private void updateTahap3TanggalPerencanaan(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap3 tahap3 = tahap3Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap3(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap3.setSubtahap_1_tanggal_perencanaan(tanggal);
+            case 2 -> tahap3.setSubtahap_2_tanggal_perencanaan(tanggal);
+            case 3 -> tahap3.setSubtahap_3_tanggal_perencanaan(tanggal);
+            case 4 -> tahap3.setSubtahap_4_tanggal_perencanaan(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap3Repository.save(tahap3);
+    }
+
+    /**
+     * Update tanggal realisasi untuk Tahap 3
+     */
+    private void updateTahap3TanggalRealisasi(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap3 tahap3 = tahap3Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap3(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap3.setSubtahap_1_tanggal_realisasi(tanggal);
+            case 2 -> tahap3.setSubtahap_2_tanggal_realisasi(tanggal);
+            case 3 -> tahap3.setSubtahap_3_tanggal_realisasi(tanggal);
+            case 4 -> tahap3.setSubtahap_4_tanggal_realisasi(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap3Repository.save(tahap3);
+    }
+
+    /**
+     * Update tanggal perencanaan untuk Tahap 4
+     */
+    private void updateTahap4TanggalPerencanaan(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap4 tahap4 = tahap4Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap4(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap4.setSubtahap_1_tanggal_perencanaan(tanggal);
+            case 2 -> tahap4.setSubtahap_2_tanggal_perencanaan(tanggal);
+            case 3 -> tahap4.setSubtahap_3_tanggal_perencanaan(tanggal);
+            case 4 -> tahap4.setSubtahap_4_tanggal_perencanaan(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap4Repository.save(tahap4);
+    }
+
+    /**
+     * Update tanggal realisasi untuk Tahap 4
+     */
+    private void updateTahap4TanggalRealisasi(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap4 tahap4 = tahap4Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap4(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap4.setSubtahap_1_tanggal_realisasi(tanggal);
+            case 2 -> tahap4.setSubtahap_2_tanggal_realisasi(tanggal);
+            case 3 -> tahap4.setSubtahap_3_tanggal_realisasi(tanggal);
+            case 4 -> tahap4.setSubtahap_4_tanggal_realisasi(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap4Repository.save(tahap4);
+    }
+
+    /**
+     * Update tanggal perencanaan untuk Tahap 5
+     */
+    private void updateTahap5TanggalPerencanaan(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap5 tahap5 = tahap5Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap5(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap5.setSubtahap_1_tanggal_perencanaan(tanggal);
+            case 2 -> tahap5.setSubtahap_2_tanggal_perencanaan(tanggal);
+            case 3 -> tahap5.setSubtahap_3_tanggal_perencanaan(tanggal);
+            case 4 -> tahap5.setSubtahap_4_tanggal_perencanaan(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap5Repository.save(tahap5);
+    }
+
+    /**
+     * Update tanggal realisasi untuk Tahap 5
+     */
+    private void updateTahap5TanggalRealisasi(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap5 tahap5 = tahap5Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap5(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap5.setSubtahap_1_tanggal_realisasi(tanggal);
+            case 2 -> tahap5.setSubtahap_2_tanggal_realisasi(tanggal);
+            case 3 -> tahap5.setSubtahap_3_tanggal_realisasi(tanggal);
+            case 4 -> tahap5.setSubtahap_4_tanggal_realisasi(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap5Repository.save(tahap5);
+    }
+
+    /**
+     * Update tanggal perencanaan untuk Tahap 6
+     */
+    private void updateTahap6TanggalPerencanaan(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap6 tahap6 = tahap6Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap6(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap6.setSubtahap_1_tanggal_perencanaan(tanggal);
+            case 2 -> tahap6.setSubtahap_2_tanggal_perencanaan(tanggal);
+            case 3 -> tahap6.setSubtahap_3_tanggal_perencanaan(tanggal);
+            case 4 -> tahap6.setSubtahap_4_tanggal_perencanaan(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap6Repository.save(tahap6);
+    }
+
+    /**
+     * Update tanggal realisasi untuk Tahap 6
+     */
+    private void updateTahap6TanggalRealisasi(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap6 tahap6 = tahap6Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap6(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap6.setSubtahap_1_tanggal_realisasi(tanggal);
+            case 2 -> tahap6.setSubtahap_2_tanggal_realisasi(tanggal);
+            case 3 -> tahap6.setSubtahap_3_tanggal_realisasi(tanggal);
+            case 4 -> tahap6.setSubtahap_4_tanggal_realisasi(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap6Repository.save(tahap6);
+    }
+
+    /**
+     * Update tanggal perencanaan untuk Tahap 7
+     */
+    private void updateTahap7TanggalPerencanaan(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap7 tahap7 = tahap7Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap7(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap7.setSubtahap_1_tanggal_perencanaan(tanggal);
+            case 2 -> tahap7.setSubtahap_2_tanggal_perencanaan(tanggal);
+            case 3 -> tahap7.setSubtahap_3_tanggal_perencanaan(tanggal);
+            case 4 -> tahap7.setSubtahap_4_tanggal_perencanaan(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap7Repository.save(tahap7);
+    }
+
+    /**
+     * Update tanggal realisasi untuk Tahap 7
+     */
+    private void updateTahap7TanggalRealisasi(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap7 tahap7 = tahap7Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap7(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap7.setSubtahap_1_tanggal_realisasi(tanggal);
+            case 2 -> tahap7.setSubtahap_2_tanggal_realisasi(tanggal);
+            case 3 -> tahap7.setSubtahap_3_tanggal_realisasi(tanggal);
+            case 4 -> tahap7.setSubtahap_4_tanggal_realisasi(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap7Repository.save(tahap7);
+    }
+
+    /**
+     * Update tanggal perencanaan untuk Tahap 8
+     */
+    private void updateTahap8TanggalPerencanaan(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap8 tahap8 = tahap8Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap8(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap8.setSubtahap_1_tanggal_perencanaan(tanggal);
+            case 2 -> tahap8.setSubtahap_2_tanggal_perencanaan(tanggal);
+            case 3 -> tahap8.setSubtahap_3_tanggal_perencanaan(tanggal);
+            case 4 -> tahap8.setSubtahap_4_tanggal_perencanaan(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap8Repository.save(tahap8);
+    }
+
+    /**
+     * Update tanggal realisasi untuk Tahap 8
+     */
+    private void updateTahap8TanggalRealisasi(Long kegiatanId, int subtahap, LocalDate tanggal) {
+        Tahap8 tahap8 = tahap8Repository.findByKegiatanId(kegiatanId)
+                .orElseGet(() -> createDefaultTahap8(kegiatanId));
+
+        switch (subtahap) {
+            case 1 -> tahap8.setSubtahap_1_tanggal_realisasi(tanggal);
+            case 2 -> tahap8.setSubtahap_2_tanggal_realisasi(tanggal);
+            case 3 -> tahap8.setSubtahap_3_tanggal_realisasi(tanggal);
+            case 4 -> tahap8.setSubtahap_4_tanggal_realisasi(tanggal);
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        }
+
+        tahap8Repository.save(tahap8);
+    }
+
+    /**
+     * Get tanggal perencanaan untuk subtahap tertentu
+     */
+    public LocalDate getSubtahapTanggalPerencanaan(Long kegiatanId, int tahap, int subtahap) {
+        switch (tahap) {
+            case 1 -> {
+                return getTahap1TanggalPerencanaan(kegiatanId, subtahap);
+            }
+            case 2 -> {
+                return getTahap2TanggalPerencanaan(kegiatanId, subtahap);
+            }
+            case 3 -> {
+                return getTahap3TanggalPerencanaan(kegiatanId, subtahap);
+            }
+            case 4 -> {
+                return getTahap4TanggalPerencanaan(kegiatanId, subtahap);
+            }
+            case 5 -> {
+                return getTahap5TanggalPerencanaan(kegiatanId, subtahap);
+            }
+            case 6 -> {
+                return getTahap6TanggalPerencanaan(kegiatanId, subtahap);
+            }
+            case 7 -> {
+                return getTahap7TanggalPerencanaan(kegiatanId, subtahap);
+            }
+            case 8 -> {
+                return getTahap8TanggalPerencanaan(kegiatanId, subtahap);
+            }
+            default -> throw new IllegalArgumentException("Invalid tahap: " + tahap);
+        }
+    }
+
+    /**
+     * Get tanggal realisasi untuk subtahap tertentu
+     */
+    public LocalDate getSubtahapTanggalRealisasi(Long kegiatanId, int tahap, int subtahap) {
+        switch (tahap) {
+            case 1 -> {
+                return getTahap1TanggalRealisasi(kegiatanId, subtahap);
+            }
+            case 2 -> {
+                return getTahap2TanggalRealisasi(kegiatanId, subtahap);
+            }
+            case 3 -> {
+                return getTahap3TanggalRealisasi(kegiatanId, subtahap);
+            }
+            case 4 -> {
+                return getTahap4TanggalRealisasi(kegiatanId, subtahap);
+            }
+            case 5 -> {
+                return getTahap5TanggalRealisasi(kegiatanId, subtahap);
+            }
+            case 6 -> {
+                return getTahap6TanggalRealisasi(kegiatanId, subtahap);
+            }
+            case 7 -> {
+                return getTahap7TanggalRealisasi(kegiatanId, subtahap);
+            }
+            case 8 -> {
+                return getTahap8TanggalRealisasi(kegiatanId, subtahap);
+            }
+            default -> throw new IllegalArgumentException("Invalid tahap: " + tahap);
+        }
+    }
+
+    private LocalDate getTahap1TanggalPerencanaan(Long kegiatanId, int subtahap) {
+        Optional<Tahap1> tahap1Opt = tahap1Repository.findByKegiatanId(kegiatanId);
+        if (tahap1Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap1 tahap1 = tahap1Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap1.getSubtahap_1_tanggal_perencanaan();
+            case 2 -> tahap1.getSubtahap_2_tanggal_perencanaan();
+            case 3 -> tahap1.getSubtahap_3_tanggal_perencanaan();
+            case 4 -> tahap1.getSubtahap_4_tanggal_perencanaan();
+            case 5 -> tahap1.getSubtahap_5_tanggal_perencanaan();
+            case 6 -> tahap1.getSubtahap_6_tanggal_perencanaan();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap1TanggalRealisasi(Long kegiatanId, int subtahap) {
+        Optional<Tahap1> tahap1Opt = tahap1Repository.findByKegiatanId(kegiatanId);
+        if (tahap1Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap1 tahap1 = tahap1Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap1.getSubtahap_1_tanggal_realisasi();
+            case 2 -> tahap1.getSubtahap_2_tanggal_realisasi();
+            case 3 -> tahap1.getSubtahap_3_tanggal_realisasi();
+            case 4 -> tahap1.getSubtahap_4_tanggal_realisasi();
+            case 5 -> tahap1.getSubtahap_5_tanggal_realisasi();
+            case 6 -> tahap1.getSubtahap_6_tanggal_realisasi();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap2TanggalPerencanaan(Long kegiatanId, int subtahap) {
+        Optional<Tahap2> tahap2Opt = tahap2Repository.findByKegiatanId(kegiatanId);
+        if (tahap2Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap2 tahap2 = tahap2Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap2.getSubtahap_1_tanggal_perencanaan();
+            case 2 -> tahap2.getSubtahap_2_tanggal_perencanaan();
+            case 3 -> tahap2.getSubtahap_3_tanggal_perencanaan();
+            case 4 -> tahap2.getSubtahap_4_tanggal_perencanaan();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap2TanggalRealisasi(Long kegiatanId, int subtahap) {
+        Optional<Tahap2> tahap2Opt = tahap2Repository.findByKegiatanId(kegiatanId);
+        if (tahap2Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap2 tahap2 = tahap2Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap2.getSubtahap_1_tanggal_realisasi();
+            case 2 -> tahap2.getSubtahap_2_tanggal_realisasi();
+            case 3 -> tahap2.getSubtahap_3_tanggal_realisasi();
+            case 4 -> tahap2.getSubtahap_4_tanggal_realisasi();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap3TanggalPerencanaan(Long kegiatanId, int subtahap) {
+        Optional<Tahap3> tahap3Opt = tahap3Repository.findByKegiatanId(kegiatanId);
+        if (tahap3Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap3 tahap3 = tahap3Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap3.getSubtahap_1_tanggal_perencanaan();
+            case 2 -> tahap3.getSubtahap_2_tanggal_perencanaan();
+            case 3 -> tahap3.getSubtahap_3_tanggal_perencanaan();
+            case 4 -> tahap3.getSubtahap_4_tanggal_perencanaan();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap3TanggalRealisasi(Long kegiatanId, int subtahap) {
+        Optional<Tahap3> tahap3Opt = tahap3Repository.findByKegiatanId(kegiatanId);
+        if (tahap3Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap3 tahap3 = tahap3Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap3.getSubtahap_1_tanggal_realisasi();
+            case 2 -> tahap3.getSubtahap_2_tanggal_realisasi();
+            case 3 -> tahap3.getSubtahap_3_tanggal_realisasi();
+            case 4 -> tahap3.getSubtahap_4_tanggal_realisasi();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap4TanggalPerencanaan(Long kegiatanId, int subtahap) {
+        Optional<Tahap4> tahap4Opt = tahap4Repository.findByKegiatanId(kegiatanId);
+        if (tahap4Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap4 tahap4 = tahap4Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap4.getSubtahap_1_tanggal_perencanaan();
+            case 2 -> tahap4.getSubtahap_2_tanggal_perencanaan();
+            case 3 -> tahap4.getSubtahap_3_tanggal_perencanaan();
+            case 4 -> tahap4.getSubtahap_4_tanggal_perencanaan();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap4TanggalRealisasi(Long kegiatanId, int subtahap) {
+        Optional<Tahap4> tahap4Opt = tahap4Repository.findByKegiatanId(kegiatanId);
+        if (tahap4Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap4 tahap4 = tahap4Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap4.getSubtahap_1_tanggal_realisasi();
+            case 2 -> tahap4.getSubtahap_2_tanggal_realisasi();
+            case 3 -> tahap4.getSubtahap_3_tanggal_realisasi();
+            case 4 -> tahap4.getSubtahap_4_tanggal_realisasi();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap5TanggalPerencanaan(Long kegiatanId, int subtahap) {
+        Optional<Tahap5> tahap5Opt = tahap5Repository.findByKegiatanId(kegiatanId);
+        if (tahap5Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap5 tahap5 = tahap5Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap5.getSubtahap_1_tanggal_perencanaan();
+            case 2 -> tahap5.getSubtahap_2_tanggal_perencanaan();
+            case 3 -> tahap5.getSubtahap_3_tanggal_perencanaan();
+            case 4 -> tahap5.getSubtahap_4_tanggal_perencanaan();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap5TanggalRealisasi(Long kegiatanId, int subtahap) {
+        Optional<Tahap5> tahap5Opt = tahap5Repository.findByKegiatanId(kegiatanId);
+        if (tahap5Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap5 tahap5 = tahap5Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap5.getSubtahap_1_tanggal_realisasi();
+            case 2 -> tahap5.getSubtahap_2_tanggal_realisasi();
+            case 3 -> tahap5.getSubtahap_3_tanggal_realisasi();
+            case 4 -> tahap5.getSubtahap_4_tanggal_realisasi();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap6TanggalPerencanaan(Long kegiatanId, int subtahap) {
+        Optional<Tahap6> tahap6Opt = tahap6Repository.findByKegiatanId(kegiatanId);
+        if (tahap6Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap6 tahap6 = tahap6Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap6.getSubtahap_1_tanggal_perencanaan();
+            case 2 -> tahap6.getSubtahap_2_tanggal_perencanaan();
+            case 3 -> tahap6.getSubtahap_3_tanggal_perencanaan();
+            case 4 -> tahap6.getSubtahap_4_tanggal_perencanaan();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap6TanggalRealisasi(Long kegiatanId, int subtahap) {
+        Optional<Tahap6> tahap6Opt = tahap6Repository.findByKegiatanId(kegiatanId);
+        if (tahap6Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap6 tahap6 = tahap6Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap6.getSubtahap_1_tanggal_realisasi();
+            case 2 -> tahap6.getSubtahap_2_tanggal_realisasi();
+            case 3 -> tahap6.getSubtahap_3_tanggal_realisasi();
+            case 4 -> tahap6.getSubtahap_4_tanggal_realisasi();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap7TanggalPerencanaan(Long kegiatanId, int subtahap) {
+        Optional<Tahap7> tahap7Opt = tahap7Repository.findByKegiatanId(kegiatanId);
+        if (tahap7Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap7 tahap7 = tahap7Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap7.getSubtahap_1_tanggal_perencanaan();
+            case 2 -> tahap7.getSubtahap_2_tanggal_perencanaan();
+            case 3 -> tahap7.getSubtahap_3_tanggal_perencanaan();
+            case 4 -> tahap7.getSubtahap_4_tanggal_perencanaan();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap7TanggalRealisasi(Long kegiatanId, int subtahap) {
+        Optional<Tahap7> tahap7Opt = tahap7Repository.findByKegiatanId(kegiatanId);
+        if (tahap7Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap7 tahap7 = tahap7Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap7.getSubtahap_1_tanggal_realisasi();
+            case 2 -> tahap7.getSubtahap_2_tanggal_realisasi();
+            case 3 -> tahap7.getSubtahap_3_tanggal_realisasi();
+            case 4 -> tahap7.getSubtahap_4_tanggal_realisasi();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap8TanggalPerencanaan(Long kegiatanId, int subtahap) {
+        Optional<Tahap8> tahap8Opt = tahap8Repository.findByKegiatanId(kegiatanId);
+        if (tahap8Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap8 tahap8 = tahap8Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap8.getSubtahap_1_tanggal_perencanaan();
+            case 2 -> tahap8.getSubtahap_2_tanggal_perencanaan();
+            case 3 -> tahap8.getSubtahap_3_tanggal_perencanaan();
+            case 4 -> tahap8.getSubtahap_4_tanggal_perencanaan();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
+    private LocalDate getTahap8TanggalRealisasi(Long kegiatanId, int subtahap) {
+        Optional<Tahap8> tahap8Opt = tahap8Repository.findByKegiatanId(kegiatanId);
+        if (tahap8Opt.isEmpty()) {
+            return null;
+        }
+
+        Tahap8 tahap8 = tahap8Opt.get();
+        return switch (subtahap) {
+            case 1 -> tahap8.getSubtahap_1_tanggal_realisasi();
+            case 2 -> tahap8.getSubtahap_2_tanggal_realisasi();
+            case 3 -> tahap8.getSubtahap_3_tanggal_realisasi();
+            case 4 -> tahap8.getSubtahap_4_tanggal_realisasi();
+            default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
+        };
+    }
+
 }
