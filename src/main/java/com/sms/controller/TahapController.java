@@ -395,4 +395,19 @@ public class TahapController {
         SubtahapDetailDto detail = tahapService.getSubtahapDetail(kegiatanId, tahap, subtahap);
         return ResponseEntity.ok(detail);
     }
+
+    /**
+     * Mendapatkan status subtahap apakah sedang berjalan, selesai tepat waktu, atau
+     * selesai terlambat, atau terlambat
+     */
+    @Operation(summary = "Get Status Subtahap", description = "Mendapatkan status subtahap apakah sedang berjalan, selesai tepat waktu, atau selesai terlambat, atau terlambat")
+    @GetMapping("/{kegiatanId}/{tahap}/{subtahap}/status")
+    public ResponseEntity<String> getSubtahapStatus(
+            @PathVariable Long kegiatanId,
+            @PathVariable int tahap,
+            @PathVariable int subtahap) {
+        SubtahapDetailDto detail = tahapService.getSubtahapDetail(kegiatanId, tahap, subtahap);
+        String status = detail.getStatus();
+        return ResponseEntity.ok(status);
+    }
 }
