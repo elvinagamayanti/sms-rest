@@ -3,12 +3,14 @@ package com.sms.service;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sms.dto.SubtahapDetailDto;
 import com.sms.dto.TahapStatusDto;
 import com.sms.entity.Kegiatan;
 import com.sms.entity.Tahap1;
@@ -329,21 +331,27 @@ public class TahapService {
         switch (subtahap) {
             case 1:
                 tahap1.setSubtahap_1(completed);
+                tahap1.setSubtahap_1_tanggal_realisasi(LocalDate.now());
                 break;
             case 2:
                 tahap1.setSubtahap_2(completed);
+                tahap1.setSubtahap_2_tanggal_realisasi(LocalDate.now());
                 break;
             case 3:
                 tahap1.setSubtahap_3(completed);
+                tahap1.setSubtahap_3_tanggal_realisasi(LocalDate.now());
                 break;
             case 4:
                 tahap1.setSubtahap_4(completed);
+                tahap1.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             case 5:
                 tahap1.setSubtahap_5(completed);
+                tahap1.setSubtahap_5_tanggal_realisasi(LocalDate.now());
                 break;
             case 6:
                 tahap1.setSubtahap_6(completed);
+                tahap1.setSubtahap_6_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -366,15 +374,19 @@ public class TahapService {
         switch (subtahap) {
             case 1:
                 tahap2.setSubtahap_1(completed);
+                tahap2.setSubtahap_1_tanggal_realisasi(LocalDate.now());
                 break;
             case 2:
                 tahap2.setSubtahap_2(completed);
+                tahap2.setSubtahap_2_tanggal_realisasi(LocalDate.now());
                 break;
             case 3:
                 tahap2.setSubtahap_3(completed);
+                tahap2.setSubtahap_3_tanggal_realisasi(LocalDate.now());
                 break;
             case 4:
                 tahap2.setSubtahap_4(completed);
+                tahap2.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -397,15 +409,19 @@ public class TahapService {
         switch (subtahap) {
             case 1:
                 tahap3.setSubtahap_1(completed);
+                tahap3.setSubtahap_1_tanggal_realisasi(LocalDate.now());
                 break;
             case 2:
                 tahap3.setSubtahap_2(completed);
+                tahap3.setSubtahap_2_tanggal_realisasi(LocalDate.now());
                 break;
             case 3:
                 tahap3.setSubtahap_3(completed);
+                tahap3.setSubtahap_3_tanggal_realisasi(LocalDate.now());
                 break;
             case 4:
                 tahap3.setSubtahap_4(completed);
+                tahap3.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -428,15 +444,19 @@ public class TahapService {
         switch (subtahap) {
             case 1:
                 tahap4.setSubtahap_1(completed);
+                tahap4.setSubtahap_1_tanggal_realisasi(LocalDate.now());
                 break;
             case 2:
                 tahap4.setSubtahap_2(completed);
+                tahap4.setSubtahap_2_tanggal_realisasi(LocalDate.now());
                 break;
             case 3:
                 tahap4.setSubtahap_3(completed);
+                tahap4.setSubtahap_3_tanggal_realisasi(LocalDate.now());
                 break;
             case 4:
                 tahap4.setSubtahap_4(completed);
+                tahap4.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -459,15 +479,19 @@ public class TahapService {
         switch (subtahap) {
             case 1:
                 tahap5.setSubtahap_1(completed);
+                tahap5.setSubtahap_1_tanggal_realisasi(LocalDate.now());
                 break;
             case 2:
                 tahap5.setSubtahap_2(completed);
+                tahap5.setSubtahap_2_tanggal_realisasi(LocalDate.now());
                 break;
             case 3:
                 tahap5.setSubtahap_3(completed);
+                tahap5.setSubtahap_3_tanggal_realisasi(LocalDate.now());
                 break;
             case 4:
                 tahap5.setSubtahap_4(completed);
+                tahap5.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -490,15 +514,19 @@ public class TahapService {
         switch (subtahap) {
             case 1:
                 tahap6.setSubtahap_1(completed);
+                tahap6.setSubtahap_1_tanggal_realisasi(LocalDate.now());
                 break;
             case 2:
                 tahap6.setSubtahap_2(completed);
+                tahap6.setSubtahap_2_tanggal_realisasi(LocalDate.now());
                 break;
             case 3:
                 tahap6.setSubtahap_3(completed);
+                tahap6.setSubtahap_3_tanggal_realisasi(LocalDate.now());
                 break;
             case 4:
                 tahap6.setSubtahap_4(completed);
+                tahap6.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -521,15 +549,19 @@ public class TahapService {
         switch (subtahap) {
             case 1:
                 tahap7.setSubtahap_1(completed);
+                tahap7.setSubtahap_1_tanggal_realisasi(LocalDate.now());
                 break;
             case 2:
                 tahap7.setSubtahap_2(completed);
+                tahap7.setSubtahap_2_tanggal_realisasi(LocalDate.now());
                 break;
             case 3:
                 tahap7.setSubtahap_3(completed);
+                tahap7.setSubtahap_3_tanggal_realisasi(LocalDate.now());
                 break;
             case 4:
                 tahap7.setSubtahap_4(completed);
+                tahap7.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -552,15 +584,19 @@ public class TahapService {
         switch (subtahap) {
             case 1:
                 tahap8.setSubtahap_1(completed);
+                tahap8.setSubtahap_1_tanggal_realisasi(LocalDate.now());
                 break;
             case 2:
                 tahap8.setSubtahap_2(completed);
+                tahap8.setSubtahap_2_tanggal_realisasi(LocalDate.now());
                 break;
             case 3:
                 tahap8.setSubtahap_3(completed);
+                tahap8.setSubtahap_3_tanggal_realisasi(LocalDate.now());
                 break;
             case 4:
                 tahap8.setSubtahap_4(completed);
+                tahap8.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -1557,6 +1593,55 @@ public class TahapService {
             case 4 -> tahap8.getSubtahap_4_tanggal_realisasi();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
+    }
+
+    /**
+     * Mendapatkan detail lengkap subtahap termasuk status dan tanggal
+     */
+    public SubtahapDetailDto getSubtahapDetail(Long kegiatanId, int tahap, int subtahap) {
+        boolean completed = isSubtaskCompleted(kegiatanId, tahap, subtahap);
+        LocalDate tanggalPerencanaan = getSubtahapTanggalPerencanaan(kegiatanId, tahap, subtahap);
+        LocalDate tanggalRealisasi = getSubtahapTanggalRealisasi(kegiatanId, tahap, subtahap);
+
+        // Determine status
+        String status;
+        Integer selisihHari = null;
+        LocalDate today = LocalDate.now();
+
+        if (completed) {
+            // Jika sudah selesai, cek apakah tepat waktu atau terlambat
+            if (tanggalPerencanaan != null && tanggalRealisasi != null) {
+                selisihHari = (int) ChronoUnit.DAYS.between(tanggalPerencanaan, tanggalRealisasi);
+
+                if (tanggalRealisasi.isAfter(tanggalPerencanaan)) {
+                    status = "SELESAI_TERLAMBAT"; // Selesai tapi terlambat
+                } else {
+                    status = "SELESAI_TEPAT_WAKTU"; // Selesai tepat waktu atau lebih cepat
+                }
+            } else {
+                // Tidak ada tanggal perencanaan atau realisasi
+                status = "SELESAI_TEPAT_WAKTU"; // Default untuk completed
+            }
+        } else if (!completed && tanggalPerencanaan != null && today.isAfter(tanggalPerencanaan)) {
+            // Belum selesai tapi sudah lewat tanggal perencanaan = TERLAMBAT
+            status = "TERLAMBAT";
+        } else if (!completed && tanggalPerencanaan != null && today.isBefore(tanggalPerencanaan)) {
+            // Belum selesai dan belum sampai tanggal perencanaan = SEDANG_BERJALAN
+            status = "SEDANG_BERJALAN";
+        } else {
+            // Belum selesai dan (tepat di tanggal perencanaan atau tidak ada tanggal
+            // perencanaan)
+            status = "SEDANG_BERJALAN";
+        }
+
+        return SubtahapDetailDto.builder()
+                .subtahapNumber(subtahap)
+                .completed(completed)
+                .tanggalPerencanaan(tanggalPerencanaan)
+                .tanggalRealisasi(tanggalRealisasi)
+                .status(status)
+                .selisihHari(selisihHari)
+                .build();
     }
 
 }

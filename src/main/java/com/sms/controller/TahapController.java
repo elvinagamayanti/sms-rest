@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sms.annotation.LogActivity;
 import com.sms.dto.SubtahapDateRequest;
+import com.sms.dto.SubtahapDetailDto;
 import com.sms.dto.TahapStatusDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
@@ -380,5 +381,18 @@ public class TahapController {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Mendapatkan detail lengkap subtahap termasuk status dan tanggal
+     */
+    @Operation(summary = "Get Detail Subtahap", description = "Mendapatkan detail lengkap subtahap termasuk status dan tanggal")
+    @GetMapping("/{kegiatanId}/{tahap}/{subtahap}/detail")
+    public ResponseEntity<SubtahapDetailDto> getSubtahapDetail(
+            @PathVariable Long kegiatanId,
+            @PathVariable int tahap,
+            @PathVariable int subtahap) {
+        SubtahapDetailDto detail = tahapService.getSubtahapDetail(kegiatanId, tahap, subtahap);
+        return ResponseEntity.ok(detail);
     }
 }
