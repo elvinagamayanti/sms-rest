@@ -141,7 +141,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     @Override
     public List<ActivityLogDto> getActivityLogsByUserId(Long userId) {
-        return activityLogRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
+        return activityLogRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(ActivityLogMapper::mapToActivityLogDto)
                 .collect(Collectors.toList());
     }
@@ -154,7 +154,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     @Override
     public List<ActivityLogDto> getUnreadLogs() {
-        return activityLogRepository.findUnreadLogs().stream()
+        return activityLogRepository.findAllUnreadLogs().stream()
                 .map(ActivityLogMapper::mapToActivityLogDto)
                 .collect(Collectors.toList());
     }
@@ -175,7 +175,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     @Override
     public List<ActivityLogDto> getRecentActivities(int hours) {
         LocalDateTime since = LocalDateTime.now().minusHours(hours);
-        return activityLogRepository.findRecentActivities(since).stream()
+        return activityLogRepository.findAllRecentActivities(since).stream()
                 .map(ActivityLogMapper::mapToActivityLogDto)
                 .collect(Collectors.toList());
     }
@@ -189,7 +189,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     @Override
     public List<ActivityLogDto> getActivitiesByDateRange(LocalDateTime start, LocalDateTime end) {
-        return activityLogRepository.findByDateRange(start, end).stream()
+        return activityLogRepository.findAllByDateRange(start, end).stream()
                 .map(ActivityLogMapper::mapToActivityLogDto)
                 .collect(Collectors.toList());
     }
@@ -202,7 +202,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     @Override
     public List<ActivityLogDto> searchActivities(String query) {
-        return activityLogRepository.searchActivities(query).stream()
+        return activityLogRepository.findAllBySearchQuery(query).stream()
                 .map(ActivityLogMapper::mapToActivityLogDto)
                 .collect(Collectors.toList());
     }
@@ -224,21 +224,21 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
     @Override
     public List<ActivityLogDto> getActivitiesByType(ActivityType activityType) {
-        return activityLogRepository.findByActivityTypeOrderByCreatedAtDesc(activityType).stream()
+        return activityLogRepository.findAllByActivityTypeOrderByCreatedAtDesc(activityType).stream()
                 .map(ActivityLogMapper::mapToActivityLogDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ActivityLogDto> getActivitiesByEntityType(EntityType entityType) {
-        return activityLogRepository.findByEntityTypeOrderByCreatedAtDesc(entityType).stream()
+        return activityLogRepository.findAllByEntityTypeOrderByCreatedAtDesc(entityType).stream()
                 .map(ActivityLogMapper::mapToActivityLogDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ActivityLogDto> getActivitiesBySeverity(LogSeverity severity) {
-        return activityLogRepository.findBySeverityOrderByCreatedAtDesc(severity).stream()
+        return activityLogRepository.findAllBySeverityOrderByCreatedAtDesc(severity).stream()
                 .map(ActivityLogMapper::mapToActivityLogDto)
                 .collect(Collectors.toList());
     }
