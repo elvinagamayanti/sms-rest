@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sms.dto.ActivityLogDto;
 import com.sms.entity.ActivityLog.LogSeverity;
@@ -32,6 +33,7 @@ public class NotificationService {
     private UserService userService;
 
     // Process notifications every 5 minutes
+    @Transactional
     @Scheduled(fixedRate = 300000) // 5 minutes
     public void processScheduledNotifications() {
         logger.info("Processing scheduled notifications...");
@@ -134,6 +136,7 @@ public class NotificationService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Async
     public CompletableFuture<Void> sendEmailNotification(User user, ActivityLogDto log, String priority) {
         try {
@@ -154,6 +157,7 @@ public class NotificationService {
         return CompletableFuture.completedFuture(null);
     }
 
+    @Transactional(readOnly = true)
     @Async
     public CompletableFuture<Void> sendPushNotification(User user, ActivityLogDto log) {
         try {
@@ -175,6 +179,7 @@ public class NotificationService {
         return CompletableFuture.completedFuture(null);
     }
 
+    @Transactional(readOnly = true)
     @Async
     public CompletableFuture<Void> sendInAppNotification(User user, ActivityLogDto log) {
         try {

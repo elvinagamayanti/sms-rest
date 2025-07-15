@@ -2,6 +2,7 @@ package com.sms.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.annotation.LogActivity;
 import com.sms.dto.RoleDto;
+import com.sms.dto.SimpleUserDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.User;
+import com.sms.mapper.UserMapper;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.RoleService;
 
@@ -156,9 +159,17 @@ public class RoleController {
             @ApiResponse(responseCode = "404", description = "Role tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/{id}/users")
-    public ResponseEntity<List<User>> getUsersByRoleId(@PathVariable("id") Long id) {
+    // public ResponseEntity<List<User>> getUsersByRoleId(@PathVariable("id") Long
+    // id) {
+    // List<User> users = roleService.getUsersByRoleId(id);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getUsersByRoleId(@PathVariable("id") Long id) {
         List<User> users = roleService.getUsersByRoleId(id);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
