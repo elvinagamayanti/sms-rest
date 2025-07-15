@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.annotation.LogActivity;
 import com.sms.dto.KegiatanDto;
+import com.sms.dto.SimpleKegiatanDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.Kegiatan;
+import com.sms.mapper.KegiatanMapper;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.KegiatanService;
 
@@ -60,8 +62,15 @@ public class KegiatanController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     })
     @GetMapping
-    public ResponseEntity<List<KegiatanDto>> getAllKegiatans() {
-        List<KegiatanDto> kegiatanDtos = this.kegiatanService.ambilDaftarKegiatan();
+    // public ResponseEntity<List<KegiatanDto>> getAllKegiatans() {
+    // List<KegiatanDto> kegiatanDtos = this.kegiatanService.ambilDaftarKegiatan();
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> getAllKegiatans() {
+        List<KegiatanDto> kegiatan = this.kegiatanService.ambilDaftarKegiatan();
+        List<SimpleKegiatanDto> kegiatanDtos = kegiatan.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
         return ResponseEntity.ok(kegiatanDtos);
     }
 
@@ -78,9 +87,15 @@ public class KegiatanController {
             @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<KegiatanDto> getKegiatanById(@PathVariable("id") Long id) {
+    // public ResponseEntity<KegiatanDto> getKegiatanById(@PathVariable("id") Long
+    // id) {
+    // KegiatanDto kegiatanDto = kegiatanService.cariKegiatanById(id);
+    // return ResponseEntity.ok(kegiatanDto);
+    // }
+    public ResponseEntity<SimpleKegiatanDto> getKegiatanById(@PathVariable("id") Long id) {
         KegiatanDto kegiatanDto = kegiatanService.cariKegiatanById(id);
-        return ResponseEntity.ok(kegiatanDto);
+        SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapKegiatanDtoToSimpleKegiatanDto(kegiatanDto);
+        return ResponseEntity.ok(simpleKegiatanDto);
     }
 
     /**
@@ -96,9 +111,15 @@ public class KegiatanController {
             @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/{id}/detail")
-    public ResponseEntity<Kegiatan> getKegiatanDetailById(@PathVariable("id") Long id) {
+    // public ResponseEntity<Kegiatan> getKegiatanDetailById(@PathVariable("id")
+    // Long id) {
+    // Kegiatan kegiatan = kegiatanService.findKegiatanById(id);
+    // return ResponseEntity.ok(kegiatan);
+    // }
+    public ResponseEntity<SimpleKegiatanDto> getKegiatanDetailById(@PathVariable("id") Long id) {
         Kegiatan kegiatan = kegiatanService.findKegiatanById(id);
-        return ResponseEntity.ok(kegiatan);
+        SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapToSimpleKegiatanDto(kegiatan);
+        return ResponseEntity.ok(simpleKegiatanDto);
     }
 
     /**
@@ -181,12 +202,20 @@ public class KegiatanController {
             @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<KegiatanDto> patchKegiatan(
+    // public ResponseEntity<KegiatanDto> patchKegiatan(
+    // @PathVariable("id") Long id,
+    // @RequestBody Map<String, Object> updates) {
+
+    // KegiatanDto kegiatanDto = kegiatanService.patchKegiatan(id, updates);
+    // return ResponseEntity.ok(kegiatanDto);
+    // }
+    public ResponseEntity<SimpleKegiatanDto> patchKegiatan(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> updates) {
 
         KegiatanDto kegiatanDto = kegiatanService.patchKegiatan(id, updates);
-        return ResponseEntity.ok(kegiatanDto);
+        SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapKegiatanDtoToSimpleKegiatanDto(kegiatanDto);
+        return ResponseEntity.ok(simpleKegiatanDto);
     }
 
     /**
@@ -202,45 +231,92 @@ public class KegiatanController {
             @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan")
     })
     @GetMapping("/direktorat/{direktoratId}")
-    public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJ(
+    // public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJ(
+    // @PathVariable("direktoratId") Long direktoratId) {
+    // List<KegiatanDto> kegiatanDtos =
+    // kegiatanService.getKegiatanByDirektoratPJ(direktoratId);
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByDirektoratPJ(
             @PathVariable("direktoratId") Long direktoratId) {
         List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJ(direktoratId);
-        return ResponseEntity.ok(kegiatanDtos);
+        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
+        return ResponseEntity.ok(simpleKegiatanDtos);
     }
 
     @LogActivity(description = "Retrieved kegiatan by direktorat PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Kode Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan kode direktorat penanggung jawab")
     @GetMapping("/direktorat/code/{direktoratCode}")
-    public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJCode(
+    // public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJCode(
+    // @PathVariable("direktoratCode") String direktoratCode) {
+    // List<KegiatanDto> kegiatanDtos =
+    // kegiatanService.getKegiatanByDirektoratPJCode(direktoratCode);
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByDirektoratPJCode(
             @PathVariable("direktoratCode") String direktoratCode) {
         List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJCode(direktoratCode);
-        return ResponseEntity.ok(kegiatanDtos);
+        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
+        return ResponseEntity.ok(simpleKegiatanDtos);
     }
 
     @LogActivity(description = "Retrieved kegiatan by deputi PJ ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Deputi PJ", description = "Menampilkan daftar kegiatan berdasarkan deputi penanggung jawab")
     @GetMapping("/deputi/{deputiId}")
-    public ResponseEntity<List<KegiatanDto>> getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
+    // public ResponseEntity<List<KegiatanDto>>
+    // getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
+    // List<KegiatanDto> kegiatanDtos =
+    // kegiatanService.getKegiatanByDeputiPJ(deputiId);
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
         List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJ(deputiId);
-        return ResponseEntity.ok(kegiatanDtos);
+        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
+        return ResponseEntity.ok(simpleKegiatanDtos);
     }
 
     @LogActivity(description = "Retrieved kegiatan by deputi PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Kode Deputi PJ", description = "Menampilkan daftar kegiatan berdasarkan kode deputi penanggung jawab")
     @GetMapping("/deputi/code/{deputiCode}")
-    public ResponseEntity<List<KegiatanDto>> getKegiatanByDeputiPJCode(@PathVariable("deputiCode") String deputiCode) {
+    // public ResponseEntity<List<KegiatanDto>>
+    // getKegiatanByDeputiPJCode(@PathVariable("deputiCode") String deputiCode) {
+    // List<KegiatanDto> kegiatanDtos =
+    // kegiatanService.getKegiatanByDeputiPJCode(deputiCode);
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByDeputiPJCode(
+            @PathVariable("deputiCode") String deputiCode) {
         List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJCode(deputiCode);
-        return ResponseEntity.ok(kegiatanDtos);
+        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
+        return ResponseEntity.ok(simpleKegiatanDtos);
     }
 
     @LogActivity(description = "Retrieved kegiatan by year and direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Menampilkan Kegiatan berdasarkan Tahun dan Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan tahun dan direktorat penanggung jawab")
     @GetMapping("/direktorat/{direktoratId}/year/{year}")
-    public ResponseEntity<List<KegiatanDto>> getKegiatanByYearAndDirektoratPJ(
+    // public ResponseEntity<List<KegiatanDto>> getKegiatanByYearAndDirektoratPJ(
+    // @PathVariable("direktoratId") Long direktoratId,
+    // @PathVariable("year") int year) {
+    // List<KegiatanDto> kegiatanDtos =
+    // kegiatanService.getKegiatanByYearAndDirektoratPJ(year, direktoratId);
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByYearAndDirektoratPJ(
             @PathVariable("direktoratId") Long direktoratId,
             @PathVariable("year") int year) {
         List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByYearAndDirektoratPJ(year, direktoratId);
-        return ResponseEntity.ok(kegiatanDtos);
+        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
+        return ResponseEntity.ok(simpleKegiatanDtos);
     }
 
     @LogActivity(description = "Retrieved kegiatan by year and deputi PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
@@ -278,28 +354,55 @@ public class KegiatanController {
     @LogActivity(description = "Retrieved kegiatan without direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Kegiatan tanpa Direktorat PJ", description = "Menampilkan daftar kegiatan yang belum memiliki direktorat penanggung jawab")
     @GetMapping("/no-direktorat-pj")
-    public ResponseEntity<List<KegiatanDto>> getKegiatanWithoutDirektoratPJ() {
+    // public ResponseEntity<List<KegiatanDto>> getKegiatanWithoutDirektoratPJ() {
+    // List<KegiatanDto> kegiatanDtos =
+    // kegiatanService.getKegiatanWithoutDirektoratPJ();
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanWithoutDirektoratPJ() {
         List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanWithoutDirektoratPJ();
-        return ResponseEntity.ok(kegiatanDtos);
+        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
+        return ResponseEntity.ok(simpleKegiatanDtos);
     }
 
     @LogActivity(description = "Searched kegiatan by query", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Search Kegiatan", description = "Mencari kegiatan berdasarkan nama atau kode")
     @GetMapping("/search")
-    public ResponseEntity<List<KegiatanDto>> searchKegiatan(@RequestParam("q") String query) {
+    // public ResponseEntity<List<KegiatanDto>> searchKegiatan(@RequestParam("q")
+    // String query) {
+    // List<KegiatanDto> kegiatanDtos = kegiatanService.searchKegiatan(query);
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> searchKegiatan(@RequestParam("q") String query) {
         List<KegiatanDto> kegiatanDtos = kegiatanService.searchKegiatan(query);
-        return ResponseEntity.ok(kegiatanDtos);
+        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
+        return ResponseEntity.ok(simpleKegiatanDtos);
     }
 
     @LogActivity(description = "Filtered kegiatan by direktorat, year, and program", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Filter Kegiatan", description = "Filter kegiatan berdasarkan direktorat, tahun, dan program")
     @GetMapping("/filter")
-    public ResponseEntity<List<KegiatanDto>> filterKegiatan(
+    // public ResponseEntity<List<KegiatanDto>> filterKegiatan(
+    // @RequestParam(value = "direktoratId", required = false) Long direktoratId,
+    // @RequestParam(value = "year", required = false) Integer year,
+    // @RequestParam(value = "programId", required = false) Long programId) {
+    // List<KegiatanDto> kegiatanDtos = kegiatanService.filterKegiatan(direktoratId,
+    // year, programId);
+    // return ResponseEntity.ok(kegiatanDtos);
+    // }
+    public ResponseEntity<List<SimpleKegiatanDto>> filterKegiatan(
             @RequestParam(value = "direktoratId", required = false) Long direktoratId,
             @RequestParam(value = "year", required = false) Integer year,
             @RequestParam(value = "programId", required = false) Long programId) {
         List<KegiatanDto> kegiatanDtos = kegiatanService.filterKegiatan(direktoratId, year, programId);
-        return ResponseEntity.ok(kegiatanDtos);
+        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                .toList();
+        return ResponseEntity.ok(simpleKegiatanDtos);
     }
 
     @LogActivity(description = "Retrieved monthly statistics for a specific direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)

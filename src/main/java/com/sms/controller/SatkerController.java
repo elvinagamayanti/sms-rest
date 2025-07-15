@@ -2,6 +2,7 @@ package com.sms.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.annotation.LogActivity;
 import com.sms.dto.SatkerDto;
+import com.sms.dto.SimpleOutputDto;
+import com.sms.dto.SimpleSatkerDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
+import com.sms.mapper.OutputMapper;
+import com.sms.mapper.SatkerMapper;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.SatkerService;
 
@@ -58,9 +63,16 @@ public class SatkerController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     })
     @GetMapping
-    public ResponseEntity<List<SatkerDto>> getAllSatkers() {
+    // public ResponseEntity<List<SatkerDto>> getAllSatkers() {
+    // List<SatkerDto> satkerDtos = this.satkerService.ambilDaftarSatker();
+    // return ResponseEntity.ok(satkerDtos);
+    // }
+    public ResponseEntity<List<SimpleSatkerDto>> getAllSatkers() {
         List<SatkerDto> satkerDtos = this.satkerService.ambilDaftarSatker();
-        return ResponseEntity.ok(satkerDtos);
+        List<SimpleSatkerDto> simpleSatkerDtos = satkerDtos.stream()
+                .map(SatkerMapper::mapSatkerDtoToSimpleSatkerDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(simpleSatkerDtos);
     }
 
     /**
@@ -76,9 +88,14 @@ public class SatkerController {
             @ApiResponse(responseCode = "404", description = "Satuan kerja tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<SatkerDto> getSatkerById(@PathVariable("id") Long id) {
+    // public ResponseEntity<SatkerDto> getSatkerById(@PathVariable("id") Long id) {
+    // SatkerDto satkerDto = satkerService.cariSatkerById(id);
+    // return ResponseEntity.ok(satkerDto);
+    // }
+    public ResponseEntity<SimpleSatkerDto> getSatkerById(@PathVariable("id") Long id) {
         SatkerDto satkerDto = satkerService.cariSatkerById(id);
-        return ResponseEntity.ok(satkerDto);
+        SimpleSatkerDto simpleSatkerDto = SatkerMapper.mapSatkerDtoToSimpleSatkerDto(satkerDto);
+        return ResponseEntity.ok(simpleSatkerDto);
     }
 
     /**
@@ -113,14 +130,15 @@ public class SatkerController {
             @ApiResponse(responseCode = "404", description = "Satuan kerja tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<SatkerDto> updateSatker(
+    public ResponseEntity<SimpleSatkerDto> updateSatker(
             @PathVariable("id") Long id,
             @Valid @RequestBody SatkerDto satkerDto) {
 
         // Set the ID from the path variable
         satkerDto.setId(id);
         satkerService.perbaruiDataSatker(satkerDto);
-        return ResponseEntity.ok(satkerDto);
+        SimpleSatkerDto simpleSatkerDto = SatkerMapper.mapSatkerDtoToSimpleSatkerDto(satkerDto);
+        return ResponseEntity.ok(simpleSatkerDto);
     }
 
     /**
@@ -155,11 +173,12 @@ public class SatkerController {
             @ApiResponse(responseCode = "404", description = "Satuan kerja tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<SatkerDto> patchSatker(
+    public ResponseEntity<SimpleSatkerDto> patchSatker(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> updates) {
 
         SatkerDto satkerDto = satkerService.patchSatker(id, updates);
-        return ResponseEntity.ok(satkerDto);
+        SimpleSatkerDto simpleSatkerDto = SatkerMapper.mapSatkerDtoToSimpleSatkerDto(satkerDto);
+        return ResponseEntity.ok(simpleSatkerDto);
     }
 }

@@ -1,6 +1,7 @@
 package com.sms.mapper;
 
 import com.sms.dto.DirektoratDto;
+import com.sms.dto.SimpleDirektoratDto;
 import com.sms.entity.Direktorat;
 
 /**
@@ -28,5 +29,27 @@ public class DirektoratMapper {
                 .deputi(direktoratDto.getDeputi())
                 .build();
         return direktorat;
+    }
+
+    public static SimpleDirektoratDto mapToSimpleDirektoratDto(Direktorat direktorat) {
+        return SimpleDirektoratDto.builder()
+                .id(direktorat.getId())
+                .name(direktorat.getName())
+                .code(direktorat.getCode())
+                .deputiId(direktorat.getDeputi() != null ? direktorat.getDeputi().getId() : null)
+                .deputiName(direktorat.getDeputi() != null ? direktorat.getDeputi().getName() : null)
+                .deputiCode(direktorat.getDeputi() != null ? direktorat.getDeputi().getCode() : null)
+                .build();
+    }
+
+    public static SimpleDirektoratDto mapDirektoratDtoToSimpleDirektoratDto(DirektoratDto direktoratDto) {
+        return SimpleDirektoratDto.builder()
+                .id(direktoratDto.getId())
+                .name(direktoratDto.getName())
+                .code(direktoratDto.getCode())
+                .deputiId(direktoratDto.getDeputi() != null ? direktoratDto.getDeputi().getId() : null)
+                .deputiName(direktoratDto.getDeputi() != null ? direktoratDto.getDeputi().getName() : null)
+                .deputiCode(direktoratDto.getDeputi() != null ? direktoratDto.getDeputi().getCode() : null)
+                .build();
     }
 }

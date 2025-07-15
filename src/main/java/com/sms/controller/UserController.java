@@ -3,6 +3,7 @@ package com.sms.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.annotation.LogActivity;
+import com.sms.dto.SimpleUserDto;
 import com.sms.dto.UserDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
@@ -26,6 +28,7 @@ import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.Deputi;
 import com.sms.entity.Direktorat;
 import com.sms.entity.User;
+import com.sms.mapper.UserMapper;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.repository.RoleRepository;
 import com.sms.service.SatkerService;
@@ -69,9 +72,17 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar pengguna", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     })
+    // @GetMapping
+    // public ResponseEntity<List<UserDto>> getAllUsers() {
+    // List<UserDto> userDtos = this.userService.findAllUsers();
+    // return ResponseEntity.ok(userDtos);
+    // }
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> userDtos = this.userService.findAllUsers();
+    public ResponseEntity<List<SimpleUserDto>> getAllUsers() {
+        List<UserDto> users = this.userService.findAllUsers();
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapUserDtoToSimpleUserDto)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(userDtos);
     }
 
@@ -89,9 +100,18 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+    // public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+    // User user = userService.findUserById(id);
+    // return ResponseEntity.ok(user);
+    // }
+    public ResponseEntity<SimpleUserDto> getUserById(@PathVariable("id") Long id) {
         User user = userService.findUserById(id);
-        return ResponseEntity.ok(user);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+        SimpleUserDto userDto = UserMapper.mapToSimpleUserDto(user);
+        return ResponseEntity.ok(userDto);
     }
 
     /**
@@ -235,9 +255,17 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Satuan kerja tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/satker/{satkerId}")
-    public ResponseEntity<List<User>> getUsersBySatkerId(@PathVariable("satkerId") Long id) {
+    // public ResponseEntity<List<User>>
+    // getUsersBySatkerId(@PathVariable("satkerId") Long id) {
+    // List<User> users = satkerService.getUsersBySatkerId(id);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getUsersBySatkerId(@PathVariable("satkerId") Long id) {
         List<User> users = satkerService.getUsersBySatkerId(id);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
@@ -307,9 +335,17 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/direktorat/{direktoratId}")
-    public ResponseEntity<List<UserDto>> getUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId) {
+    // public ResponseEntity<List<UserDto>>
+    // getUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId) {
+    // List<UserDto> users = userService.findUsersByDirektoratId(direktoratId);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId) {
         List<UserDto> users = userService.findUsersByDirektoratId(direktoratId);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapUserDtoToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
@@ -325,9 +361,17 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Deputi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/deputi/{deputiId}")
-    public ResponseEntity<List<UserDto>> getUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
+    // public ResponseEntity<List<UserDto>>
+    // getUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
+    // List<UserDto> users = userService.findUsersByDeputiId(deputiId);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
         List<UserDto> users = userService.findUsersByDeputiId(deputiId);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapUserDtoToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
@@ -343,9 +387,20 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/direktorat/{direktoratId}/active")
-    public ResponseEntity<List<UserDto>> getActiveUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId) {
+    // public ResponseEntity<List<UserDto>>
+    // getActiveUsersByDirektoratId(@PathVariable("direktoratId") Long direktoratId)
+    // {
+    // List<UserDto> users =
+    // userService.findActiveUsersByDirektoratId(direktoratId);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getActiveUsersByDirektoratId(
+            @PathVariable("direktoratId") Long direktoratId) {
         List<UserDto> users = userService.findActiveUsersByDirektoratId(direktoratId);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapUserDtoToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
@@ -361,9 +416,17 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Deputi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/deputi/{deputiId}/active")
-    public ResponseEntity<List<UserDto>> getActiveUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
+    // public ResponseEntity<List<UserDto>>
+    // getActiveUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
+    // List<UserDto> users = userService.findActiveUsersByDeputiId(deputiId);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getActiveUsersByDeputiId(@PathVariable("deputiId") Long deputiId) {
         List<UserDto> users = userService.findActiveUsersByDeputiId(deputiId);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapUserDtoToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
@@ -379,9 +442,17 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/direktorat/code/{code}")
-    public ResponseEntity<List<UserDto>> getUsersByDirektoratCode(@PathVariable("code") String code) {
+    // public ResponseEntity<List<UserDto>>
+    // getUsersByDirektoratCode(@PathVariable("code") String code) {
+    // List<UserDto> users = userService.findUsersByDirektoratCode(code);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getUsersByDirektoratCode(@PathVariable("code") String code) {
         List<UserDto> users = userService.findUsersByDirektoratCode(code);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapUserDtoToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
@@ -397,9 +468,17 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Deputi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/deputi/code/{code}")
-    public ResponseEntity<List<UserDto>> getUsersByDeputiCode(@PathVariable("code") String code) {
+    // public ResponseEntity<List<UserDto>>
+    // getUsersByDeputiCode(@PathVariable("code") String code) {
+    // List<UserDto> users = userService.findUsersByDeputiCode(code);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getUsersByDeputiCode(@PathVariable("code") String code) {
         List<UserDto> users = userService.findUsersByDeputiCode(code);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> userDtos = users.stream()
+                .map(UserMapper::mapUserDtoToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(userDtos);
     }
 
     /**
@@ -520,11 +599,23 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> patchUser(
+    // public ResponseEntity<UserDto> patchUser(
+    // @PathVariable("id") Long id,
+    // @RequestBody Map<String, Object> updates) {
+
+    // UserDto userDto = userService.patchUser(id, updates);
+    // return ResponseEntity.ok(userDto);
+    // }
+    public ResponseEntity<SimpleUserDto> patchUser(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> updates) {
 
-        UserDto userDto = userService.patchUser(id, updates);
+        UserDto user = userService.patchUser(id, updates);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+        SimpleUserDto userDto = UserMapper.mapUserDtoToSimpleUserDto(user);
         return ResponseEntity.ok(userDto);
     }
 

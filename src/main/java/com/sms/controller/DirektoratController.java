@@ -24,6 +24,11 @@ import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.User;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.DirektoratService;
+import com.sms.mapper.DirektoratMapper;
+import com.sms.dto.SimpleDirektoratDto;
+import java.util.stream.Collectors;
+import com.sms.dto.SimpleUserDto;
+import com.sms.mapper.UserMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -59,9 +64,17 @@ public class DirektoratController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     })
     @GetMapping
-    public ResponseEntity<List<DirektoratDto>> getAllDirektorats() {
+    // public ResponseEntity<List<DirektoratDto>> getAllDirektorats() {
+    // List<DirektoratDto> direktoratDtos =
+    // this.direktoratService.ambilDaftarDirektorat();
+    // return ResponseEntity.ok(direktoratDtos);
+    // }
+    public ResponseEntity<List<SimpleDirektoratDto>> getAllDirektorats() {
         List<DirektoratDto> direktoratDtos = this.direktoratService.ambilDaftarDirektorat();
-        return ResponseEntity.ok(direktoratDtos);
+        List<SimpleDirektoratDto> simpleDirektoratDtos = direktoratDtos.stream()
+                .map(DirektoratMapper::mapDirektoratDtoToSimpleDirektoratDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(simpleDirektoratDtos);
     }
 
     /**
@@ -77,9 +90,15 @@ public class DirektoratController {
             @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<DirektoratDto> getDirektoratById(@PathVariable("id") Long id) {
+    // public ResponseEntity<DirektoratDto> getDirektoratById(@PathVariable("id")
+    // Long id) {
+    // DirektoratDto direktoratDto = direktoratService.cariDirektoratById(id);
+    // return ResponseEntity.ok(direktoratDto);
+    // }
+    public ResponseEntity<SimpleDirektoratDto> getDirektoratById(@PathVariable("id") Long id) {
         DirektoratDto direktoratDto = direktoratService.cariDirektoratById(id);
-        return ResponseEntity.ok(direktoratDto);
+        SimpleDirektoratDto simpleDirektoratDto = DirektoratMapper.mapDirektoratDtoToSimpleDirektoratDto(direktoratDto);
+        return ResponseEntity.ok(simpleDirektoratDto);
     }
 
     @LogActivity(description = "Retrieved direktorat by code", activityType = ActivityType.VIEW, entityType = EntityType.DIREKTORAT, severity = LogSeverity.LOW)
@@ -89,9 +108,15 @@ public class DirektoratController {
             @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/code/{code}")
-    public ResponseEntity<DirektoratDto> getDirektoratByCode(@PathVariable("code") String code) {
+    // public ResponseEntity<DirektoratDto>
+    // getDirektoratByCode(@PathVariable("code") String code) {
+    // DirektoratDto direktoratDto = direktoratService.cariDirektoratByCode(code);
+    // return ResponseEntity.ok(direktoratDto);
+    // }
+    public ResponseEntity<SimpleDirektoratDto> getDirektoratByCode(@PathVariable("code") String code) {
         DirektoratDto direktoratDto = direktoratService.cariDirektoratByCode(code);
-        return ResponseEntity.ok(direktoratDto);
+        SimpleDirektoratDto simpleDirektoratDto = DirektoratMapper.mapDirektoratDtoToSimpleDirektoratDto(direktoratDto);
+        return ResponseEntity.ok(simpleDirektoratDto);
     }
 
     @LogActivity(description = "Created new direktorat", activityType = ActivityType.CREATE, entityType = EntityType.DIREKTORAT, severity = LogSeverity.MEDIUM)
@@ -140,9 +165,18 @@ public class DirektoratController {
             @ApiResponse(responseCode = "404", description = "Deputi tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/deputi/{deputiId}")
-    public ResponseEntity<List<DirektoratDto>> getDirektoratsByDeputiId(@PathVariable("deputiId") Long deputiId) {
+    // public ResponseEntity<List<DirektoratDto>>
+    // getDirektoratsByDeputiId(@PathVariable("deputiId") Long deputiId) {
+    // List<DirektoratDto> direktorats =
+    // direktoratService.getDirektoratsByDeputiId(deputiId);
+    // return ResponseEntity.ok(direktorats);
+    // }
+    public ResponseEntity<List<SimpleDirektoratDto>> getDirektoratsByDeputiId(@PathVariable("deputiId") Long deputiId) {
         List<DirektoratDto> direktorats = direktoratService.getDirektoratsByDeputiId(deputiId);
-        return ResponseEntity.ok(direktorats);
+        List<SimpleDirektoratDto> simpleDirektoratDtos = direktorats.stream()
+                .map(DirektoratMapper::mapDirektoratDtoToSimpleDirektoratDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(simpleDirektoratDtos);
     }
 
     @LogActivity(description = "Retrieved users by direktorat ID", activityType = ActivityType.VIEW, entityType = EntityType.DIREKTORAT, severity = LogSeverity.LOW)
@@ -152,9 +186,17 @@ public class DirektoratController {
             @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/{id}/users")
-    public ResponseEntity<List<User>> getUsersByDirektoratId(@PathVariable("id") Long id) {
+    // public ResponseEntity<List<User>> getUsersByDirektoratId(@PathVariable("id")
+    // Long id) {
+    // List<User> users = direktoratService.getUsersByDirektoratId(id);
+    // return ResponseEntity.ok(users);
+    // }
+    public ResponseEntity<List<SimpleUserDto>> getUsersByDirektoratId(@PathVariable("id") Long id) {
         List<User> users = direktoratService.getUsersByDirektoratId(id);
-        return ResponseEntity.ok(users);
+        List<SimpleUserDto> simpleUserDtos = users.stream()
+                .map(UserMapper::mapToSimpleUserDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(simpleUserDtos);
     }
 
     @LogActivity(description = "Partially updated direktorat by ID", activityType = ActivityType.UPDATE, entityType = EntityType.DIREKTORAT, severity = LogSeverity.MEDIUM)
@@ -164,11 +206,20 @@ public class DirektoratController {
             @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<DirektoratDto> patchDirektorat(
+    // public ResponseEntity<DirektoratDto> patchDirektorat(
+    // @PathVariable("id") Long id,
+    // @RequestBody Map<String, Object> updates) {
+
+    // DirektoratDto direktoratDto = direktoratService.patchDirektorat(id, updates);
+    // return ResponseEntity.ok(direktoratDto);
+    // }
+    public ResponseEntity<SimpleDirektoratDto> patchDirektorat(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> updates) {
 
         DirektoratDto direktoratDto = direktoratService.patchDirektorat(id, updates);
-        return ResponseEntity.ok(direktoratDto);
+        SimpleDirektoratDto simpleDirektoratDto = DirektoratMapper.mapDirektoratDtoToSimpleDirektoratDto(direktoratDto);
+        return ResponseEntity.ok(simpleDirektoratDto);
     }
+
 }

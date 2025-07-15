@@ -2,6 +2,7 @@ package com.sms.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.annotation.LogActivity;
 import com.sms.dto.OutputDto;
+import com.sms.dto.SimpleOutputDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
+import com.sms.mapper.OutputMapper;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.OutputService;
 
@@ -58,8 +61,15 @@ public class OutputController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     })
     @GetMapping
-    public ResponseEntity<List<OutputDto>> getAllOutputs() {
-        List<OutputDto> outputDtos = this.outputService.ambilDaftarOutput();
+    // public ResponseEntity<List<OutputDto>> getAllOutputs() {
+    // List<OutputDto> outputDtos = this.outputService.ambilDaftarOutput();
+    // return ResponseEntity.ok(outputDtos);
+    // }
+    public ResponseEntity<List<SimpleOutputDto>> getAllOutputs() {
+        List<OutputDto> output = outputService.ambilDaftarOutput();
+        List<SimpleOutputDto> outputDtos = output.stream()
+                .map(OutputMapper::mapOutputDtoToSimpleOutputDto)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(outputDtos);
     }
 
@@ -76,9 +86,14 @@ public class OutputController {
             @ApiResponse(responseCode = "404", description = "Output tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<OutputDto> getOutputById(@PathVariable("id") Long id) {
+    // public ResponseEntity<OutputDto> getOutputById(@PathVariable("id") Long id) {
+    // OutputDto outputDto = outputService.cariOutputById(id);
+    // return ResponseEntity.ok(outputDto);
+    // }
+    public ResponseEntity<SimpleOutputDto> getOutputById(@PathVariable("id") Long id) {
         OutputDto outputDto = outputService.cariOutputById(id);
-        return ResponseEntity.ok(outputDto);
+        SimpleOutputDto simpleOutputDto = OutputMapper.mapOutputDtoToSimpleOutputDto(outputDto);
+        return ResponseEntity.ok(simpleOutputDto);
     }
 
     /**
@@ -113,14 +128,15 @@ public class OutputController {
             @ApiResponse(responseCode = "404", description = "Output tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<OutputDto> updateOutput(
+    public ResponseEntity<SimpleOutputDto> updateOutput(
             @PathVariable("id") Long id,
             @Valid @RequestBody OutputDto outputDto) {
 
         // Set the ID from the path variable
         outputDto.setId(id);
         outputService.perbaruiDataOutput(outputDto);
-        return ResponseEntity.ok(outputDto);
+        SimpleOutputDto simpleOutputDto = OutputMapper.mapOutputDtoToSimpleOutputDto(outputDto);
+        return ResponseEntity.ok(simpleOutputDto);
     }
 
     /**
@@ -155,11 +171,12 @@ public class OutputController {
             @ApiResponse(responseCode = "404", description = "Output tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<OutputDto> patchOutput(
+    public ResponseEntity<SimpleOutputDto> patchOutput(
             @PathVariable("id") Long id,
             @RequestBody Map<String, Object> updates) {
 
         OutputDto outputDto = outputService.patchOutput(id, updates);
-        return ResponseEntity.ok(outputDto);
+        SimpleOutputDto simpleOutputDto = OutputMapper.mapOutputDtoToSimpleOutputDto(outputDto);
+        return ResponseEntity.ok(simpleOutputDto);
     }
 }

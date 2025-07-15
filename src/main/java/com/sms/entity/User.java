@@ -8,10 +8,6 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +26,7 @@ import lombok.Setter;
 @Builder
 @Entity
 @Table(name = "users")
-// @JsonIgnoreProperties({ "roles", "listKegiatans" })
+// @JsonIgnoreProperties({ "roles", "listKegiatans", "password" })
 public class User {
     private static final long serialVersionUID = 1L;
 
