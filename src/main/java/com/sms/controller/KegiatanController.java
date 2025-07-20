@@ -1,5 +1,6 @@
 package com.sms.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,9 +25,11 @@ import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.Kegiatan;
+import com.sms.entity.User;
 import com.sms.mapper.KegiatanMapper;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.KegiatanService;
+import com.sms.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,9 +48,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/kegiatans")
 public class KegiatanController {
     private final KegiatanService kegiatanService;
+    private final UserService userService;
 
-    public KegiatanController(KegiatanService kegiatanService) {
+    public KegiatanController(KegiatanService kegiatanService, UserService userService) {
         this.kegiatanService = kegiatanService;
+        this.userService = userService;
     }
 
     /**
@@ -431,5 +436,184 @@ public class KegiatanController {
     public ResponseEntity<Map<String, Object>> syncDirektoratPJFromUser() {
         Map<String, Object> result = kegiatanService.syncDirektoratPJFromUser();
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Assign kegiatan ke multiple satker
+     */
+    @LogActivity(description = "Assigned kegiatan to multiple satkers", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
+    @Operation(summary = "Assign Kegiatan ke Satker", description = "Menduplikasi kegiatan dari pusat ke satker-satker daerah yang dipilih")
+    @PostMapping("/{kegiatanId}/assign-to-satkers")
+    public ResponseEntity<Map<String, Object>> assignKegiatanToSatkers(
+            @PathVariable("kegiatanId") Long kegiatanId,
+            @RequestBody Map<String, List<Long>> request) {
+
+        List<Long> satkerIds = request.get("satkerIds");
+
+        if (satkerIds == null || satkerIds.isEmpty()) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Daftar satker tidak boleh kosong");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        Map<String, Object> result = kegiatanService.assignKegiatanToSatkers(kegiatanId, satkerIds);
+
+        if ((Boolean) result.get("success")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
+    }
+
+    /**
+     * Assign kegiatan berdasarkan kode provinsi
+     */
+    @LogActivity(description = "Assigned kegiatan to provinces", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
+    @Operation(summary = "Assign Kegiatan ke Provinsi", description = "Menduplikasi kegiatan dari pusat ke semua satker di provinsi yang dipilih")
+    @PostMapping("/{kegiatanId}/assign-to-provinces")
+    public ResponseEntity<Map<String, Object>> assignKegiatanToProvinces(
+            @PathVariable("kegiatanId") Long kegiatanId,
+            @RequestBody Map<String, List<String>> request) {
+
+        List<String> provinceCodes = request.get("provinceCodes");
+
+        if (provinceCodes == null || provinceCodes.isEmpty()) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Daftar kode provinsi tidak boleh kosong");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        Map<String, Object> result = kegiatanService.assignKegiatanToProvinces(kegiatanId, provinceCodes);
+
+        if ((Boolean) result.get("success")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
+    }
+
+    /**
+     * Get kegiatan yang di-assign ke satker tertentu
+     */
+    @LogActivity(description = "Retrieved assigned kegiatan by satker", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan yang Di-assign ke Satker", description = "Menampilkan daftar kegiatan yang telah di-assign ke satker tertentu")
+    @GetMapping("/assigned/satker/{satkerId}")
+    public ResponseEntity<List<KegiatanDto>> getAssignedKegiatanBySatker(
+            @PathVariable("satkerId") Long satkerId) {
+        List<KegiatanDto> kegiatans = kegiatanService.getAssignedKegiatanBySatker(satkerId);
+        return ResponseEntity.ok(kegiatans);
+    }
+
+    /**
+     * Assign user ke kegiatan (untuk admin/supervisor)
+     */
+    @LogActivity(description = "Assigned user to kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Assign User ke Kegiatan", description = "Menugaskan user tertentu ke kegiatan di satker")
+    @PostMapping("/{kegiatanId}/assign-user/{userId}")
+    public ResponseEntity<Map<String, Object>> assignUserToKegiatan(
+            @PathVariable("kegiatanId") Long kegiatanId,
+            @PathVariable("userId") Long userId) {
+
+        Map<String, Object> result = kegiatanService.assignUserToKegiatan(kegiatanId, userId);
+
+        if ((Boolean) result.get("success")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+    }
+
+    /**
+     * User claim kegiatan untuk dirinya sendiri
+     */
+    @LogActivity(description = "User claimed kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Claim Kegiatan", description = "User mengambil/claim kegiatan untuk dirinya sendiri")
+    @PostMapping("/{kegiatanId}/claim")
+    public ResponseEntity<Map<String, Object>> claimKegiatan(
+            @PathVariable("kegiatanId") Long kegiatanId) {
+
+        Map<String, Object> result = kegiatanService.claimKegiatan(kegiatanId);
+
+        if ((Boolean) result.get("success")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+    }
+
+    /**
+     * Unassign user dari kegiatan
+     */
+    @LogActivity(description = "Unassigned user from kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Unassign User dari Kegiatan", description = "Melepas assignment user dari kegiatan")
+    @PostMapping("/{kegiatanId}/unassign")
+    public ResponseEntity<Map<String, Object>> unassignUserFromKegiatan(
+            @PathVariable("kegiatanId") Long kegiatanId) {
+
+        Map<String, Object> result = kegiatanService.unassignUserFromKegiatan(kegiatanId);
+
+        if ((Boolean) result.get("success")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+    }
+
+    /**
+     * Get kegiatan yang belum ditugaskan di satker
+     */
+    @LogActivity(description = "Retrieved unassigned kegiatan by satker", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan Belum Ditugaskan", description = "Menampilkan daftar kegiatan yang belum ditugaskan di satker")
+    @GetMapping("/unassigned/satker/{satkerId}")
+    public ResponseEntity<List<KegiatanDto>> getUnassignedKegiatanBySatker(
+            @PathVariable("satkerId") Long satkerId) {
+        List<KegiatanDto> kegiatans = kegiatanService.getUnassignedKegiatanBySatker(satkerId);
+        return ResponseEntity.ok(kegiatans);
+    }
+
+    /**
+     * Get kegiatan yang ditugaskan ke user tertentu
+     */
+    @LogActivity(description = "Retrieved kegiatan by assigned user", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan User", description = "Menampilkan daftar kegiatan yang ditugaskan ke user tertentu")
+    @GetMapping("/assigned/user/{userId}")
+    public ResponseEntity<List<KegiatanDto>> getKegiatanByAssignedUser(
+            @PathVariable("userId") Long userId) {
+        List<KegiatanDto> kegiatans = kegiatanService.getKegiatanByAssignedUser(userId);
+        return ResponseEntity.ok(kegiatans);
+    }
+
+    /**
+     * Get kegiatan untuk current user yang sedang login
+     */
+    @Operation(summary = "Kegiatan Saya", description = "Menampilkan daftar kegiatan yang ditugaskan ke user yang sedang login")
+    @GetMapping("/my-kegiatans")
+    public ResponseEntity<List<KegiatanDto>> getMyKegiatans() {
+        User currentUser = userService.getCurrentUser();
+        List<KegiatanDto> kegiatans = kegiatanService.getKegiatanByAssignedUser(currentUser.getId());
+        return ResponseEntity.ok(kegiatans);
+    }
+
+    /**
+     * Transfer kegiatan dari satu user ke user lain
+     */
+    @LogActivity(description = "Transferred kegiatan between users", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
+    @Operation(summary = "Transfer Kegiatan", description = "Transfer kegiatan dari satu user ke user lain dalam satker yang sama")
+    @PostMapping("/{kegiatanId}/transfer/{fromUserId}/{toUserId}")
+    public ResponseEntity<Map<String, Object>> transferKegiatanToUser(
+            @PathVariable("kegiatanId") Long kegiatanId,
+            @PathVariable("fromUserId") Long fromUserId,
+            @PathVariable("toUserId") Long toUserId) {
+
+        Map<String, Object> result = kegiatanService.transferKegiatanToUser(
+                kegiatanId, fromUserId, toUserId);
+
+        if ((Boolean) result.get("success")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
     }
 }

@@ -64,4 +64,84 @@ public interface KegiatanService {
     void assignDirektoratPJ(Long kegiatanId, Long direktoratId);
 
     Map<String, Object> syncDirektoratPJFromUser();
+
+    /**
+     * Assign kegiatan survei ke multiple satker
+     * Method ini akan menduplikasi kegiatan yang dibuat di pusat ke satker-satker
+     * daerah
+     * 
+     * @param kegiatanId ID kegiatan master yang akan di-assign
+     * @param satkerIds  List ID satker yang akan menerima kegiatan
+     * @return Map berisi informasi hasil assign
+     */
+    Map<String, Object> assignKegiatanToSatkers(Long kegiatanId, List<Long> satkerIds);
+
+    /**
+     * Assign kegiatan survei ke satker berdasarkan kode provinsi
+     * 
+     * @param kegiatanId    ID kegiatan master
+     * @param provinceCodes List kode provinsi
+     * @return Map berisi informasi hasil assign
+     */
+    Map<String, Object> assignKegiatanToProvinces(Long kegiatanId, List<String> provinceCodes);
+
+    /**
+     * Get kegiatan yang telah di-assign ke satker tertentu
+     * 
+     * @param satkerId ID satker
+     * @return List kegiatan yang di-assign ke satker
+     */
+    List<KegiatanDto> getAssignedKegiatanBySatker(Long satkerId);
+
+    /**
+     * Assign user ke kegiatan yang sudah di-assign ke satker
+     * Method ini digunakan oleh satker daerah untuk menugaskan user ke kegiatan
+     * 
+     * @param kegiatanId ID kegiatan yang akan ditugaskan
+     * @param userId     ID user yang akan ditugaskan
+     * @return Response dengan informasi hasil assign
+     */
+    Map<String, Object> assignUserToKegiatan(Long kegiatanId, Long userId);
+
+    /**
+     * User claim kegiatan untuk dirinya sendiri
+     * 
+     * @param kegiatanId ID kegiatan yang akan di-claim
+     * @return Response dengan informasi hasil claim
+     */
+    Map<String, Object> claimKegiatan(Long kegiatanId);
+
+    /**
+     * Lepas assignment user dari kegiatan (set user_id = null)
+     * 
+     * @param kegiatanId ID kegiatan
+     * @return Response dengan informasi hasil unassign
+     */
+    Map<String, Object> unassignUserFromKegiatan(Long kegiatanId);
+
+    /**
+     * Get daftar kegiatan yang belum ditugaskan (user_id = null) di satker tertentu
+     * 
+     * @param satkerId ID satker
+     * @return List kegiatan yang belum ditugaskan
+     */
+    List<KegiatanDto> getUnassignedKegiatanBySatker(Long satkerId);
+
+    /**
+     * Get daftar kegiatan yang sudah ditugaskan ke user tertentu
+     * 
+     * @param userId ID user
+     * @return List kegiatan yang sudah ditugaskan ke user
+     */
+    List<KegiatanDto> getKegiatanByAssignedUser(Long userId);
+
+    /**
+     * Transfer kegiatan dari satu user ke user lain dalam satker yang sama
+     * 
+     * @param kegiatanId ID kegiatan
+     * @param fromUserId ID user asal
+     * @param toUserId   ID user tujuan
+     * @return Response dengan informasi hasil transfer
+     */
+    Map<String, Object> transferKegiatanToUser(Long kegiatanId, Long fromUserId, Long toUserId);
 }

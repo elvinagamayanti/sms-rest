@@ -6,12 +6,15 @@ package com.sms.service.impl;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sms.dto.KegiatanDto;
 import com.sms.entity.Direktorat;
@@ -28,6 +31,7 @@ import com.sms.repository.ProgramRepository;
 import com.sms.repository.SatkerRepository;
 import com.sms.repository.UserRepository;
 import com.sms.service.KegiatanService;
+import com.sms.service.UserService;
 
 /**
  *
@@ -41,16 +45,18 @@ public class KegiatanServiceImpl implements KegiatanService {
     private ProgramRepository programRepository;
     private OutputRepository outputRepository;
     private DirektoratRepository direktoratRepository;
+    private final UserService userService;
 
     public KegiatanServiceImpl(KegiatanRepository kegiatanRepository, UserRepository userRepository,
             SatkerRepository satkerRepository, ProgramRepository programRepository, OutputRepository outputRepository,
-            DirektoratRepository direktoratRepository) {
+            DirektoratRepository direktoratRepository, UserService userService) {
         this.userRepository = userRepository;
         this.satkerRepository = satkerRepository;
         this.programRepository = programRepository;
         this.outputRepository = outputRepository;
         this.kegiatanRepository = kegiatanRepository;
         this.direktoratRepository = direktoratRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -414,6 +420,321 @@ public class KegiatanServiceImpl implements KegiatanService {
         result.put("errorCount", errorCount);
         result.put("message",
                 "Sync completed: " + syncedCount + " kegiatan berhasil di-sync, " + errorCount + " error");
+
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> assignKegiatanToSatkers(Long kegiatanId, List<Long> satkerIds) {
+        Map<String, Object> result = new HashMap<>();
+
+        // 1. Validasi input
+        if (satkerIds == null || satkerIds.isEmpty()) {
+            throw new IllegalArgumentException("Daftar satker tidak boleh kosong");
+        }
+
+        // 2. Ambil kegiatan master
+        Kegiatan masterKegiatan = kegiatanRepository.findById(kegiatanId)
+                .orElseThrow(() -> new RuntimeException("Kegiatan not found with id: " + kegiatanId));
+
+        List<String> successSatkers = new ArrayList<>();
+        List<String> failedSatkers = new ArrayList<>();
+
+        // 3. Process setiap satker - TANPA TRY-CATCH INTERNAL
+        for (Long satkerId : satkerIds) {
+            // Validasi satker
+            Satker targetSatker = satkerRepository.findById(satkerId)
+                    .orElseThrow(() -> new RuntimeException("Satker not found with id: " + satkerId));
+
+            // Cek duplikasi
+            boolean exists = kegiatanRepository.existsByNameAndSatkerId(
+                    masterKegiatan.getName(), satkerId);
+
+            if (exists) {
+                failedSatkers.add(targetSatker.getName() + " (sudah ada)");
+                continue; // Skip tanpa exception
+            }
+
+            // Buat dan simpan kegiatan baru
+            Kegiatan assignedKegiatan = createDuplicateKegiatan(masterKegiatan, targetSatker);
+            kegiatanRepository.save(assignedKegiatan);
+
+            successSatkers.add(targetSatker.getName());
+        }
+
+        // 4. Buat response
+        result.put("success", true);
+        result.put("message", "Proses assign kegiatan selesai");
+        result.put("masterKegiatan", masterKegiatan.getName());
+        result.put("totalSatker", satkerIds.size());
+        result.put("successCount", successSatkers.size());
+        result.put("failedCount", failedSatkers.size());
+        result.put("successSatkers", successSatkers);
+        result.put("failedSatkers", failedSatkers);
+
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> assignKegiatanToProvinces(Long kegiatanId, List<String> provinceCodes) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // Ambil semua satker berdasarkan kode provinsi
+            List<Long> satkerIds = new ArrayList<>();
+
+            for (String provinceCode : provinceCodes) {
+                List<Satker> satkers = satkerRepository.findByCodeStartingWith(provinceCode);
+                satkerIds.addAll(satkers.stream().map(Satker::getId).collect(Collectors.toList()));
+            }
+
+            // Gunakan method assignKegiatanToSatkers
+            result = assignKegiatanToSatkers(kegiatanId, satkerIds);
+            result.put("assignType", "by_provinces");
+            result.put("provinceCodes", provinceCodes);
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Error saat assign kegiatan by provinces: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<KegiatanDto> getAssignedKegiatanBySatker(Long satkerId) {
+        List<Kegiatan> kegiatans = kegiatanRepository.findBySatkerId(satkerId);
+        return kegiatans.stream()
+                .map(KegiatanMapper::mapToKegiatanDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Helper method untuk membuat duplikasi kegiatan
+     */
+    private Kegiatan createDuplicateKegiatan(Kegiatan masterKegiatan, Satker targetSatker) {
+        return Kegiatan.builder()
+                .name(masterKegiatan.getName())
+                .code(generateKegiatanCode(masterKegiatan.getCode(), targetSatker))
+                .budget(masterKegiatan.getBudget())
+                .startDate(masterKegiatan.getStartDate())
+                .endDate(masterKegiatan.getEndDate())
+                .satker(targetSatker)
+                .program(masterKegiatan.getProgram())
+                .output(masterKegiatan.getOutput())
+                .direktoratPenanggungJawab(masterKegiatan.getDirektoratPenanggungJawab())
+                // User akan di-set ketika satker daerah mulai mengerjakan
+                .user(null) // Initially null, akan di-assign nanti oleh satker daerah
+                .build();
+    }
+
+    /**
+     * Generate kode kegiatan untuk satker daerah
+     */
+    private String generateKegiatanCode(String masterCode, Satker targetSatker) {
+        if (masterCode == null || masterCode.isEmpty()) {
+            return targetSatker.getCode() + "-" + System.currentTimeMillis();
+        }
+        return masterCode + "-" + targetSatker.getCode();
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> assignUserToKegiatan(Long kegiatanId, Long userId) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // 1. Validasi kegiatan ada
+            Kegiatan kegiatan = kegiatanRepository.findById(kegiatanId)
+                    .orElseThrow(() -> new RuntimeException("Kegiatan not found with id: " + kegiatanId));
+
+            // 2. Validasi user ada dan aktif
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+            if (!user.getIsActive()) {
+                throw new RuntimeException("User tidak aktif, tidak dapat ditugaskan");
+            }
+
+            // 3. Validasi user dan kegiatan dalam satker yang sama
+            if (!kegiatan.getSatker().getId().equals(user.getSatker().getId())) {
+                throw new RuntimeException("User dan kegiatan harus dalam satker yang sama");
+            }
+
+            // 4. Cek apakah kegiatan sudah ditugaskan ke user lain
+            if (kegiatan.getUser() != null && !kegiatan.getUser().getId().equals(userId)) {
+                result.put("success", false);
+                result.put("message", "Kegiatan sudah ditugaskan ke user lain: " + kegiatan.getUser().getName());
+                result.put("currentAssignedUser", kegiatan.getUser().getName());
+                return result;
+            }
+
+            // 5. Assign user ke kegiatan
+            kegiatan.setUser(user);
+
+            // 6. Auto-update direktorat PJ berdasarkan user yang ditugaskan
+            if (user.getDirektorat() != null) {
+                kegiatan.setDirektoratPenanggungJawab(user.getDirektorat());
+            }
+
+            // 7. Simpan perubahan
+            Kegiatan savedKegiatan = kegiatanRepository.save(kegiatan);
+
+            // 8. Build response
+            result.put("success", true);
+            result.put("message", "User berhasil ditugaskan ke kegiatan");
+            result.put("kegiatanId", savedKegiatan.getId());
+            result.put("kegiatanName", savedKegiatan.getName());
+            result.put("assignedUserId", user.getId());
+            result.put("assignedUserName", user.getName());
+            result.put("satkerName", kegiatan.getSatker().getName());
+            result.put("assignedDate", new Date());
+
+            System.out.println("Kegiatan '" + kegiatan.getName() +
+                    "' berhasil ditugaskan ke user: " + user.getName());
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Error saat assign user ke kegiatan: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> claimKegiatan(Long kegiatanId) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // Ambil current user yang sedang login
+            User currentUser = userService.getCurrentUser();
+
+            if (currentUser == null) {
+                throw new RuntimeException("User tidak terautentikasi");
+            }
+
+            // Gunakan method assignUserToKegiatan
+            result = assignUserToKegiatan(kegiatanId, currentUser.getId());
+
+            if ((Boolean) result.get("success")) {
+                result.put("claimType", "self_claim");
+                result.put("message", "Kegiatan berhasil di-claim untuk diri sendiri");
+            }
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Error saat claim kegiatan: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> unassignUserFromKegiatan(Long kegiatanId) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // 1. Ambil kegiatan
+            Kegiatan kegiatan = kegiatanRepository.findById(kegiatanId)
+                    .orElseThrow(() -> new RuntimeException("Kegiatan not found with id: " + kegiatanId));
+
+            // 2. Simpan info user sebelumnya untuk response
+            String previousUserName = kegiatan.getUser() != null ? kegiatan.getUser().getName() : "Tidak ada";
+
+            // 3. Set user ke null (unassign)
+            kegiatan.setUser(null);
+
+            // 4. Simpan perubahan
+            kegiatanRepository.save(kegiatan);
+
+            // 5. Build response
+            result.put("success", true);
+            result.put("message", "User berhasil dilepas dari kegiatan");
+            result.put("kegiatanId", kegiatanId);
+            result.put("kegiatanName", kegiatan.getName());
+            result.put("previousUser", previousUserName);
+            result.put("unassignedDate", new Date());
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Error saat unassign user: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<KegiatanDto> getUnassignedKegiatanBySatker(Long satkerId) {
+        List<Kegiatan> kegiatans = kegiatanRepository.findUnassignedKegiatanBySatkerId(satkerId);
+        return kegiatans.stream()
+                .map(KegiatanMapper::mapToKegiatanDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<KegiatanDto> getKegiatanByAssignedUser(Long userId) {
+        List<Kegiatan> kegiatans = kegiatanRepository.findByUserId(userId);
+        return kegiatans.stream()
+                .map(KegiatanMapper::mapToKegiatanDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> transferKegiatanToUser(Long kegiatanId, Long fromUserId, Long toUserId) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            // 1. Validasi kegiatan
+            Kegiatan kegiatan = kegiatanRepository.findById(kegiatanId)
+                    .orElseThrow(() -> new RuntimeException("Kegiatan not found with id: " + kegiatanId));
+
+            // 2. Validasi kegiatan saat ini ditugaskan ke fromUser
+            if (kegiatan.getUser() == null || !kegiatan.getUser().getId().equals(fromUserId)) {
+                throw new RuntimeException("Kegiatan tidak ditugaskan ke user asal yang dimaksud");
+            }
+
+            // 3. Validasi target user
+            User toUser = userRepository.findById(toUserId)
+                    .orElseThrow(() -> new RuntimeException("Target user not found with id: " + toUserId));
+
+            // 4. Validasi kedua user dalam satker yang sama
+            if (!kegiatan.getSatker().getId().equals(toUser.getSatker().getId())) {
+                throw new RuntimeException("Target user harus dalam satker yang sama");
+            }
+
+            // 5. Simpan info untuk response
+            String fromUserName = kegiatan.getUser().getName();
+            String toUserName = toUser.getName();
+
+            // 6. Transfer assignment
+            kegiatan.setUser(toUser);
+
+            // 7. Update direktorat PJ jika berbeda
+            if (toUser.getDirektorat() != null) {
+                kegiatan.setDirektoratPenanggungJawab(toUser.getDirektorat());
+            }
+
+            // 8. Simpan perubahan
+            kegiatanRepository.save(kegiatan);
+
+            // 9. Build response
+            result.put("success", true);
+            result.put("message", "Kegiatan berhasil ditransfer");
+            result.put("kegiatanId", kegiatanId);
+            result.put("kegiatanName", kegiatan.getName());
+            result.put("fromUser", fromUserName);
+            result.put("toUser", toUserName);
+            result.put("transferDate", new Date());
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "Error saat transfer kegiatan: " + e.getMessage());
+        }
 
         return result;
     }

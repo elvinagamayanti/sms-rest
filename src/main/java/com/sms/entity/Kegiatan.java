@@ -54,7 +54,7 @@ public class Kegiatan {
     private Date endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -92,7 +92,7 @@ public class Kegiatan {
     }
 
     public String getNamaUser() {
-        return user.getName();
+        return user != null ? user.getName() : "Belum ditugaskan";
     }
 
     public String getNamaProgram() {

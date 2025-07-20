@@ -47,7 +47,7 @@ public class KegiatanDto {
     private BigDecimal budget;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false) // Relasi ke User
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = true) // Relasi ke User
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -83,7 +83,7 @@ public class KegiatanDto {
     }
 
     public String getNamaUser() {
-        return user.getName();
+        return user != null ? user.getName() : "Belum ditugaskan";
     }
 
     public String getNamaDirektoratPJ() {
