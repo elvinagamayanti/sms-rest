@@ -61,9 +61,24 @@ public class Tahap3 {
     private LocalDate subtahap_4_tanggal_perencanaan;
     private LocalDate subtahap_4_tanggal_realisasi;
 
+    // Subtahap 5
+    private boolean subtahap_5;
+    private LocalDate subtahap_5_tanggal_perencanaan;
+    private LocalDate subtahap_5_tanggal_realisasi;
+
+    // Subtahap 6
+    private boolean subtahap_6;
+    private LocalDate subtahap_6_tanggal_perencanaan;
+    private LocalDate subtahap_6_tanggal_realisasi;
+
+    // Subtahap 7
+    private boolean subtahap_7;
+    private LocalDate subtahap_7_tanggal_perencanaan;
+    private LocalDate subtahap_7_tanggal_realisasi;
+
     public int getCompletionPercentage() {
         int completed = 0;
-        int total = 4;
+        int total = 7;
 
         if (subtahap_1)
             completed++;
@@ -72,6 +87,12 @@ public class Tahap3 {
         if (subtahap_3)
             completed++;
         if (subtahap_4)
+            completed++;
+        if (subtahap_5)
+            completed++;
+        if (subtahap_6)
+            completed++;
+        if (subtahap_7)
             completed++;
 
         return (completed * 100) / total;

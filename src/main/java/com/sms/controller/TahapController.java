@@ -162,12 +162,12 @@ public class TahapController {
                 }
             }
             case 2 -> {
-                for (int subtahap = 1; subtahap <= 4; subtahap++) {
+                for (int subtahap = 1; subtahap <= 6; subtahap++) {
                     tahapService.updateSubtaskStatus(kegiatanId, tahap, subtahap, true);
                 }
             }
             case 3 -> {
-                for (int subtahap = 1; subtahap <= 4; subtahap++) {
+                for (int subtahap = 1; subtahap <= 7; subtahap++) {
                     tahapService.updateSubtaskStatus(kegiatanId, tahap, subtahap, true);
                 }
             }
@@ -177,22 +177,22 @@ public class TahapController {
                 }
             }
             case 5 -> {
-                for (int subtahap = 1; subtahap <= 4; subtahap++) {
+                for (int subtahap = 1; subtahap <= 8; subtahap++) {
                     tahapService.updateSubtaskStatus(kegiatanId, tahap, subtahap, true);
                 }
             }
             case 6 -> {
-                for (int subtahap = 1; subtahap <= 4; subtahap++) {
+                for (int subtahap = 1; subtahap <= 5; subtahap++) {
                     tahapService.updateSubtaskStatus(kegiatanId, tahap, subtahap, true);
                 }
             }
             case 7 -> {
-                for (int subtahap = 1; subtahap <= 4; subtahap++) {
+                for (int subtahap = 1; subtahap <= 5; subtahap++) {
                     tahapService.updateSubtaskStatus(kegiatanId, tahap, subtahap, true);
                 }
             }
             case 8 -> {
-                for (int subtahap = 1; subtahap <= 4; subtahap++) {
+                for (int subtahap = 1; subtahap <= 3; subtahap++) {
                     tahapService.updateSubtaskStatus(kegiatanId, tahap, subtahap, true);
                 }
             }

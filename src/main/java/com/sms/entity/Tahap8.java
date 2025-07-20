@@ -61,11 +61,6 @@ public class Tahap8 {
     private LocalDate subtahap_3_tanggal_perencanaan;
     private LocalDate subtahap_3_tanggal_realisasi;
 
-    // Subtahap 4
-    private boolean subtahap_4;
-    private LocalDate subtahap_4_tanggal_perencanaan;
-    private LocalDate subtahap_4_tanggal_realisasi;
-
     private String uploadFileName;
     private String uploadFilePath;
 
@@ -74,15 +69,13 @@ public class Tahap8 {
 
     public int getCompletionPercentage() {
         int completed = 0;
-        int total = 4;
+        int total = 3;
 
         if (subtahap_1)
             completed++;
         if (subtahap_2)
             completed++;
         if (subtahap_3)
-            completed++;
-        if (subtahap_4)
             completed++;
 
         return (completed * 100) / total;

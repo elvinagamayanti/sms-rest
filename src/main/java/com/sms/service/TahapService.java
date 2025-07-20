@@ -138,6 +138,12 @@ public class TahapService {
             case 4 -> {
                 return tahap2.isSubtahap_4();
             }
+            case 5 -> {
+                return tahap2.isSubtahap_5();
+            }
+            case 6 -> {
+                return tahap2.isSubtahap_6();
+            }
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
     }
@@ -161,6 +167,15 @@ public class TahapService {
             }
             case 4 -> {
                 return tahap3.isSubtahap_4();
+            }
+            case 5 -> {
+                return tahap3.isSubtahap_5();
+            }
+            case 6 -> {
+                return tahap3.isSubtahap_6();
+            }
+            case 7 -> {
+                return tahap3.isSubtahap_7();
             }
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
@@ -210,6 +225,18 @@ public class TahapService {
             case 4 -> {
                 return tahap5.isSubtahap_4();
             }
+            case 5 -> {
+                return tahap5.isSubtahap_5();
+            }
+            case 6 -> {
+                return tahap5.isSubtahap_6();
+            }
+            case 7 -> {
+                return tahap5.isSubtahap_7();
+            }
+            case 8 -> {
+                return tahap5.isSubtahap_8();
+            }
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
     }
@@ -233,6 +260,9 @@ public class TahapService {
             }
             case 4 -> {
                 return tahap6.isSubtahap_4();
+            }
+            case 5 -> {
+                return tahap6.isSubtahap_5();
             }
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
@@ -258,6 +288,9 @@ public class TahapService {
             case 4 -> {
                 return tahap7.isSubtahap_4();
             }
+            case 5 -> {
+                return tahap7.isSubtahap_5();
+            }
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
     }
@@ -278,9 +311,6 @@ public class TahapService {
             }
             case 3 -> {
                 return tahap8.isSubtahap_3();
-            }
-            case 4 -> {
-                return tahap8.isSubtahap_4();
             }
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
@@ -388,6 +418,14 @@ public class TahapService {
                 tahap2.setSubtahap_4(completed);
                 tahap2.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
+            case 5:
+                tahap2.setSubtahap_5(completed);
+                tahap2.setSubtahap_5_tanggal_realisasi(LocalDate.now());
+                break;
+            case 6:
+                tahap2.setSubtahap_6(completed);
+                tahap2.setSubtahap_6_tanggal_realisasi(LocalDate.now());
+                break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
@@ -422,6 +460,18 @@ public class TahapService {
             case 4:
                 tahap3.setSubtahap_4(completed);
                 tahap3.setSubtahap_4_tanggal_realisasi(LocalDate.now());
+                break;
+            case 5:
+                tahap3.setSubtahap_5(completed);
+                tahap3.setSubtahap_5_tanggal_realisasi(LocalDate.now());
+                break;
+            case 6:
+                tahap3.setSubtahap_6(completed);
+                tahap3.setSubtahap_6_tanggal_realisasi(LocalDate.now());
+                break;
+            case 7:
+                tahap3.setSubtahap_7(completed);
+                tahap3.setSubtahap_7_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -493,6 +543,22 @@ public class TahapService {
                 tahap5.setSubtahap_4(completed);
                 tahap5.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
+            case 5:
+                tahap5.setSubtahap_5(completed);
+                tahap5.setSubtahap_5_tanggal_realisasi(LocalDate.now());
+                break;
+            case 6:
+                tahap5.setSubtahap_6(completed);
+                tahap5.setSubtahap_6_tanggal_realisasi(LocalDate.now());
+                break;
+            case 7:
+                tahap5.setSubtahap_7(completed);
+                tahap5.setSubtahap_7_tanggal_realisasi(LocalDate.now());
+                break;
+            case 8:
+                tahap5.setSubtahap_8(completed);
+                tahap5.setSubtahap_8_tanggal_realisasi(LocalDate.now());
+                break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
@@ -527,6 +593,10 @@ public class TahapService {
             case 4:
                 tahap6.setSubtahap_4(completed);
                 tahap6.setSubtahap_4_tanggal_realisasi(LocalDate.now());
+                break;
+            case 5:
+                tahap6.setSubtahap_5(completed);
+                tahap6.setSubtahap_5_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -563,6 +633,10 @@ public class TahapService {
                 tahap7.setSubtahap_4(completed);
                 tahap7.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
+            case 5:
+                tahap7.setSubtahap_5(completed);
+                tahap7.setSubtahap_5_tanggal_realisasi(LocalDate.now());
+                break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
@@ -593,10 +667,6 @@ public class TahapService {
             case 3:
                 tahap8.setSubtahap_3(completed);
                 tahap8.setSubtahap_3_tanggal_realisasi(LocalDate.now());
-                break;
-            case 4:
-                tahap8.setSubtahap_4(completed);
-                tahap8.setSubtahap_4_tanggal_realisasi(LocalDate.now());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
@@ -723,6 +793,8 @@ public class TahapService {
         tahap2.setSubtahap_2(false);
         tahap2.setSubtahap_3(false);
         tahap2.setSubtahap_4(false);
+        tahap2.setSubtahap_5(false);
+        tahap2.setSubtahap_6(false);
 
         // Initialize all planning and realization dates to null
         tahap2.setSubtahap_1_tanggal_perencanaan(null);
@@ -733,6 +805,10 @@ public class TahapService {
         tahap2.setSubtahap_3_tanggal_realisasi(null);
         tahap2.setSubtahap_4_tanggal_perencanaan(null);
         tahap2.setSubtahap_4_tanggal_realisasi(null);
+        tahap2.setSubtahap_5_tanggal_perencanaan(null);
+        tahap2.setSubtahap_5_tanggal_realisasi(null);
+        tahap2.setSubtahap_6_tanggal_perencanaan(null);
+        tahap2.setSubtahap_6_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap2Repository.save(tahap2);
@@ -751,6 +827,9 @@ public class TahapService {
         tahap3.setSubtahap_2(false);
         tahap3.setSubtahap_3(false);
         tahap3.setSubtahap_4(false);
+        tahap3.setSubtahap_5(false);
+        tahap3.setSubtahap_6(false);
+        tahap3.setSubtahap_7(false);
 
         // Initialize all planning and realization dates to null
         tahap3.setSubtahap_1_tanggal_perencanaan(null);
@@ -761,6 +840,12 @@ public class TahapService {
         tahap3.setSubtahap_3_tanggal_realisasi(null);
         tahap3.setSubtahap_4_tanggal_perencanaan(null);
         tahap3.setSubtahap_4_tanggal_realisasi(null);
+        tahap3.setSubtahap_5_tanggal_perencanaan(null);
+        tahap3.setSubtahap_5_tanggal_realisasi(null);
+        tahap3.setSubtahap_6_tanggal_perencanaan(null);
+        tahap3.setSubtahap_6_tanggal_realisasi(null);
+        tahap3.setSubtahap_7_tanggal_perencanaan(null);
+        tahap3.setSubtahap_7_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap3Repository.save(tahap3);
@@ -807,6 +892,10 @@ public class TahapService {
         tahap5.setSubtahap_2(false);
         tahap5.setSubtahap_3(false);
         tahap5.setSubtahap_4(false);
+        tahap5.setSubtahap_5(false);
+        tahap5.setSubtahap_6(false);
+        tahap5.setSubtahap_7(false);
+        tahap5.setSubtahap_8(false);
 
         // Initialize all planning and realization dates to null
         tahap5.setSubtahap_1_tanggal_perencanaan(null);
@@ -817,6 +906,14 @@ public class TahapService {
         tahap5.setSubtahap_3_tanggal_realisasi(null);
         tahap5.setSubtahap_4_tanggal_perencanaan(null);
         tahap5.setSubtahap_4_tanggal_realisasi(null);
+        tahap5.setSubtahap_5_tanggal_perencanaan(null);
+        tahap5.setSubtahap_5_tanggal_realisasi(null);
+        tahap5.setSubtahap_6_tanggal_perencanaan(null);
+        tahap5.setSubtahap_6_tanggal_realisasi(null);
+        tahap5.setSubtahap_7_tanggal_perencanaan(null);
+        tahap5.setSubtahap_7_tanggal_realisasi(null);
+        tahap5.setSubtahap_8_tanggal_perencanaan(null);
+        tahap5.setSubtahap_8_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap5Repository.save(tahap5);
@@ -835,6 +932,7 @@ public class TahapService {
         tahap6.setSubtahap_2(false);
         tahap6.setSubtahap_3(false);
         tahap6.setSubtahap_4(false);
+        tahap6.setSubtahap_5(false);
 
         // Initialize all planning and realization dates to null
         tahap6.setSubtahap_1_tanggal_perencanaan(null);
@@ -845,6 +943,8 @@ public class TahapService {
         tahap6.setSubtahap_3_tanggal_realisasi(null);
         tahap6.setSubtahap_4_tanggal_perencanaan(null);
         tahap6.setSubtahap_4_tanggal_realisasi(null);
+        tahap6.setSubtahap_5_tanggal_perencanaan(null);
+        tahap6.setSubtahap_5_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap6Repository.save(tahap6);
@@ -863,6 +963,7 @@ public class TahapService {
         tahap7.setSubtahap_2(false);
         tahap7.setSubtahap_3(false);
         tahap7.setSubtahap_4(false);
+        tahap7.setSubtahap_5(false);
 
         // Initialize all planning and realization dates to null
         tahap7.setSubtahap_1_tanggal_perencanaan(null);
@@ -873,6 +974,8 @@ public class TahapService {
         tahap7.setSubtahap_3_tanggal_realisasi(null);
         tahap7.setSubtahap_4_tanggal_perencanaan(null);
         tahap7.setSubtahap_4_tanggal_realisasi(null);
+        tahap7.setSubtahap_5_tanggal_perencanaan(null);
+        tahap7.setSubtahap_5_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap7Repository.save(tahap7);
@@ -890,7 +993,6 @@ public class TahapService {
         tahap8.setSubtahap_1(false);
         tahap8.setSubtahap_2(false);
         tahap8.setSubtahap_3(false);
-        tahap8.setSubtahap_4(false);
 
         // Initialize all planning and realization dates to null
         tahap8.setSubtahap_1_tanggal_perencanaan(null);
@@ -899,8 +1001,6 @@ public class TahapService {
         tahap8.setSubtahap_2_tanggal_realisasi(null);
         tahap8.setSubtahap_3_tanggal_perencanaan(null);
         tahap8.setSubtahap_3_tanggal_realisasi(null);
-        tahap8.setSubtahap_4_tanggal_perencanaan(null);
-        tahap8.setSubtahap_4_tanggal_realisasi(null);
 
         // Save the new entity
         return tahap8Repository.save(tahap8);
@@ -1028,6 +1128,8 @@ public class TahapService {
             case 2 -> tahap2.setSubtahap_2_tanggal_perencanaan(tanggal);
             case 3 -> tahap2.setSubtahap_3_tanggal_perencanaan(tanggal);
             case 4 -> tahap2.setSubtahap_4_tanggal_perencanaan(tanggal);
+            case 5 -> tahap2.setSubtahap_5_tanggal_perencanaan(tanggal);
+            case 6 -> tahap2.setSubtahap_6_tanggal_perencanaan(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1046,6 +1148,8 @@ public class TahapService {
             case 2 -> tahap2.setSubtahap_2_tanggal_realisasi(tanggal);
             case 3 -> tahap2.setSubtahap_3_tanggal_realisasi(tanggal);
             case 4 -> tahap2.setSubtahap_4_tanggal_realisasi(tanggal);
+            case 5 -> tahap2.setSubtahap_5_tanggal_realisasi(tanggal);
+            case 6 -> tahap2.setSubtahap_6_tanggal_realisasi(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1065,6 +1169,9 @@ public class TahapService {
             case 2 -> tahap3.setSubtahap_2_tanggal_perencanaan(tanggal);
             case 3 -> tahap3.setSubtahap_3_tanggal_perencanaan(tanggal);
             case 4 -> tahap3.setSubtahap_4_tanggal_perencanaan(tanggal);
+            case 5 -> tahap3.setSubtahap_5_tanggal_perencanaan(tanggal);
+            case 6 -> tahap3.setSubtahap_6_tanggal_perencanaan(tanggal);
+            case 7 -> tahap3.setSubtahap_7_tanggal_perencanaan(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1083,6 +1190,9 @@ public class TahapService {
             case 2 -> tahap3.setSubtahap_2_tanggal_realisasi(tanggal);
             case 3 -> tahap3.setSubtahap_3_tanggal_realisasi(tanggal);
             case 4 -> tahap3.setSubtahap_4_tanggal_realisasi(tanggal);
+            case 5 -> tahap3.setSubtahap_5_tanggal_realisasi(tanggal);
+            case 6 -> tahap3.setSubtahap_6_tanggal_realisasi(tanggal);
+            case 7 -> tahap3.setSubtahap_7_tanggal_realisasi(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1137,6 +1247,10 @@ public class TahapService {
             case 2 -> tahap5.setSubtahap_2_tanggal_perencanaan(tanggal);
             case 3 -> tahap5.setSubtahap_3_tanggal_perencanaan(tanggal);
             case 4 -> tahap5.setSubtahap_4_tanggal_perencanaan(tanggal);
+            case 5 -> tahap5.setSubtahap_5_tanggal_perencanaan(tanggal);
+            case 6 -> tahap5.setSubtahap_6_tanggal_perencanaan(tanggal);
+            case 7 -> tahap5.setSubtahap_7_tanggal_perencanaan(tanggal);
+            case 8 -> tahap5.setSubtahap_8_tanggal_perencanaan(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1155,6 +1269,10 @@ public class TahapService {
             case 2 -> tahap5.setSubtahap_2_tanggal_realisasi(tanggal);
             case 3 -> tahap5.setSubtahap_3_tanggal_realisasi(tanggal);
             case 4 -> tahap5.setSubtahap_4_tanggal_realisasi(tanggal);
+            case 5 -> tahap5.setSubtahap_5_tanggal_realisasi(tanggal);
+            case 6 -> tahap5.setSubtahap_6_tanggal_realisasi(tanggal);
+            case 7 -> tahap5.setSubtahap_7_tanggal_realisasi(tanggal);
+            case 8 -> tahap5.setSubtahap_8_tanggal_realisasi(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1173,6 +1291,7 @@ public class TahapService {
             case 2 -> tahap6.setSubtahap_2_tanggal_perencanaan(tanggal);
             case 3 -> tahap6.setSubtahap_3_tanggal_perencanaan(tanggal);
             case 4 -> tahap6.setSubtahap_4_tanggal_perencanaan(tanggal);
+            case 5 -> tahap6.setSubtahap_5_tanggal_perencanaan(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1191,6 +1310,7 @@ public class TahapService {
             case 2 -> tahap6.setSubtahap_2_tanggal_realisasi(tanggal);
             case 3 -> tahap6.setSubtahap_3_tanggal_realisasi(tanggal);
             case 4 -> tahap6.setSubtahap_4_tanggal_realisasi(tanggal);
+            case 5 -> tahap6.setSubtahap_5_tanggal_realisasi(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1209,6 +1329,7 @@ public class TahapService {
             case 2 -> tahap7.setSubtahap_2_tanggal_perencanaan(tanggal);
             case 3 -> tahap7.setSubtahap_3_tanggal_perencanaan(tanggal);
             case 4 -> tahap7.setSubtahap_4_tanggal_perencanaan(tanggal);
+            case 5 -> tahap7.setSubtahap_5_tanggal_perencanaan(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1227,6 +1348,7 @@ public class TahapService {
             case 2 -> tahap7.setSubtahap_2_tanggal_realisasi(tanggal);
             case 3 -> tahap7.setSubtahap_3_tanggal_realisasi(tanggal);
             case 4 -> tahap7.setSubtahap_4_tanggal_realisasi(tanggal);
+            case 5 -> tahap7.setSubtahap_5_tanggal_realisasi(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1244,7 +1366,6 @@ public class TahapService {
             case 1 -> tahap8.setSubtahap_1_tanggal_perencanaan(tanggal);
             case 2 -> tahap8.setSubtahap_2_tanggal_perencanaan(tanggal);
             case 3 -> tahap8.setSubtahap_3_tanggal_perencanaan(tanggal);
-            case 4 -> tahap8.setSubtahap_4_tanggal_perencanaan(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1262,7 +1383,6 @@ public class TahapService {
             case 1 -> tahap8.setSubtahap_1_tanggal_realisasi(tanggal);
             case 2 -> tahap8.setSubtahap_2_tanggal_realisasi(tanggal);
             case 3 -> tahap8.setSubtahap_3_tanggal_realisasi(tanggal);
-            case 4 -> tahap8.setSubtahap_4_tanggal_realisasi(tanggal);
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         }
 
@@ -1383,6 +1503,8 @@ public class TahapService {
             case 2 -> tahap2.getSubtahap_2_tanggal_perencanaan();
             case 3 -> tahap2.getSubtahap_3_tanggal_perencanaan();
             case 4 -> tahap2.getSubtahap_4_tanggal_perencanaan();
+            case 5 -> tahap2.getSubtahap_5_tanggal_perencanaan();
+            case 6 -> tahap2.getSubtahap_6_tanggal_perencanaan();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1399,6 +1521,8 @@ public class TahapService {
             case 2 -> tahap2.getSubtahap_2_tanggal_realisasi();
             case 3 -> tahap2.getSubtahap_3_tanggal_realisasi();
             case 4 -> tahap2.getSubtahap_4_tanggal_realisasi();
+            case 5 -> tahap2.getSubtahap_5_tanggal_realisasi();
+            case 6 -> tahap2.getSubtahap_6_tanggal_realisasi();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1415,6 +1539,9 @@ public class TahapService {
             case 2 -> tahap3.getSubtahap_2_tanggal_perencanaan();
             case 3 -> tahap3.getSubtahap_3_tanggal_perencanaan();
             case 4 -> tahap3.getSubtahap_4_tanggal_perencanaan();
+            case 5 -> tahap3.getSubtahap_5_tanggal_perencanaan();
+            case 6 -> tahap3.getSubtahap_6_tanggal_perencanaan();
+            case 7 -> tahap3.getSubtahap_7_tanggal_perencanaan();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1431,6 +1558,9 @@ public class TahapService {
             case 2 -> tahap3.getSubtahap_2_tanggal_realisasi();
             case 3 -> tahap3.getSubtahap_3_tanggal_realisasi();
             case 4 -> tahap3.getSubtahap_4_tanggal_realisasi();
+            case 5 -> tahap3.getSubtahap_5_tanggal_realisasi();
+            case 6 -> tahap3.getSubtahap_6_tanggal_realisasi();
+            case 7 -> tahap3.getSubtahap_7_tanggal_realisasi();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1479,6 +1609,10 @@ public class TahapService {
             case 2 -> tahap5.getSubtahap_2_tanggal_perencanaan();
             case 3 -> tahap5.getSubtahap_3_tanggal_perencanaan();
             case 4 -> tahap5.getSubtahap_4_tanggal_perencanaan();
+            case 5 -> tahap5.getSubtahap_5_tanggal_perencanaan();
+            case 6 -> tahap5.getSubtahap_6_tanggal_perencanaan();
+            case 7 -> tahap5.getSubtahap_7_tanggal_perencanaan();
+            case 8 -> tahap5.getSubtahap_8_tanggal_perencanaan();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1495,6 +1629,10 @@ public class TahapService {
             case 2 -> tahap5.getSubtahap_2_tanggal_realisasi();
             case 3 -> tahap5.getSubtahap_3_tanggal_realisasi();
             case 4 -> tahap5.getSubtahap_4_tanggal_realisasi();
+            case 5 -> tahap5.getSubtahap_5_tanggal_realisasi();
+            case 6 -> tahap5.getSubtahap_6_tanggal_realisasi();
+            case 7 -> tahap5.getSubtahap_7_tanggal_realisasi();
+            case 8 -> tahap5.getSubtahap_8_tanggal_realisasi();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1511,6 +1649,7 @@ public class TahapService {
             case 2 -> tahap6.getSubtahap_2_tanggal_perencanaan();
             case 3 -> tahap6.getSubtahap_3_tanggal_perencanaan();
             case 4 -> tahap6.getSubtahap_4_tanggal_perencanaan();
+            case 5 -> tahap6.getSubtahap_5_tanggal_perencanaan();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1527,6 +1666,7 @@ public class TahapService {
             case 2 -> tahap6.getSubtahap_2_tanggal_realisasi();
             case 3 -> tahap6.getSubtahap_3_tanggal_realisasi();
             case 4 -> tahap6.getSubtahap_4_tanggal_realisasi();
+            case 5 -> tahap6.getSubtahap_5_tanggal_realisasi();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1543,6 +1683,7 @@ public class TahapService {
             case 2 -> tahap7.getSubtahap_2_tanggal_perencanaan();
             case 3 -> tahap7.getSubtahap_3_tanggal_perencanaan();
             case 4 -> tahap7.getSubtahap_4_tanggal_perencanaan();
+            case 5 -> tahap7.getSubtahap_5_tanggal_perencanaan();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1559,6 +1700,7 @@ public class TahapService {
             case 2 -> tahap7.getSubtahap_2_tanggal_realisasi();
             case 3 -> tahap7.getSubtahap_3_tanggal_realisasi();
             case 4 -> tahap7.getSubtahap_4_tanggal_realisasi();
+            case 5 -> tahap7.getSubtahap_5_tanggal_realisasi();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1574,7 +1716,6 @@ public class TahapService {
             case 1 -> tahap8.getSubtahap_1_tanggal_perencanaan();
             case 2 -> tahap8.getSubtahap_2_tanggal_perencanaan();
             case 3 -> tahap8.getSubtahap_3_tanggal_perencanaan();
-            case 4 -> tahap8.getSubtahap_4_tanggal_perencanaan();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1590,7 +1731,6 @@ public class TahapService {
             case 1 -> tahap8.getSubtahap_1_tanggal_realisasi();
             case 2 -> tahap8.getSubtahap_2_tanggal_realisasi();
             case 3 -> tahap8.getSubtahap_3_tanggal_realisasi();
-            case 4 -> tahap8.getSubtahap_4_tanggal_realisasi();
             default -> throw new IllegalArgumentException("Invalid subtahap: " + subtahap);
         };
     }
@@ -1630,7 +1770,6 @@ public class TahapService {
             status = "SEDANG_BERJALAN";
         } else {
             // Belum selesai dan (tepat di tanggal perencanaan atau tidak ada tanggal
-            // perencanaan)
             status = "SEDANG_BERJALAN";
         }
 
