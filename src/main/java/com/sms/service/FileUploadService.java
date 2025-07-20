@@ -79,7 +79,8 @@ public class FileUploadService {
     public List<String> getUploadedFiles(Long kegiatanId, int tahapId) {
         return tahapUploadedFileRepository.findByKegiatanIdAndTahapId(kegiatanId, tahapId)
                 .stream()
-                .map(TahapUploadedFile::getOriginalFilename)
+                // .map(TahapUploadedFile::getOriginalFilename)
+                .map(TahapUploadedFile::getStoredFilename)
                 .collect(Collectors.toList());
     }
 }
