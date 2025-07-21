@@ -31,4 +31,12 @@ public interface SatkerRepository extends JpaRepository<Satker, Long> {
     // provinceCode);
 
     List<Satker> findByCodeStartingWith(String provinceCode);
+
+    List<Satker> findByIsProvince(Boolean isProvince);
+
+    @Query("SELECT s FROM Satker s WHERE s.code LIKE '00%'")
+    List<Satker> findPusatSatkers();
+
+    @Query("SELECT s FROM Satker s WHERE s.isProvince = true AND s.code != '0000'")
+    List<Satker> findProvinsiSatkersOnly();
 }

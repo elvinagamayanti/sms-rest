@@ -126,4 +126,43 @@ public interface KegiatanRepository extends JpaRepository<Kegiatan, Long> {
          * Count kegiatan yang sudah di-assign ke user tertentu
          */
         Long countByUserId(Long userId);
+
+        /**
+         * Find kegiatan by province code (semua satker dalam provinsi)
+         */
+        @Query("SELECT k FROM Kegiatan k WHERE k.satker IS NOT NULL AND SUBSTRING(k.satker.code, 1, 2) = :provinceCode")
+        List<Kegiatan> findByProvinceCode(@Param("provinceCode") String provinceCode);
+
+        /**
+         * Find master kegiatan (belum di-assign ke satker)
+         */
+        @Query("SELECT k FROM Kegiatan k WHERE k.satker IS NULL")
+        List<Kegiatan> findMasterKegiatan();
+
+        /**
+         * Find kegiatan assigned to any satker in province
+         */
+        @Query("SELECT k FROM Kegiatan k WHERE k.satker.code LIKE CONCAT(:provinceCode, '%')")
+        List<Kegiatan> findBySatkerInProvince(@Param("provinceCode") String provinceCode);
+
+        /**
+         * Find kegiatan with geographic scope filtering
+         */
+        @Query("SELECT k FROM Kegiatan k WHERE " +
+                        "(:scope = 'NATIONAL') OR " +
+                        "(:scope = 'PROVINCE' AND SUBSTRING(k.satker.code, 1, 2) = :scopeValue) OR " +
+                        "(:scope = 'SATKER' AND k.satker.id = :scopeValue)")
+        List<Kegiatan> findWithGeographicScope(
+                        @Param("scope") String scope,
+                        @Param("scopeValue") String scopeValue);
+
+        /**
+         * Count kegiatan by scope
+         */
+        @Query("SELECT COUNT(k) FROM Kegiatan k WHERE " +
+                        "(:provinceCode IS NULL OR SUBSTRING(k.satker.code, 1, 2) = :provinceCode) AND " +
+                        "(:satkerId IS NULL OR k.satker.id = :satkerId)")
+        Long countByScope(
+                        @Param("provinceCode") String provinceCode,
+                        @Param("satkerId") Long satkerId);
 }

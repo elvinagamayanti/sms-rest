@@ -3,9 +3,13 @@ package com.sms.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,16 +28,12 @@ import com.sms.dto.SimpleKegiatanDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
-import com.sms.entity.Kegiatan;
 import com.sms.entity.User;
 import com.sms.mapper.KegiatanMapper;
-import com.sms.payload.ApiErrorResponse;
 import com.sms.service.KegiatanService;
 import com.sms.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -50,400 +50,246 @@ public class KegiatanController {
     private final KegiatanService kegiatanService;
     private final UserService userService;
 
+    private final Logger logger = LoggerFactory.getLogger(KegiatanController.class);
+
     public KegiatanController(KegiatanService kegiatanService, UserService userService) {
         this.kegiatanService = kegiatanService;
         this.userService = userService;
     }
 
     /**
-     * Get all kegiatans
-     * 
-     * @return list of kegiatans
+     * Get all kegiatan with automatic scope filtering
      */
-    @LogActivity(description = "Retrieved all kegiatan list", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Menampilkan Daftar Kegiatan", description = "Menampilkan daftar seluruh kegiatan yang terdaftar pada sistem")
+    @LogActivity(description = "Retrieved filtered kegiatan list", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Menampilkan Daftar Kegiatan", description = "Menampilkan daftar kegiatan berdasarkan scope akses user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
-            @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar kegiatan"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions")
     })
     @GetMapping
-    // public ResponseEntity<List<KegiatanDto>> getAllKegiatans() {
-    // List<KegiatanDto> kegiatanDtos = this.kegiatanService.ambilDaftarKegiatan();
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> getAllKegiatans() {
-        List<KegiatanDto> kegiatan = this.kegiatanService.ambilDaftarKegiatan();
-        List<SimpleKegiatanDto> kegiatanDtos = kegiatan.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(kegiatanDtos);
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
+    public ResponseEntity<?> getAllKegiatans() {
+        try {
+            // Using filtered method based on user scope
+            List<KegiatanDto> kegiatanDtos = kegiatanService.findAllKegiatanFiltered();
+            List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Tidak memiliki akses untuk melihat kegiatan"));
+        } catch (Exception e) {
+            logger.error("Error getting all kegiatan: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
     }
 
     /**
-     * Get kegiatan by id
-     * 
-     * @param id kegiatan id
-     * @return kegiatan details
+     * Get kegiatan by ID with access validation
      */
     @LogActivity(description = "Retrieved kegiatan by ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Menampilkan Kegiatan berdasarkan ID", description = "Menampilkan detail kegiatan berdasarkan ID yang diberikan")
+    @Operation(summary = "Menampilkan Detail Kegiatan", description = "Menampilkan detail kegiatan berdasarkan ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan kegiatan berdasarkan ID", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
-            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan detail kegiatan"),
+            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan"),
+            @ApiResponse(responseCode = "403", description = "Tidak memiliki akses untuk melihat kegiatan ini")
     })
     @GetMapping("/{id}")
-    // public ResponseEntity<KegiatanDto> getKegiatanById(@PathVariable("id") Long
-    // id) {
-    // KegiatanDto kegiatanDto = kegiatanService.cariKegiatanById(id);
-    // return ResponseEntity.ok(kegiatanDto);
-    // }
-    public ResponseEntity<SimpleKegiatanDto> getKegiatanById(@PathVariable("id") Long id) {
-        KegiatanDto kegiatanDto = kegiatanService.cariKegiatanById(id);
-        SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapKegiatanDtoToSimpleKegiatanDto(kegiatanDto);
-        return ResponseEntity.ok(simpleKegiatanDto);
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
+    public ResponseEntity<?> getKegiatanById(@PathVariable("id") Long id) {
+        try {
+            // Validate access permission
+            if (!kegiatanService.canAccessKegiatan(id)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Tidak memiliki akses untuk melihat kegiatan ini"));
+            }
+
+            KegiatanDto kegiatanDto = kegiatanService.cariKegiatanById(id);
+            SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapKegiatanDtoToSimpleKegiatanDto(kegiatanDto);
+            return ResponseEntity.ok(simpleKegiatanDto);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Kegiatan tidak ditemukan"));
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan by ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
     }
 
     /**
-     * Get kegiatan entity by id (for detailed information)
-     * 
-     * @param id kegiatan id
-     * @return kegiatan entity with all relationships
+     * Get detailed kegiatan entity by ID (for comprehensive information)
      */
     @LogActivity(description = "Retrieved kegiatan entity by ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Menampilkan Detail Kegiatan", description = "Menampilkan detail kegiatan berdasarkan ID yang diberikan")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan detail kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Kegiatan.class))),
-            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
-    })
+    @Operation(summary = "Menampilkan Detail Lengkap Kegiatan", description = "Menampilkan detail lengkap kegiatan dengan semua relasi")
     @GetMapping("/{id}/detail")
-    // public ResponseEntity<Kegiatan> getKegiatanDetailById(@PathVariable("id")
-    // Long id) {
-    // Kegiatan kegiatan = kegiatanService.findKegiatanById(id);
-    // return ResponseEntity.ok(kegiatan);
-    // }
-    public ResponseEntity<SimpleKegiatanDto> getKegiatanDetailById(@PathVariable("id") Long id) {
-        Kegiatan kegiatan = kegiatanService.findKegiatanById(id);
-        SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapToSimpleKegiatanDto(kegiatan);
-        return ResponseEntity.ok(simpleKegiatanDto);
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
+    public ResponseEntity<?> getKegiatanDetailById(@PathVariable("id") Long id) {
+        try {
+            if (!kegiatanService.canAccessKegiatan(id)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Tidak memiliki akses untuk melihat detail kegiatan ini"));
+            }
+
+            KegiatanDto kegiatanDto = kegiatanService.cariKegiatanById(id);
+            return ResponseEntity.ok(kegiatanDto);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Kegiatan tidak ditemukan"));
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan detail by ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
     }
 
     /**
-     * Create new kegiatan
-     * 
-     * @param kegiatanDto kegiatan data
-     * @return created kegiatan
+     * Create new kegiatan (master kegiatan - pusat only)
      */
     @LogActivity(description = "Created new kegiatan", activityType = ActivityType.CREATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
-    @Operation(summary = "Membuat Kegiatan Baru", description = "Membuat kegiatan baru dengan data yang diberikan")
+    @Operation(summary = "Membuat Kegiatan Baru", description = "Membuat kegiatan master baru (hanya untuk pusat)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Kegiatan berhasil dibuat", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
-            @ApiResponse(responseCode = "400", description = "Permintaan tidak valid", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+            @ApiResponse(responseCode = "201", description = "Kegiatan berhasil dibuat"),
+            @ApiResponse(responseCode = "400", description = "Permintaan tidak valid"),
+            @ApiResponse(responseCode = "403", description = "Tidak memiliki akses untuk membuat kegiatan")
     })
-    // @PostMapping
-    // public ResponseEntity<KegiatanDto> createKegiatan(@Valid @RequestBody
-    // KegiatanDto kegiatanDto) {
-    // kegiatanService.simpanDataKegiatan(kegiatanDto);
-    // return new ResponseEntity<>(kegiatanDto, HttpStatus.CREATED);
-    // }
     @PostMapping
-    public ResponseEntity<KegiatanDto> createKegiatan(@Valid @RequestBody KegiatanDto kegiatanDto) {
-        KegiatanDto savedKegiatan = kegiatanService.simpanDataKegiatan(kegiatanDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedKegiatan);
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    public ResponseEntity<?> createKegiatan(@Valid @RequestBody KegiatanDto kegiatanDto) {
+        try {
+            KegiatanDto savedKegiatan = kegiatanService.simpanDataKegiatan(kegiatanDto);
+
+            User currentUser = userService.getUserLogged();
+            logger.info("Kegiatan {} created by user {}", savedKegiatan.getName(), currentUser.getName());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedKegiatan);
+
+        } catch (Exception e) {
+            logger.error("Error creating kegiatan: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal membuat kegiatan: " + e.getMessage()));
+        }
     }
 
     /**
-     * Update existing kegiatan
-     * 
-     * @param id          kegiatan id
-     * @param kegiatanDto kegiatan data
-     * @return updated kegiatan
+     * Update kegiatan with permission validation
      */
-    @LogActivity(description = "Updated kegiatan by ID", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
-    @Operation(summary = "Memperbarui Kegiatan", description = "Memperbarui kegiatan yang sudah ada dengan data yang diberikan")
+    @LogActivity(description = "Updated kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Update Kegiatan", description = "Memperbarui data kegiatan")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Kegiatan berhasil diperbarui", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
-            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Kegiatan berhasil diperbarui"),
+            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan"),
+            @ApiResponse(responseCode = "403", description = "Tidak memiliki akses untuk mengubah kegiatan ini")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<KegiatanDto> updateKegiatan(
-            @PathVariable("id") Long id,
-            @Valid @RequestBody KegiatanDto kegiatanDto) {
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'ADMIN_SATKER')")
+    public ResponseEntity<?> updateKegiatan(@PathVariable("id") Long id, @Valid @RequestBody KegiatanDto kegiatanDto) {
+        try {
+            // Validate modify permission
+            if (!kegiatanService.canModifyKegiatan(id)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Tidak memiliki akses untuk mengubah kegiatan ini"));
+            }
 
-        // Set the ID from the path variable
-        kegiatanDto.setId(id);
-        kegiatanService.perbaruiDataKegiatan(kegiatanDto);
-        return ResponseEntity.ok(kegiatanDto);
+            kegiatanDto.setId(id);
+            kegiatanService.perbaruiDataKegiatan(kegiatanDto);
+
+            SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapKegiatanDtoToSimpleKegiatanDto(kegiatanDto);
+            return ResponseEntity.ok(simpleKegiatanDto);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Kegiatan tidak ditemukan"));
+        } catch (Exception e) {
+            logger.error("Error updating kegiatan {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengupdate kegiatan: " + e.getMessage()));
+        }
     }
 
     /**
-     * Delete kegiatan by id
-     * 
-     * @param id kegiatan id
-     * @return success message
+     * Partial update kegiatan
      */
-    @LogActivity(description = "Deleted kegiatan by ID", activityType = ActivityType.DELETE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
-    @Operation(summary = "Menghapus Kegiatan", description = "Menghapus kegiatan berdasarkan ID yang diberikan")
+    @LogActivity(description = "Partially updated kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Update Sebagian Data Kegiatan", description = "Memperbarui sebagian field kegiatan")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Kegiatan berhasil dihapus", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
-            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
-    })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteKegiatan(@PathVariable("id") Long id) {
-        kegiatanService.hapusDataKegiatan(id);
-        return ResponseEntity.ok(Map.of("message", "Kegiatan with ID " + id + " deleted successfully"));
-    }
-
-    /**
-     * Update partial kegiatan data
-     * 
-     * @param id      kegiatan id
-     * @param updates map of field updates
-     * @return updated kegiatan
-     */
-    @LogActivity(description = "Partially updated kegiatan by ID", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
-    @Operation(summary = "Update Sebagian Data Kegiatan", description = "Memperbarui sebagian field kegiatan tanpa harus mengisi semua field")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data kegiatan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
-            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data kegiatan"),
+            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan"),
+            @ApiResponse(responseCode = "403", description = "Tidak memiliki akses untuk mengubah kegiatan ini")
     })
     @PatchMapping("/{id}")
-    // public ResponseEntity<KegiatanDto> patchKegiatan(
-    // @PathVariable("id") Long id,
-    // @RequestBody Map<String, Object> updates) {
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'ADMIN_SATKER')")
+    public ResponseEntity<?> patchKegiatan(@PathVariable("id") Long id, @RequestBody Map<String, Object> updates) {
+        try {
+            if (!kegiatanService.canModifyKegiatan(id)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Tidak memiliki akses untuk mengubah kegiatan ini"));
+            }
 
-    // KegiatanDto kegiatanDto = kegiatanService.patchKegiatan(id, updates);
-    // return ResponseEntity.ok(kegiatanDto);
-    // }
-    public ResponseEntity<SimpleKegiatanDto> patchKegiatan(
-            @PathVariable("id") Long id,
-            @RequestBody Map<String, Object> updates) {
+            KegiatanDto kegiatanDto = kegiatanService.patchKegiatan(id, updates);
+            SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapKegiatanDtoToSimpleKegiatanDto(kegiatanDto);
+            return ResponseEntity.ok(simpleKegiatanDto);
 
-        KegiatanDto kegiatanDto = kegiatanService.patchKegiatan(id, updates);
-        SimpleKegiatanDto simpleKegiatanDto = KegiatanMapper.mapKegiatanDtoToSimpleKegiatanDto(kegiatanDto);
-        return ResponseEntity.ok(simpleKegiatanDto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Kegiatan tidak ditemukan"));
+        } catch (Exception e) {
+            logger.error("Error patching kegiatan {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengupdate kegiatan: " + e.getMessage()));
+        }
     }
 
     /**
-     * Get kegiatan by program ID
-     * 
-     * @param programId program ID
-     * @return list of kegiatan for the given program
+     * Delete kegiatan (pusat only)
      */
-    @LogActivity(description = "Retrieved kegiatan by program ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Menampilkan Kegiatan berdasarkan Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan direktorat penanggung jawab")
+    @LogActivity(description = "Deleted kegiatan", activityType = ActivityType.DELETE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
+    @Operation(summary = "Hapus Kegiatan", description = "Menghapus kegiatan (hanya untuk pusat)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan kegiatan berdasarkan direktorat PJ", content = @Content(mediaType = "application/json", schema = @Schema(implementation = KegiatanDto.class))),
-            @ApiResponse(responseCode = "404", description = "Direktorat tidak ditemukan")
+            @ApiResponse(responseCode = "200", description = "Kegiatan berhasil dihapus"),
+            @ApiResponse(responseCode = "404", description = "Kegiatan tidak ditemukan"),
+            @ApiResponse(responseCode = "403", description = "Tidak memiliki akses untuk menghapus kegiatan")
     })
-    @GetMapping("/direktorat/{direktoratId}")
-    // public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJ(
-    // @PathVariable("direktoratId") Long direktoratId) {
-    // List<KegiatanDto> kegiatanDtos =
-    // kegiatanService.getKegiatanByDirektoratPJ(direktoratId);
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByDirektoratPJ(
-            @PathVariable("direktoratId") Long direktoratId) {
-        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJ(direktoratId);
-        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(simpleKegiatanDtos);
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT')")
+    public ResponseEntity<?> deleteKegiatan(@PathVariable("id") Long id) {
+        try {
+            if (!kegiatanService.canModifyKegiatan(id)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Tidak memiliki akses untuk menghapus kegiatan ini"));
+            }
+
+            kegiatanService.hapusDataKegiatan(id);
+            return ResponseEntity.ok(Map.of("message", "Kegiatan berhasil dihapus"));
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "Kegiatan tidak ditemukan"));
+        } catch (Exception e) {
+            logger.error("Error deleting kegiatan {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal menghapus kegiatan"));
+        }
     }
 
-    @LogActivity(description = "Retrieved kegiatan by direktorat PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Menampilkan Kegiatan berdasarkan Kode Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan kode direktorat penanggung jawab")
-    @GetMapping("/direktorat/code/{direktoratCode}")
-    // public ResponseEntity<List<KegiatanDto>> getKegiatanByDirektoratPJCode(
-    // @PathVariable("direktoratCode") String direktoratCode) {
-    // List<KegiatanDto> kegiatanDtos =
-    // kegiatanService.getKegiatanByDirektoratPJCode(direktoratCode);
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByDirektoratPJCode(
-            @PathVariable("direktoratCode") String direktoratCode) {
-        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJCode(direktoratCode);
-        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(simpleKegiatanDtos);
-    }
-
-    @LogActivity(description = "Retrieved kegiatan by deputi PJ ID", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Menampilkan Kegiatan berdasarkan Deputi PJ", description = "Menampilkan daftar kegiatan berdasarkan deputi penanggung jawab")
-    @GetMapping("/deputi/{deputiId}")
-    // public ResponseEntity<List<KegiatanDto>>
-    // getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
-    // List<KegiatanDto> kegiatanDtos =
-    // kegiatanService.getKegiatanByDeputiPJ(deputiId);
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
-        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJ(deputiId);
-        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(simpleKegiatanDtos);
-    }
-
-    @LogActivity(description = "Retrieved kegiatan by deputi PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Menampilkan Kegiatan berdasarkan Kode Deputi PJ", description = "Menampilkan daftar kegiatan berdasarkan kode deputi penanggung jawab")
-    @GetMapping("/deputi/code/{deputiCode}")
-    // public ResponseEntity<List<KegiatanDto>>
-    // getKegiatanByDeputiPJCode(@PathVariable("deputiCode") String deputiCode) {
-    // List<KegiatanDto> kegiatanDtos =
-    // kegiatanService.getKegiatanByDeputiPJCode(deputiCode);
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByDeputiPJCode(
-            @PathVariable("deputiCode") String deputiCode) {
-        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJCode(deputiCode);
-        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(simpleKegiatanDtos);
-    }
-
-    @LogActivity(description = "Retrieved kegiatan by year and direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Menampilkan Kegiatan berdasarkan Tahun dan Direktorat PJ", description = "Menampilkan daftar kegiatan berdasarkan tahun dan direktorat penanggung jawab")
-    @GetMapping("/direktorat/{direktoratId}/year/{year}")
-    // public ResponseEntity<List<KegiatanDto>> getKegiatanByYearAndDirektoratPJ(
-    // @PathVariable("direktoratId") Long direktoratId,
-    // @PathVariable("year") int year) {
-    // List<KegiatanDto> kegiatanDtos =
-    // kegiatanService.getKegiatanByYearAndDirektoratPJ(year, direktoratId);
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanByYearAndDirektoratPJ(
-            @PathVariable("direktoratId") Long direktoratId,
-            @PathVariable("year") int year) {
-        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByYearAndDirektoratPJ(year, direktoratId);
-        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(simpleKegiatanDtos);
-    }
-
-    @LogActivity(description = "Retrieved kegiatan by year and deputi PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Statistik Kegiatan per Direktorat", description = "Menampilkan statistik jumlah kegiatan per direktorat")
-    @GetMapping("/statistics/direktorat")
-    public ResponseEntity<Map<String, Object>> getStatisticsByDirektorat() {
-        Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsByDirektorat();
-        return ResponseEntity.ok(statistics);
-    }
-
-    @LogActivity(description = "Retrieved kegiatan statistics by deputi", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Statistik Kegiatan per Deputi", description = "Menampilkan statistik jumlah kegiatan per deputi")
-    @GetMapping("/statistics/deputi")
-    public ResponseEntity<Map<String, Object>> getStatisticsByDeputi() {
-        Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsByDeputi();
-        return ResponseEntity.ok(statistics);
-    }
-
-    @LogActivity(description = "Retrieved budget statistics by direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Statistik Anggaran per Direktorat", description = "Menampilkan statistik total anggaran per direktorat")
-    @GetMapping("/budget/direktorat")
-    public ResponseEntity<Map<String, Object>> getBudgetByDirektorat() {
-        Map<String, Object> budgetStats = kegiatanService.getBudgetStatisticsByDirektorat();
-        return ResponseEntity.ok(budgetStats);
-    }
-
-    @LogActivity(description = "Retrieved budget statistics by deputi", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Statistik Anggaran per Deputi", description = "Menampilkan statistik total anggaran per deputi")
-    @GetMapping("/budget/deputi")
-    public ResponseEntity<Map<String, Object>> getBudgetByDeputi() {
-        Map<String, Object> budgetStats = kegiatanService.getBudgetStatisticsByDeputi();
-        return ResponseEntity.ok(budgetStats);
-    }
-
-    @LogActivity(description = "Retrieved kegiatan without direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Kegiatan tanpa Direktorat PJ", description = "Menampilkan daftar kegiatan yang belum memiliki direktorat penanggung jawab")
-    @GetMapping("/no-direktorat-pj")
-    // public ResponseEntity<List<KegiatanDto>> getKegiatanWithoutDirektoratPJ() {
-    // List<KegiatanDto> kegiatanDtos =
-    // kegiatanService.getKegiatanWithoutDirektoratPJ();
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> getKegiatanWithoutDirektoratPJ() {
-        List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanWithoutDirektoratPJ();
-        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(simpleKegiatanDtos);
-    }
-
-    @LogActivity(description = "Searched kegiatan by query", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Search Kegiatan", description = "Mencari kegiatan berdasarkan nama atau kode")
-    @GetMapping("/search")
-    // public ResponseEntity<List<KegiatanDto>> searchKegiatan(@RequestParam("q")
-    // String query) {
-    // List<KegiatanDto> kegiatanDtos = kegiatanService.searchKegiatan(query);
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> searchKegiatan(@RequestParam("q") String query) {
-        List<KegiatanDto> kegiatanDtos = kegiatanService.searchKegiatan(query);
-        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(simpleKegiatanDtos);
-    }
-
-    @LogActivity(description = "Filtered kegiatan by direktorat, year, and program", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Filter Kegiatan", description = "Filter kegiatan berdasarkan direktorat, tahun, dan program")
-    @GetMapping("/filter")
-    // public ResponseEntity<List<KegiatanDto>> filterKegiatan(
-    // @RequestParam(value = "direktoratId", required = false) Long direktoratId,
-    // @RequestParam(value = "year", required = false) Integer year,
-    // @RequestParam(value = "programId", required = false) Long programId) {
-    // List<KegiatanDto> kegiatanDtos = kegiatanService.filterKegiatan(direktoratId,
-    // year, programId);
-    // return ResponseEntity.ok(kegiatanDtos);
-    // }
-    public ResponseEntity<List<SimpleKegiatanDto>> filterKegiatan(
-            @RequestParam(value = "direktoratId", required = false) Long direktoratId,
-            @RequestParam(value = "year", required = false) Integer year,
-            @RequestParam(value = "programId", required = false) Long programId) {
-        List<KegiatanDto> kegiatanDtos = kegiatanService.filterKegiatan(direktoratId, year, programId);
-        List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
-                .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
-                .toList();
-        return ResponseEntity.ok(simpleKegiatanDtos);
-    }
-
-    @LogActivity(description = "Retrieved monthly statistics for a specific direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Statistik Bulanan per Direktorat", description = "Menampilkan statistik kegiatan per bulan untuk direktorat tertentu")
-    @GetMapping("/statistics/monthly/{direktoratId}/{year}")
-    public ResponseEntity<Map<String, Object>> getMonthlyStatistics(
-            @PathVariable("direktoratId") Long direktoratId,
-            @PathVariable("year") int year) {
-        Map<String, Object> monthlyStats = kegiatanService.getMonthlyStatistics(year, direktoratId);
-        return ResponseEntity.ok(monthlyStats);
-    }
-
-    @LogActivity(description = "Assigned direktorat PJ to a kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
-    @Operation(summary = "Assign Direktorat PJ", description = "Mengubah direktorat penanggung jawab kegiatan secara manual")
-    @PostMapping("/{kegiatanId}/assign-direktorat/{direktoratId}")
-    public ResponseEntity<Map<String, String>> assignDirektoratPJ(
-            @PathVariable("kegiatanId") Long kegiatanId,
-            @PathVariable("direktoratId") Long direktoratId) {
-        kegiatanService.assignDirektoratPJ(kegiatanId, direktoratId);
-        return ResponseEntity.ok(Map.of("message", "Direktorat PJ berhasil di-assign ke kegiatan"));
-    }
-
-    @LogActivity(description = "Synced direktorat PJ from user", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
-    @Operation(summary = "Sync Direktorat PJ dari User", description = "Sinkronisasi direktorat PJ dengan direktorat user untuk semua kegiatan")
-    @PostMapping("/sync-direktorat-pj")
-    public ResponseEntity<Map<String, Object>> syncDirektoratPJFromUser() {
-        Map<String, Object> result = kegiatanService.syncDirektoratPJFromUser();
-        return ResponseEntity.ok(result);
-    }
+    // ====================================
+    // ASSIGNMENT OPERATIONS (PUSAT ONLY)
+    // ====================================
 
     /**
-     * Assign kegiatan ke multiple satker
+     * Assign kegiatan to multiple satkers (pusat only)
      */
-    @LogActivity(description = "Assigned kegiatan to multiple satkers", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
-    @Operation(summary = "Assign Kegiatan ke Satker", description = "Menduplikasi kegiatan dari pusat ke satker-satker daerah yang dipilih")
+    @LogActivity(description = "Assigned kegiatan to satkers", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
+    @Operation(summary = "Assign Kegiatan ke Satkers", description = "Menduplikasi kegiatan dari pusat ke satker-satker daerah")
     @PostMapping("/{kegiatanId}/assign-to-satkers")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
     public ResponseEntity<Map<String, Object>> assignKegiatanToSatkers(
             @PathVariable("kegiatanId") Long kegiatanId,
             @RequestBody Map<String, List<Long>> request) {
@@ -457,21 +303,28 @@ public class KegiatanController {
             return ResponseEntity.badRequest().body(error);
         }
 
-        Map<String, Object> result = kegiatanService.assignKegiatanToSatkers(kegiatanId, satkerIds);
+        try {
+            Map<String, Object> result = kegiatanService.assignKegiatanToSatkers(kegiatanId, satkerIds);
 
-        if ((Boolean) result.get("success")) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+            if ((Boolean) result.get("success")) {
+                return ResponseEntity.ok(result);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+            }
+        } catch (Exception e) {
+            logger.error("Error assigning kegiatan {} to satkers: {}", kegiatanId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Gagal assign kegiatan: " + e.getMessage()));
         }
     }
 
     /**
-     * Assign kegiatan berdasarkan kode provinsi
+     * Assign kegiatan to provinces (pusat only)
      */
     @LogActivity(description = "Assigned kegiatan to provinces", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
     @Operation(summary = "Assign Kegiatan ke Provinsi", description = "Menduplikasi kegiatan dari pusat ke semua satker di provinsi yang dipilih")
     @PostMapping("/{kegiatanId}/assign-to-provinces")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
     public ResponseEntity<Map<String, Object>> assignKegiatanToProvinces(
             @PathVariable("kegiatanId") Long kegiatanId,
             @RequestBody Map<String, List<String>> request) {
@@ -485,135 +338,425 @@ public class KegiatanController {
             return ResponseEntity.badRequest().body(error);
         }
 
-        Map<String, Object> result = kegiatanService.assignKegiatanToProvinces(kegiatanId, provinceCodes);
+        try {
+            Map<String, Object> result = kegiatanService.assignKegiatanToProvinces(kegiatanId, provinceCodes);
 
-        if ((Boolean) result.get("success")) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+            if ((Boolean) result.get("success")) {
+                return ResponseEntity.ok(result);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+            }
+        } catch (Exception e) {
+            logger.error("Error assigning kegiatan {} to provinces: {}", kegiatanId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Gagal assign kegiatan: " + e.getMessage()));
         }
     }
 
     /**
-     * Get kegiatan yang di-assign ke satker tertentu
+     * Assign user to kegiatan (admin only)
+     */
+    @LogActivity(description = "Assigned user to kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Assign User ke Kegiatan", description = "Menugaskan user untuk mengerjakan kegiatan tertentu")
+    @PostMapping("/{kegiatanId}/assign-user")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'ADMIN_PROVINSI', 'ADMIN_SATKER')")
+    public ResponseEntity<Map<String, Object>> assignUserToKegiatan(
+            @PathVariable("kegiatanId") Long kegiatanId,
+            @RequestBody Map<String, Long> request) {
+
+        Long userId = request.get("userId");
+        if (userId == null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", "User ID tidak boleh kosong"));
+        }
+
+        try {
+            // Validate access to this kegiatan
+            if (!kegiatanService.canModifyKegiatan(kegiatanId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("success", false, "message",
+                                "Tidak memiliki akses untuk assign user ke kegiatan ini"));
+            }
+
+            Map<String, Object> result = kegiatanService.assignUserToKegiatan(kegiatanId, userId);
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            logger.error("Error assigning user {} to kegiatan {}: {}", userId, kegiatanId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Gagal assign user: " + e.getMessage()));
+        }
+    }
+
+    // ====================================
+    // QUERY & FILTERING ENDPOINTS
+    // ====================================
+
+    /**
+     * Get kegiatan assigned to specific satker with access validation
      */
     @LogActivity(description = "Retrieved assigned kegiatan by satker", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Kegiatan yang Di-assign ke Satker", description = "Menampilkan daftar kegiatan yang telah di-assign ke satker tertentu")
     @GetMapping("/assigned/satker/{satkerId}")
-    public ResponseEntity<List<KegiatanDto>> getAssignedKegiatanBySatker(
-            @PathVariable("satkerId") Long satkerId) {
-        List<KegiatanDto> kegiatans = kegiatanService.getAssignedKegiatanBySatker(satkerId);
-        return ResponseEntity.ok(kegiatans);
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
+    public ResponseEntity<?> getAssignedKegiatanBySatker(@PathVariable("satkerId") Long satkerId) {
+        try {
+            // Validate access to this satker's data
+            User currentUser = userService.getUserLogged();
+            String userRole = userService.getCurrentUserHighestRole();
+
+            boolean canAccess = false;
+            switch (userRole) {
+                case "ROLE_SUPERADMIN":
+                case "ROLE_ADMIN_PUSAT":
+                case "ROLE_OPERATOR_PUSAT":
+                    canAccess = true; // Can access any satker
+                    break;
+                case "ROLE_ADMIN_PROVINSI":
+                case "ROLE_OPERATOR_PROVINSI":
+                    // Can only access satkers in same province
+                    // TODO: Implement validation that satkerId is in same province as current user
+                    canAccess = true; // Temporary - should validate province scope
+                    break;
+                case "ROLE_ADMIN_SATKER":
+                case "ROLE_OPERATOR_SATKER":
+                    // Can only access own satker
+                    canAccess = currentUser.getSatker().getId().equals(satkerId);
+                    break;
+            }
+
+            if (!canAccess) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Tidak memiliki akses untuk melihat kegiatan satker ini"));
+            }
+
+            List<KegiatanDto> kegiatans = kegiatanService.getAssignedKegiatanBySatker(satkerId);
+            List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatans.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error getting assigned kegiatan for satker {}: {}", satkerId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Terjadi kesalahan sistem"));
+        }
     }
 
     /**
-     * Assign user ke kegiatan (untuk admin/supervisor)
+     * Search kegiatan (with automatic scope filtering)
      */
-    @LogActivity(description = "Assigned user to kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
-    @Operation(summary = "Assign User ke Kegiatan", description = "Menugaskan user tertentu ke kegiatan di satker")
-    @PostMapping("/{kegiatanId}/assign-user/{userId}")
-    public ResponseEntity<Map<String, Object>> assignUserToKegiatan(
+    @LogActivity(description = "Searched kegiatan by query", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Search Kegiatan", description = "Mencari kegiatan berdasarkan nama atau kode")
+    @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
+    public ResponseEntity<?> searchKegiatan(@RequestParam("q") String query) {
+        try {
+            // Note: searchKegiatan should be enhanced to respect user scope
+            List<KegiatanDto> kegiatanDtos = kegiatanService.searchKegiatan(query);
+
+            // Filter results based on user access
+            List<KegiatanDto> filteredResults = kegiatanDtos.stream()
+                    .filter(dto -> kegiatanService.canAccessKegiatan(dto.getId()))
+                    .collect(Collectors.toList());
+
+            List<SimpleKegiatanDto> simpleKegiatanDtos = filteredResults.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error searching kegiatan with query '{}': {}", query, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal melakukan pencarian"));
+        }
+    }
+
+    /**
+     * Filter kegiatan with multiple criteria
+     */
+    @LogActivity(description = "Filtered kegiatan by criteria", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Filter Kegiatan", description = "Filter kegiatan berdasarkan direktorat, tahun, dan program")
+    @GetMapping("/filter")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
+    public ResponseEntity<?> filterKegiatan(
+            @RequestParam(value = "direktoratId", required = false) Long direktoratId,
+            @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "programId", required = false) Long programId) {
+        try {
+            List<KegiatanDto> kegiatanDtos = kegiatanService.filterKegiatan(direktoratId, year, programId);
+
+            // Filter results based on user access
+            List<KegiatanDto> filteredResults = kegiatanDtos.stream()
+                    .filter(dto -> kegiatanService.canAccessKegiatan(dto.getId()))
+                    .collect(Collectors.toList());
+
+            List<SimpleKegiatanDto> simpleKegiatanDtos = filteredResults.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error filtering kegiatan: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal melakukan filter"));
+        }
+    }
+
+    /**
+     * Get all kegiatan with automatic scope filtering
+     */
+    @LogActivity(description = "Retrieved filtered kegiatan list", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Menampilkan Daftar Kegiatan", description = "Menampilkan daftar kegiatan berdasarkan scope akses user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Berhasil menampilkan daftar kegiatan"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions")
+    })
+    @GetMapping
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
+    public ResponseEntity<?> getKegiatanStatistics() {
+        try {
+            Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsForCurrentScope();
+            return ResponseEntity.ok(statistics);
+
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan statistics: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengambil statistik"));
+        }
+    }
+
+    /**
+     * Get monthly statistics for specific year and direktorat
+     */
+    @LogActivity(description = "Retrieved monthly statistics", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Statistik Bulanan", description = "Menampilkan statistik kegiatan bulanan")
+    @GetMapping("/statistics/monthly")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI')")
+    public ResponseEntity<?> getMonthlyStatistics(
+            @RequestParam("year") int year,
+            @RequestParam(value = "direktoratId", required = false) Long direktoratId) {
+        try {
+            Map<String, Object> statistics = kegiatanService.getMonthlyStatistics(year, direktoratId);
+            return ResponseEntity.ok(statistics);
+
+        } catch (Exception e) {
+            logger.error("Error getting monthly statistics: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengambil statistik bulanan"));
+        }
+    }
+
+    // ====================================
+    // DIREKTORAT & DEPUTI QUERIES
+    // ====================================
+
+    /**
+     * Get kegiatan by direktorat PJ
+     */
+    @LogActivity(description = "Retrieved kegiatan by direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan berdasarkan Direktorat PJ", description = "Menampilkan kegiatan berdasarkan direktorat penanggung jawab")
+    @GetMapping("/direktorat/{direktoratId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI')")
+    public ResponseEntity<?> getKegiatanByDirektoratPJ(@PathVariable("direktoratId") Long direktoratId) {
+        try {
+            List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJ(direktoratId);
+
+            // Filter results based on user access
+            List<KegiatanDto> filteredResults = kegiatanDtos.stream()
+                    .filter(dto -> kegiatanService.canAccessKegiatan(dto.getId()))
+                    .collect(Collectors.toList());
+
+            List<SimpleKegiatanDto> simpleKegiatanDtos = filteredResults.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan by direktorat PJ {}: {}", direktoratId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengambil data kegiatan"));
+        }
+    }
+
+    /**
+     * Get kegiatan by direktorat PJ code
+     */
+    @LogActivity(description = "Retrieved kegiatan by direktorat PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan berdasarkan Kode Direktorat PJ", description = "Menampilkan kegiatan berdasarkan kode direktorat penanggung jawab")
+    @GetMapping("/direktorat/code/{direktoratCode}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI')")
+    public ResponseEntity<?> getKegiatanByDirektoratPJCode(@PathVariable("direktoratCode") String direktoratCode) {
+        try {
+            List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJCode(direktoratCode);
+
+            // Filter results based on user access
+            List<KegiatanDto> filteredResults = kegiatanDtos.stream()
+                    .filter(dto -> kegiatanService.canAccessKegiatan(dto.getId()))
+                    .collect(Collectors.toList());
+
+            List<SimpleKegiatanDto> simpleKegiatanDtos = filteredResults.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan by direktorat PJ code {}: {}", direktoratCode, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengambil data kegiatan"));
+        }
+    }
+
+    /**
+     * Get kegiatan by deputi PJ
+     */
+    @LogActivity(description = "Retrieved kegiatan by deputi PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan berdasarkan Deputi PJ", description = "Menampilkan kegiatan berdasarkan deputi penanggung jawab")
+    @GetMapping("/deputi/{deputiId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    public ResponseEntity<?> getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
+        try {
+            List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJ(deputiId);
+            List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan by deputi PJ {}: {}", deputiId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengambil data kegiatan"));
+        }
+    }
+
+    /**
+     * Get kegiatan by deputi PJ code
+     */
+    @LogActivity(description = "Retrieved kegiatan by deputi PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan berdasarkan Kode Deputi PJ", description = "Menampilkan kegiatan berdasarkan kode deputi penanggung jawab")
+    @GetMapping("/deputi/code/{deputiCode}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    public ResponseEntity<?> getKegiatanByDeputiPJCode(@PathVariable("deputiCode") String deputiCode) {
+        try {
+            List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJCode(deputiCode);
+            List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan by deputi PJ code {}: {}", deputiCode, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengambil data kegiatan"));
+        }
+    }
+
+    /**
+     * Get kegiatan by year and direktorat PJ
+     */
+    @LogActivity(description = "Retrieved kegiatan by year and direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan berdasarkan Tahun dan Direktorat PJ", description = "Menampilkan kegiatan berdasarkan tahun dan direktorat penanggung jawab")
+    @GetMapping("/year/{year}/direktorat/{direktoratId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI')")
+    public ResponseEntity<?> getKegiatanByYearAndDirektoratPJ(
+            @PathVariable("year") int year,
+            @PathVariable("direktoratId") Long direktoratId) {
+        try {
+            List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByYearAndDirektoratPJ(year, direktoratId);
+
+            // Filter results based on user access
+            List<KegiatanDto> filteredResults = kegiatanDtos.stream()
+                    .filter(dto -> kegiatanService.canAccessKegiatan(dto.getId()))
+                    .collect(Collectors.toList());
+
+            List<SimpleKegiatanDto> simpleKegiatanDtos = filteredResults.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan by year {} and direktorat PJ {}: {}", year, direktoratId,
+                    e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengambil data kegiatan"));
+        }
+    }
+
+    // ====================================
+    // UTILITY ENDPOINTS
+    // ====================================
+
+    /**
+     * Get kegiatan without direktorat PJ (admin only)
+     */
+    @LogActivity(description = "Retrieved kegiatan without direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Kegiatan Tanpa Direktorat PJ", description = "Menampilkan kegiatan yang belum memiliki direktorat penanggung jawab")
+    @GetMapping("/without-direktorat-pj")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    public ResponseEntity<?> getKegiatanWithoutDirektoratPJ() {
+        try {
+            List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanWithoutDirektoratPJ();
+            List<SimpleKegiatanDto> simpleKegiatanDtos = kegiatanDtos.stream()
+                    .map(KegiatanMapper::mapKegiatanDtoToSimpleKegiatanDto)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(simpleKegiatanDtos);
+
+        } catch (Exception e) {
+            logger.error("Error getting kegiatan without direktorat PJ: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal mengambil data kegiatan"));
+        }
+    }
+
+    /**
+     * Assign direktorat PJ to kegiatan (admin only)
+     */
+    @LogActivity(description = "Assigned direktorat PJ to kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
+    @Operation(summary = "Assign Direktorat PJ", description = "Menugaskan direktorat penanggung jawab ke kegiatan")
+    @PostMapping("/{kegiatanId}/assign-direktorat-pj/{direktoratId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT')")
+    public ResponseEntity<?> assignDirektoratPJ(
             @PathVariable("kegiatanId") Long kegiatanId,
-            @PathVariable("userId") Long userId) {
+            @PathVariable("direktoratId") Long direktoratId) {
+        try {
+            kegiatanService.assignDirektoratPJ(kegiatanId, direktoratId);
+            return ResponseEntity.ok(Map.of("message", "Direktorat PJ berhasil di-assign"));
 
-        Map<String, Object> result = kegiatanService.assignUserToKegiatan(kegiatanId, userId);
-
-        if ((Boolean) result.get("success")) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        } catch (Exception e) {
+            logger.error("Error assigning direktorat PJ {} to kegiatan {}: {}", direktoratId, kegiatanId,
+                    e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Gagal assign direktorat PJ: " + e.getMessage()));
         }
     }
 
     /**
-     * User claim kegiatan untuk dirinya sendiri
+     * Sync direktorat PJ from user (admin only)
      */
-    @LogActivity(description = "User claimed kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
-    @Operation(summary = "Claim Kegiatan", description = "User mengambil/claim kegiatan untuk dirinya sendiri")
-    @PostMapping("/{kegiatanId}/claim")
-    public ResponseEntity<Map<String, Object>> claimKegiatan(
-            @PathVariable("kegiatanId") Long kegiatanId) {
-
-        Map<String, Object> result = kegiatanService.claimKegiatan(kegiatanId);
-
-        if ((Boolean) result.get("success")) {
+    @LogActivity(description = "Synced direktorat PJ from user", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
+    @Operation(summary = "Sync Direktorat PJ dari User", description = "Menyinkronkan direktorat PJ berdasarkan direktorat user")
+    @PostMapping("/sync-direktorat-pj")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT')")
+    public ResponseEntity<Map<String, Object>> syncDirektoratPJFromUser() {
+        try {
+            Map<String, Object> result = kegiatanService.syncDirektoratPJFromUser();
             return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+
+        } catch (Exception e) {
+            logger.error("Error syncing direktorat PJ from user: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "Gagal sync direktorat PJ: " + e.getMessage()));
         }
     }
 
-    /**
-     * Unassign user dari kegiatan
-     */
-    @LogActivity(description = "Unassigned user from kegiatan", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.MEDIUM)
-    @Operation(summary = "Unassign User dari Kegiatan", description = "Melepas assignment user dari kegiatan")
-    @PostMapping("/{kegiatanId}/unassign")
-    public ResponseEntity<Map<String, Object>> unassignUserFromKegiatan(
-            @PathVariable("kegiatanId") Long kegiatanId) {
-
-        Map<String, Object> result = kegiatanService.unassignUserFromKegiatan(kegiatanId);
-
-        if ((Boolean) result.get("success")) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
-        }
-    }
-
-    /**
-     * Get kegiatan yang belum ditugaskan di satker
-     */
-    @LogActivity(description = "Retrieved unassigned kegiatan by satker", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Kegiatan Belum Ditugaskan", description = "Menampilkan daftar kegiatan yang belum ditugaskan di satker")
-    @GetMapping("/unassigned/satker/{satkerId}")
-    public ResponseEntity<List<KegiatanDto>> getUnassignedKegiatanBySatker(
-            @PathVariable("satkerId") Long satkerId) {
-        List<KegiatanDto> kegiatans = kegiatanService.getUnassignedKegiatanBySatker(satkerId);
-        return ResponseEntity.ok(kegiatans);
-    }
-
-    /**
-     * Get kegiatan yang ditugaskan ke user tertentu
-     */
-    @LogActivity(description = "Retrieved kegiatan by assigned user", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @Operation(summary = "Kegiatan User", description = "Menampilkan daftar kegiatan yang ditugaskan ke user tertentu")
-    @GetMapping("/assigned/user/{userId}")
-    public ResponseEntity<List<KegiatanDto>> getKegiatanByAssignedUser(
-            @PathVariable("userId") Long userId) {
-        List<KegiatanDto> kegiatans = kegiatanService.getKegiatanByAssignedUser(userId);
-        return ResponseEntity.ok(kegiatans);
-    }
-
-    /**
-     * Get kegiatan untuk current user yang sedang login
-     */
-    @Operation(summary = "Kegiatan Saya", description = "Menampilkan daftar kegiatan yang ditugaskan ke user yang sedang login")
-    @GetMapping("/my-kegiatans")
-    public ResponseEntity<List<KegiatanDto>> getMyKegiatans() {
-        User currentUser = userService.getCurrentUser();
-        List<KegiatanDto> kegiatans = kegiatanService.getKegiatanByAssignedUser(currentUser.getId());
-        return ResponseEntity.ok(kegiatans);
-    }
-
-    /**
-     * Transfer kegiatan dari satu user ke user lain
-     */
-    @LogActivity(description = "Transferred kegiatan between users", activityType = ActivityType.UPDATE, entityType = EntityType.KEGIATAN, severity = LogSeverity.HIGH)
-    @Operation(summary = "Transfer Kegiatan", description = "Transfer kegiatan dari satu user ke user lain dalam satker yang sama")
-    @PostMapping("/{kegiatanId}/transfer/{fromUserId}/{toUserId}")
-    public ResponseEntity<Map<String, Object>> transferKegiatanToUser(
-            @PathVariable("kegiatanId") Long kegiatanId,
-            @PathVariable("fromUserId") Long fromUserId,
-            @PathVariable("toUserId") Long toUserId) {
-
-        Map<String, Object> result = kegiatanService.transferKegiatanToUser(
-                kegiatanId, fromUserId, toUserId);
-
-        if ((Boolean) result.get("success")) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
-        }
-    }
 }

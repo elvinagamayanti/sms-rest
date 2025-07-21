@@ -44,14 +44,84 @@ public class SecurityConfig {
         http.logout(logout -> logout.disable());
 
         http.authorizeHttpRequests(auth -> auth
+                // .requestMatchers("/", "/login", "/logout", "/docs/**", "/error").permitAll()
+                // .requestMatchers("/api/tahap/**", "/api/kegiatan/**",
+                // "/api/notifications/**", "/api/activity-logs/**")
+                // .hasAnyRole("ADMIN", "USER", "SUPERADMIN")
+                // .requestMatchers("/api/direktorats/**",
+                // "/api/deputis/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                // .requestMatchers("/api/roles/**", "/api/provinces/**", "/api/satkers/**",
+                // "/api/programs/**",
+                // "/api/outputs/**")
+                // .hasRole("SUPERADMIN")
+                // .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                // .anyRequest().authenticated()
+                // Public endpoints
                 .requestMatchers("/", "/login", "/logout", "/docs/**", "/error").permitAll()
-                .requestMatchers("/api/tahap/**", "/api/kegiatan/**", "/api/notifications/**", "/api/activity-logs/**")
-                .hasAnyRole("ADMIN", "USER", "SUPERADMIN")
-                .requestMatchers("/api/direktorats/**", "/api/deputis/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                .requestMatchers("/api/roles/**", "/api/provinces/**", "/api/satkers/**", "/api/programs/**",
-                        "/api/outputs/**")
-                .hasRole("SUPERADMIN")
-                .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "SUPERADMIN")
+
+                // User Management - hierarchical access
+                .requestMatchers("/api/users/current").authenticated()
+                .requestMatchers("/api/users/statistics")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI", "OPERATOR_PROVINSI",
+                        "ADMIN_SATKER", "OPERATOR_SATKER")
+                .requestMatchers("/api/users/under-management")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
+                .requestMatchers("/api/users/available-satkers")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
+                .requestMatchers("/api/users/manageable-roles")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
+                .requestMatchers("/api/users/bulk-status")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
+                .requestMatchers("/api/users/*/transfer").hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI")
+                .requestMatchers("/api/users/*/activate")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
+                .requestMatchers("/api/users/*/deactivate")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
+                .requestMatchers("/api/users/*/roles/*")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
+                .requestMatchers("/api/users")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI", "OPERATOR_PROVINSI",
+                        "ADMIN_SATKER", "OPERATOR_SATKER")
+
+                // Kegiatan Management - scope-based access
+                .requestMatchers("/api/kegiatans/*/assign-to-satkers")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT")
+                .requestMatchers("/api/kegiatans/*/assign-to-provinces")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT")
+                .requestMatchers("/api/kegiatans/*/assign-user")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
+                .requestMatchers("/api/kegiatans/statistics")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI", "OPERATOR_PROVINSI",
+                        "ADMIN_SATKER", "OPERATOR_SATKER")
+                .requestMatchers("/api/kegiatans")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI", "OPERATOR_PROVINSI",
+                        "ADMIN_SATKER", "OPERATOR_SATKER")
+
+                // Tahap Management - scope-based access
+                .requestMatchers("/api/tahap/*/update-status")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI", "OPERATOR_PROVINSI",
+                        "ADMIN_SATKER", "OPERATOR_SATKER")
+                .requestMatchers("/api/tahap")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI", "OPERATOR_PROVINSI",
+                        "ADMIN_SATKER", "OPERATOR_SATKER")
+
+                // Master Data Management - superadmin only
+                .requestMatchers("/api/roles/**").hasRole("SUPERADMIN")
+                .requestMatchers("/api/provinces/**").hasRole("SUPERADMIN")
+                .requestMatchers("/api/satkers/**").hasRole("SUPERADMIN")
+                .requestMatchers("/api/programs/**").hasRole("SUPERADMIN")
+                .requestMatchers("/api/outputs/**").hasRole("SUPERADMIN")
+                .requestMatchers("/api/direktorats/**").hasAnyRole("ADMIN_PUSAT", "SUPERADMIN")
+                .requestMatchers("/api/deputis/**").hasAnyRole("ADMIN_PUSAT", "SUPERADMIN")
+
+                // Notifications and Logs
+                .requestMatchers("/api/notifications/**")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI", "OPERATOR_PROVINSI",
+                        "ADMIN_SATKER", "OPERATOR_SATKER")
+                .requestMatchers("/api/activity-logs/**")
+                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI", "OPERATOR_PROVINSI",
+                        "ADMIN_SATKER", "OPERATOR_SATKER")
+
                 .anyRequest().authenticated());
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

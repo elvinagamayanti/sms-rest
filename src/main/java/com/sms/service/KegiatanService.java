@@ -144,4 +144,50 @@ public interface KegiatanService {
      * @return Response dengan informasi hasil transfer
      */
     Map<String, Object> transferKegiatanToUser(Long kegiatanId, Long fromUserId, Long toUserId);
+
+    /**
+     * Get filtered kegiatan list based on current user's scope and role
+     * 
+     * @return List kegiatan sesuai dengan scope akses
+     */
+    List<KegiatanDto> findAllKegiatanFiltered();
+
+    /**
+     * Check if current user can access specific kegiatan
+     * 
+     * @param kegiatanId ID kegiatan yang akan diakses
+     * @return true jika boleh akses, false jika tidak
+     */
+    boolean canAccessKegiatan(Long kegiatanId);
+
+    /**
+     * Check if current user can modify (edit/delete) specific kegiatan
+     * 
+     * @param kegiatanId ID kegiatan yang akan dimodifikasi
+     * @return true jika boleh modify, false jika tidak
+     */
+    boolean canModifyKegiatan(Long kegiatanId);
+
+    /**
+     * Get kegiatan statistics for current user's scope
+     * 
+     * @return Map berisi statistik kegiatan
+     */
+    Map<String, Object> getKegiatanStatisticsForCurrentScope();
+
+    /**
+     * Find kegiatan by province scope
+     * 
+     * @param provinceCode kode provinsi
+     * @return List kegiatan dalam provinsi tersebut
+     */
+    List<KegiatanDto> findKegiatanByProvinceScope(String provinceCode);
+
+    /**
+     * Find kegiatan by satker scope
+     * 
+     * @param satkerId ID satker
+     * @return List kegiatan dalam satker tersebut
+     */
+    List<KegiatanDto> findKegiatanBySatkerScope(Long satkerId);
 }

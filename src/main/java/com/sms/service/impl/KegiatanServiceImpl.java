@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sms.dto.KegiatanDto;
 import com.sms.entity.Direktorat;
@@ -47,6 +49,8 @@ public class KegiatanServiceImpl implements KegiatanService {
     private DirektoratRepository direktoratRepository;
     private final UserService userService;
 
+    private final Logger logger = LoggerFactory.getLogger(KegiatanServiceImpl.class);
+
     public KegiatanServiceImpl(KegiatanRepository kegiatanRepository, UserRepository userRepository,
             SatkerRepository satkerRepository, ProgramRepository programRepository, OutputRepository outputRepository,
             DirektoratRepository direktoratRepository, UserService userService) {
@@ -60,86 +64,374 @@ public class KegiatanServiceImpl implements KegiatanService {
     }
 
     @Override
+    public List<KegiatanDto> findAllKegiatanFiltered() {
+        User currentUser = userService.getUserLogged();
+        if (currentUser == null) {
+            throw new SecurityException("User tidak terautentikasi");
+        }
+
+        String userRole = userService.getCurrentUserHighestRole();
+
+        switch (userRole) {
+            case "ROLE_SUPERADMIN":
+            case "ROLE_ADMIN_PUSAT":
+            case "ROLE_OPERATOR_PUSAT":
+                // Akses semua kegiatan nasional
+                logger.info("User {} accessing all national kegiatan", currentUser.getName());
+                return findAllKegiatan();
+
+            case "ROLE_ADMIN_PROVINSI":
+            case "ROLE_OPERATOR_PROVINSI":
+                // Akses kegiatan dalam provinsi (semua satker dalam provinsi)
+                logger.info("User {} accessing province-scoped kegiatan", currentUser.getName());
+                return findKegiatanByProvinceScope(currentUser);
+
+            case "ROLE_ADMIN_SATKER":
+            case "ROLE_OPERATOR_SATKER":
+                // Akses kegiatan hanya dalam satker sendiri
+                logger.info("User {} accessing satker-scoped kegiatan", currentUser.getName());
+                return findKegiatanBySatkerScope(currentUser.getSatker().getId());
+
+            default:
+                throw new SecurityException("Role tidak dikenali: " + userRole);
+        }
+    }
+
+    private List<KegiatanDto> findKegiatanByProvinceScope(User currentUser) {
+        if (currentUser.getSatker() == null) {
+            throw new RuntimeException("User tidak memiliki satker");
+        }
+
+        String provinceCode = userService.extractProvinceCodeFromSatker(currentUser.getSatker().getCode());
+        return findKegiatanByProvinceScope(provinceCode);
+    }
+
+    @Override
+    public List<KegiatanDto> findKegiatanByProvinceScope(String provinceCode) {
+        try {
+            // Find all kegiatan yang di-assign ke satker dalam provinsi ini
+            List<Kegiatan> kegiatans = kegiatanRepository.findByProvinceCode(provinceCode);
+            logger.debug("Found {} kegiatan for province code {}", kegiatans.size(), provinceCode);
+
+            return kegiatans.stream()
+                    .map(KegiatanMapper::mapToKegiatanDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error finding kegiatan by province scope {}: {}", provinceCode, e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<KegiatanDto> findKegiatanBySatkerScope(Long satkerId) {
+        try {
+            // Find kegiatan yang di-assign ke satker tertentu
+            List<Kegiatan> kegiatans = kegiatanRepository.findBySatkerId(satkerId);
+            logger.debug("Found {} kegiatan for satker {}", kegiatans.size(), satkerId);
+
+            return kegiatans.stream()
+                    .map(KegiatanMapper::mapToKegiatanDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.error("Error finding kegiatan by satker scope {}: {}", satkerId, e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public boolean canAccessKegiatan(Long kegiatanId) {
+        User currentUser = userService.getUserLogged();
+        if (currentUser == null)
+            return false;
+
+        try {
+            Kegiatan kegiatan = findKegiatanById(kegiatanId);
+            String userRole = userService.getCurrentUserHighestRole();
+
+            switch (userRole) {
+                case "ROLE_SUPERADMIN":
+                case "ROLE_ADMIN_PUSAT":
+                case "ROLE_OPERATOR_PUSAT":
+                    return true; // Can access all kegiatan
+
+                case "ROLE_ADMIN_PROVINSI":
+                case "ROLE_OPERATOR_PROVINSI":
+                    // Can access kegiatan in same province
+                    if (kegiatan.getSatker() == null)
+                        return true; // Master kegiatan accessible
+                    return userService.isSameProvince(
+                            currentUser.getSatker().getCode(),
+                            kegiatan.getSatker().getCode());
+
+                case "ROLE_ADMIN_SATKER":
+                case "ROLE_OPERATOR_SATKER":
+                    // Can access kegiatan in same satker only
+                    if (kegiatan.getSatker() == null)
+                        return false; // No access to master kegiatan
+                    return currentUser.getSatker().getId().equals(kegiatan.getSatker().getId());
+
+                default:
+                    return false;
+            }
+
+        } catch (Exception e) {
+            logger.error("Error checking kegiatan access for user {} and kegiatan {}: {}",
+                    currentUser.getId(), kegiatanId, e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean canModifyKegiatan(Long kegiatanId) {
+        User currentUser = userService.getUserLogged();
+        if (currentUser == null)
+            return false;
+
+        try {
+            Kegiatan kegiatan = findKegiatanById(kegiatanId);
+            String userRole = userService.getCurrentUserHighestRole();
+
+            switch (userRole) {
+                case "ROLE_SUPERADMIN":
+                case "ROLE_ADMIN_PUSAT":
+                    return true; // Can modify all kegiatan
+
+                case "ROLE_OPERATOR_PUSAT":
+                    // Can only modify master kegiatan (not assigned to any satker)
+                    return kegiatan.getSatker() == null;
+
+                case "ROLE_ADMIN_PROVINSI":
+                    // Can modify kegiatan assigned to satkers in same province
+                    if (kegiatan.getSatker() == null)
+                        return false; // No access to master
+                    return userService.isSameProvince(
+                            currentUser.getSatker().getCode(),
+                            kegiatan.getSatker().getCode());
+
+                case "ROLE_OPERATOR_PROVINSI":
+                    // Cannot modify, only view and update status
+                    return false;
+
+                case "ROLE_ADMIN_SATKER":
+                    // Can modify kegiatan assigned to their satker
+                    if (kegiatan.getSatker() == null)
+                        return false;
+                    return currentUser.getSatker().getId().equals(kegiatan.getSatker().getId());
+
+                case "ROLE_OPERATOR_SATKER":
+                    // Cannot modify, only view and update status
+                    return false;
+
+                default:
+                    return false;
+            }
+
+        } catch (Exception e) {
+            logger.error("Error checking kegiatan modify permission for user {} and kegiatan {}: {}",
+                    currentUser.getId(), kegiatanId, e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public Map<String, Object> getKegiatanStatisticsForCurrentScope() {
+        Map<String, Object> statistics = new HashMap<>();
+
+        try {
+            List<KegiatanDto> scopedKegiatan = findAllKegiatanFiltered();
+
+            // Basic counts
+            statistics.put("totalKegiatan", scopedKegiatan.size());
+
+            // Active/inactive kegiatan (berdasarkan end date)
+            Date now = new Date();
+            long activeKegiatan = scopedKegiatan.stream()
+                    .mapToLong(k -> k.getEndDate() == null || k.getEndDate().after(now) ? 1 : 0)
+                    .sum();
+            statistics.put("activeKegiatan", activeKegiatan);
+            statistics.put("completedKegiatan", scopedKegiatan.size() - activeKegiatan);
+
+            // User assignment status
+            long assignedKegiatan = scopedKegiatan.stream()
+                    .mapToLong(k -> k.getUser() != null ? 1 : 0)
+                    .sum();
+            statistics.put("assignedKegiatan", assignedKegiatan);
+            statistics.put("unassignedKegiatan", scopedKegiatan.size() - assignedKegiatan);
+
+            // Budget statistics
+            BigDecimal totalBudget = scopedKegiatan.stream()
+                    .filter(k -> k.getBudget() != null)
+                    .map(KegiatanDto::getBudget)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            statistics.put("totalBudget", totalBudget);
+
+            // Current user info
+            User currentUser = userService.getUserLogged();
+            if (currentUser != null) {
+                statistics.put("currentUserRole", userService.getCurrentUserHighestRole());
+                statistics.put("currentUserScope", determineKegiatanScope(currentUser));
+                statistics.put("currentUserSatker", currentUser.getSatker().getName());
+            }
+
+        } catch (Exception e) {
+            logger.error("Error generating kegiatan statistics: {}", e.getMessage());
+            statistics.put("error", "Unable to generate statistics");
+        }
+
+        return statistics;
+    }
+
+    private String determineKegiatanScope(User user) {
+        String role = userService.getCurrentUserHighestRole();
+
+        switch (role) {
+            case "ROLE_SUPERADMIN":
+            case "ROLE_ADMIN_PUSAT":
+            case "ROLE_OPERATOR_PUSAT":
+                return "National";
+            case "ROLE_ADMIN_PROVINSI":
+            case "ROLE_OPERATOR_PROVINSI":
+                String provinceCode = userService.extractProvinceCodeFromSatker(user.getSatker().getCode());
+                return "Province " + provinceCode;
+            case "ROLE_ADMIN_SATKER":
+            case "ROLE_OPERATOR_SATKER":
+                return "Satker " + user.getSatker().getCode();
+            default:
+                return "Limited";
+        }
+    }
+
+    // ====================================
+    // CORE CRUD METHODS (UPDATED)
+    // ====================================
+
+    @Override
     public List<KegiatanDto> ambilDaftarKegiatan() {
-        List<Kegiatan> kegiatans = this.kegiatanRepository.findAll();
-        List<KegiatanDto> kegiatanDtos = kegiatans.stream()
-                .map((kegiatan) -> (KegiatanMapper.mapToKegiatanDto(kegiatan)))
+        // DEPRECATED - use findAllKegiatanFiltered() instead for security
+        logger.warn("Using deprecated ambilDaftarKegiatan() method - should use findAllKegiatanFiltered()");
+        return findAllKegiatanFiltered();
+    }
+
+    private List<KegiatanDto> findAllKegiatan() {
+        // Internal method for unfiltered access (pusat only)
+        List<Kegiatan> kegiatans = kegiatanRepository.findAll();
+        return kegiatans.stream()
+                .map(KegiatanMapper::mapToKegiatanDto)
                 .collect(Collectors.toList());
-        return kegiatanDtos;
     }
 
     @Override
-    public void hapusDataKegiatan(Long kegiatanId) {
-        kegiatanRepository.deleteById(kegiatanId);
-    }
-
-    @Override
-    public void perbaruiDataKegiatan(KegiatanDto kegiatanDto) {
-        Kegiatan kegiatan = KegiatanMapper.mapToKegiatan(kegiatanDto);
-
-        // Auto-assign direktorat penanggung jawab dari user
-        if (kegiatan.getUser() != null && kegiatan.getUser().getDirektorat() != null) {
-            kegiatan.setDirektoratPenanggungJawab(kegiatan.getUser().getDirektorat());
-        }
-
-        System.out.println(kegiatanDto);
-        kegiatanRepository.save(kegiatan);
-    }
-
-    @Override
+    @Transactional
     public KegiatanDto simpanDataKegiatan(KegiatanDto kegiatanDto) {
-        Kegiatan kegiatan = KegiatanMapper.mapToKegiatan(kegiatanDto);
-        User user = userRepository.findById(kegiatanDto.getUser().getId())
-                .orElseThrow(
-                        () -> new RuntimeException("User not found with id: " + kegiatanDto.getUser().getId()));
-        System.out.println("User: " + user);
+        try {
+            Kegiatan kegiatan = KegiatanMapper.mapToKegiatan(kegiatanDto);
 
-        Satker satker = satkerRepository.findById(user.getSatker().getId())
-                .orElseThrow(
-                        () -> new RuntimeException(
-                                "Satker not found with id: " + user.getSatker().getId()));
-        System.out.println("Satker: " + satker);
+            // Get current user for auto-assignment
+            User currentUser = userService.getUserLogged();
+            if (currentUser == null) {
+                throw new RuntimeException("User tidak terautentikasi");
+            }
 
-        Output output = outputRepository.findById(kegiatanDto.getOutput().getId())
-                .orElseThrow(
-                        () -> new RuntimeException("Output not found with id: " + kegiatanDto.getOutput().getId()));
+            // Handle user assignment
+            if (kegiatanDto.getUser() != null && kegiatanDto.getUser().getId() != null) {
+                User user = userRepository.findById(kegiatanDto.getUser().getId())
+                        .orElseThrow(
+                                () -> new RuntimeException("User not found with id: " + kegiatanDto.getUser().getId()));
+                kegiatan.setUser(user);
 
-        Program program = programRepository.findById(output.getProgram().getId())
-                .orElseThrow(
-                        () -> new RuntimeException(
+                // AUTO-ASSIGN: Set direktorat penanggung jawab berdasarkan direktorat user
+                if (user.getDirektorat() != null) {
+                    kegiatan.setDirektoratPenanggungJawab(user.getDirektorat());
+                    logger.info("Auto-assigned direktorat PJ: {}", user.getDirektorat().getName());
+                }
+            } else {
+                // For master kegiatan created by pusat, user might be null initially
+                kegiatan.setUser(null);
+            }
+
+            // Handle satker assignment
+            if (kegiatanDto.getSatker() != null && kegiatanDto.getSatker().getId() != null) {
+                Satker satker = satkerRepository.findById(kegiatanDto.getSatker().getId())
+                        .orElseThrow(() -> new RuntimeException(
+                                "Satker not found with id: " + kegiatanDto.getSatker().getId()));
+                kegiatan.setSatker(satker);
+            } else {
+                // Master kegiatan (created by pusat) has no satker initially
+                kegiatan.setSatker(null);
+            }
+
+            // Handle program and output
+            if (kegiatanDto.getOutput() != null && kegiatanDto.getOutput().getId() != null) {
+                Output output = outputRepository.findById(kegiatanDto.getOutput().getId())
+                        .orElseThrow(() -> new RuntimeException(
+                                "Output not found with id: " + kegiatanDto.getOutput().getId()));
+                kegiatan.setOutput(output);
+
+                // Auto-assign program from output
+                Program program = programRepository.findById(output.getProgram().getId())
+                        .orElseThrow(() -> new RuntimeException(
                                 "Program not found with id: " + output.getProgram().getId()));
+                kegiatan.setProgram(program);
+            }
 
-        kegiatan.setUser(user);
-        System.out.println(kegiatan.getUser().getId());
-        kegiatan.setSatker(satker);
-        System.out.println(kegiatan.getSatker().getId());
-        kegiatan.setProgram(program);
-        System.out.println(kegiatan.getProgram().getId());
-        kegiatan.setOutput(output);
-        System.out.println(kegiatan.getOutput().getId());
-        // kegiatanRepository.save(kegiatan);
+            Kegiatan saved = kegiatanRepository.save(kegiatan);
+            logger.info("Kegiatan created: {} by user {}", saved.getName(), currentUser.getName());
 
-        // AUTO-ASSIGN: Set direktorat penanggung jawab berdasarkan direktorat user
-        if (user.getDirektorat() != null) {
-            kegiatan.setDirektoratPenanggungJawab(user.getDirektorat());
-            System.out.println("Direktorat PJ: " + user.getDirektorat().getName());
-        } else {
-            System.out.println("Warning: User tidak memiliki direktorat, direktorat PJ tidak di-set");
+            return KegiatanMapper.mapToKegiatanDto(saved);
+
+        } catch (Exception e) {
+            logger.error("Error saving kegiatan: {}", e.getMessage(), e);
+            throw new RuntimeException("Gagal menyimpan kegiatan: " + e.getMessage());
         }
+    }
 
-        Kegiatan saved = kegiatanRepository.save(kegiatan);
-        return KegiatanMapper.mapToKegiatanDto(saved);
+    @Override
+    @Transactional
+    public void perbaruiDataKegiatan(KegiatanDto kegiatanDto) {
+        try {
+            Kegiatan kegiatan = KegiatanMapper.mapToKegiatan(kegiatanDto);
+
+            // Auto-assign direktorat penanggung jawab dari user
+            if (kegiatan.getUser() != null && kegiatan.getUser().getDirektorat() != null) {
+                kegiatan.setDirektoratPenanggungJawab(kegiatan.getUser().getDirektorat());
+                logger.info("Updated direktorat PJ: {}", kegiatan.getUser().getDirektorat().getName());
+            }
+
+            kegiatanRepository.save(kegiatan);
+            logger.info("Kegiatan updated: {}", kegiatan.getName());
+
+        } catch (Exception e) {
+            logger.error("Error updating kegiatan: {}", e.getMessage(), e);
+            throw new RuntimeException("Gagal mengupdate kegiatan: " + e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void hapusDataKegiatan(Long kegiatanId) {
+        try {
+            // Validate kegiatan exists and user can delete it
+            Kegiatan kegiatan = findKegiatanById(kegiatanId);
+
+            kegiatanRepository.deleteById(kegiatanId);
+            logger.info("Kegiatan deleted: {} (ID: {})", kegiatan.getName(), kegiatanId);
+
+        } catch (Exception e) {
+            logger.error("Error deleting kegiatan {}: {}", kegiatanId, e.getMessage(), e);
+            throw new RuntimeException("Gagal menghapus kegiatan: " + e.getMessage());
+        }
     }
 
     @Override
     public KegiatanDto cariKegiatanById(Long id) {
-        Kegiatan kegiatan = kegiatanRepository.findById(id).get();
+        Kegiatan kegiatan = findKegiatanById(id);
         return KegiatanMapper.mapToKegiatanDto(kegiatan);
     }
 
     @Override
     public Kegiatan findKegiatanById(Long id) {
-        return kegiatanRepository.findById(id).orElseThrow(() -> new RuntimeException("Survey not found"));
+        return kegiatanRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Kegiatan not found with id: " + id));
     }
 
     @Override

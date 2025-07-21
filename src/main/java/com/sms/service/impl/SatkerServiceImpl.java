@@ -150,4 +150,38 @@ public class SatkerServiceImpl implements SatkerService {
         satkerHolder[0] = satkerRepository.save(satkerHolder[0]);
         return SatkerMapper.mapToSatkerDto(satkerHolder[0]);
     }
+
+    public Satker findById(Long satkerId) {
+        return satkerRepository.findById(satkerId)
+                .orElseThrow(() -> new RuntimeException("Satker not found with id: " + satkerId));
+    }
+
+    public List<SatkerDto> findPusatSatkers() {
+        List<Satker> satkers = satkerRepository.findByCodeStartingWith("00");
+        return satkers.stream()
+                .map(SatkerMapper::mapToSatkerDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<SatkerDto> findProvinsiSatkers() {
+        List<Satker> satkers = satkerRepository.findByIsProvince(true);
+        return satkers.stream()
+                .filter(satker -> !"0000".equals(satker.getCode()))
+                .map(SatkerMapper::mapToSatkerDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<SatkerDto> findKabKotaSatkers() {
+        List<Satker> satkers = satkerRepository.findByIsProvince(false);
+        return satkers.stream()
+                .map(SatkerMapper::mapToSatkerDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<SatkerDto> findByProvinceCode(String provinceCode) {
+        List<Satker> satkers = satkerRepository.findByCodeStartingWith(provinceCode);
+        return satkers.stream()
+                .map(SatkerMapper::mapToSatkerDto)
+                .collect(Collectors.toList());
+    }
 }
