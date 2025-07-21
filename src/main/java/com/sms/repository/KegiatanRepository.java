@@ -151,7 +151,7 @@ public interface KegiatanRepository extends JpaRepository<Kegiatan, Long> {
         @Query("SELECT k FROM Kegiatan k WHERE " +
                         "(:scope = 'NATIONAL') OR " +
                         "(:scope = 'PROVINCE' AND SUBSTRING(k.satker.code, 1, 2) = :scopeValue) OR " +
-                        "(:scope = 'SATKER' AND k.satker.id = :scopeValue)")
+                        "(:scope = 'SATKER' AND k.satker.id = CAST(:scopeValue AS Long))")
         List<Kegiatan> findWithGeographicScope(
                         @Param("scope") String scope,
                         @Param("scopeValue") String scopeValue);

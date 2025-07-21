@@ -516,7 +516,7 @@ public class KegiatanController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required"),
             @ApiResponse(responseCode = "403", description = "Forbidden - insufficient permissions")
     })
-    @GetMapping
+    @GetMapping("/statistics")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<?> getKegiatanStatistics() {
         try {
