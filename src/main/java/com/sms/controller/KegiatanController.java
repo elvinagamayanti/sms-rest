@@ -691,6 +691,42 @@ public class KegiatanController {
         }
     }
 
+    @LogActivity(description = "Retrieved kegiatan by Direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Statistik Kegiatan per Direktorat", description = "Menampilkan statistik jumlah kegiatan per direktorat")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    @GetMapping("/statistics/direktorat")
+    public ResponseEntity<Map<String, Object>> getStatisticsByDirektorat() {
+        Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsByDirektorat();
+        return ResponseEntity.ok(statistics);
+    }
+
+    @LogActivity(description = "Retrieved kegiatan by Deputi", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @Operation(summary = "Statistik Kegiatan per Deputi", description = "Menampilkan statistik jumlah kegiatan per deputi")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    @GetMapping("/statistics/deputi")
+    public ResponseEntity<Map<String, Object>> getStatisticsByDeputi() {
+        Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsByDeputi();
+        return ResponseEntity.ok(statistics);
+    }
+
+    @Operation(summary = "Statistik Anggaran per Direktorat", description = "Menampilkan statistik total anggaran per direktorat")
+    @LogActivity(description = "Retrieved budget statistics by direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @GetMapping("/budget/direktorat")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    public ResponseEntity<Map<String, Object>> getBudgetByDirektorat() {
+        Map<String, Object> budgetStats = kegiatanService.getBudgetStatisticsByDirektorat();
+        return ResponseEntity.ok(budgetStats);
+    }
+
+    @Operation(summary = "Statistik Anggaran per Deputi", description = "Menampilkan statistik total anggaran per deputi")
+    @GetMapping("/budget/deputi")
+    @LogActivity(description = "Retrieved budget statistics by deputi", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    public ResponseEntity<Map<String, Object>> getBudgetByDeputi() {
+        Map<String, Object> budgetStats = kegiatanService.getBudgetStatisticsByDeputi();
+        return ResponseEntity.ok(budgetStats);
+    }
+
     // ====================================
     // UTILITY ENDPOINTS
     // ====================================

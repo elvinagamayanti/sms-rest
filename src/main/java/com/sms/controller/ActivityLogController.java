@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.dto.ActivityLogDto;
+import com.sms.dto.SimpleActivityLogDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
+import com.sms.mapper.ActivityLogMapper;
 import com.sms.payload.ApiErrorResponse;
 import com.sms.service.ActivityLogService;
 
@@ -55,12 +58,13 @@ public class ActivityLogController {
             @ApiResponse(responseCode = "401", description = "Unauthorized - authentication required")
     })
     @GetMapping
-    public ResponseEntity<Page<ActivityLogDto>> getAllActivityLogs(
+    public ResponseEntity<Page<SimpleActivityLogDto>> getAllActivityLogs(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ActivityLogDto> logs = activityLogService.getAllActivityLogs(pageable);
-        return ResponseEntity.ok(logs);
+        Page<SimpleActivityLogDto> simpleLogs = logs.map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto);
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Menampilkan Detail Log Aktivitas", description = "Menampilkan detail log aktivitas berdasarkan ID")
@@ -69,64 +73,72 @@ public class ActivityLogController {
             @ApiResponse(responseCode = "404", description = "Log aktivitas tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     @GetMapping("/{id}")
-    public ResponseEntity<ActivityLogDto> getActivityLogById(@PathVariable Long id) {
+    public ResponseEntity<SimpleActivityLogDto> getActivityLogById(@PathVariable Long id) {
         ActivityLogDto log = activityLogService.getActivityLogById(id);
-        return ResponseEntity.ok(log);
+        SimpleActivityLogDto simpleLog = ActivityLogMapper.mapActivityLogDtoToSimpleActivityLogDto(log);
+        return ResponseEntity.ok(simpleLog);
     }
 
     @Operation(summary = "Menampilkan Log Aktivitas User", description = "Menampilkan log aktivitas berdasarkan ID user")
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Page<ActivityLogDto>> getActivityLogsByUserId(
+    public ResponseEntity<Page<SimpleActivityLogDto>> getActivityLogsByUserId(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ActivityLogDto> logs = activityLogService.getActivityLogsByUserId(userId, pageable);
-        return ResponseEntity.ok(logs);
+        Page<SimpleActivityLogDto> simpleLogs = logs.map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto);
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Menampilkan Log Aktivitas yang Belum Dibaca", description = "Menampilkan daftar log aktivitas yang belum dibaca")
     @GetMapping("/unread")
-    public ResponseEntity<Page<ActivityLogDto>> getUnreadLogs(
+    public ResponseEntity<Page<SimpleActivityLogDto>> getUnreadLogs(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ActivityLogDto> logs = activityLogService.getUnreadLogs(pageable);
-        return ResponseEntity.ok(logs);
+        Page<SimpleActivityLogDto> simpleLogs = logs.map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto);
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Menampilkan Log Aktivitas yang Belum Dibaca untuk User", description = "Menampilkan log aktivitas yang belum dibaca untuk user tertentu")
     @GetMapping("/user/{userId}/unread")
-    public ResponseEntity<List<ActivityLogDto>> getUnreadLogsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<SimpleActivityLogDto>> getUnreadLogsByUserId(@PathVariable Long userId) {
         List<ActivityLogDto> logs = activityLogService.getUnreadLogsByUserId(userId);
-        return ResponseEntity.ok(logs);
+        List<SimpleActivityLogDto> simpleLogs = logs.stream()
+                .map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto)
+                .toList();
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Menampilkan Aktivitas Terkini", description = "Menampilkan aktivitas dalam beberapa jam terakhir")
     @GetMapping("/recent")
-    public ResponseEntity<Page<ActivityLogDto>> getRecentActivities(
+    public ResponseEntity<Page<SimpleActivityLogDto>> getRecentActivities(
             @RequestParam(defaultValue = "24") int hours,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ActivityLogDto> logs = activityLogService.getRecentActivities(hours, pageable);
-        return ResponseEntity.ok(logs);
+        Page<SimpleActivityLogDto> simpleLogs = logs.map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto);
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Mencari Log Aktivitas", description = "Mencari log aktivitas berdasarkan kata kunci")
     @GetMapping("/search")
-    public ResponseEntity<Page<ActivityLogDto>> searchActivities(
+    public ResponseEntity<Page<SimpleActivityLogDto>> searchActivities(
             @RequestParam String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<ActivityLogDto> logs = activityLogService.searchActivities(query, pageable);
-        return ResponseEntity.ok(logs);
+        Page<SimpleActivityLogDto> simpleLogs = logs.map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto);
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Filter Log Aktivitas", description = "Filter log aktivitas berdasarkan berbagai kriteria")
     @GetMapping("/filter")
-    public ResponseEntity<Page<ActivityLogDto>> getActivitiesWithFilters(
+    public ResponseEntity<Page<SimpleActivityLogDto>> getActivitiesWithFilters(
             @RequestParam(required = false) ActivityType activityType,
             @RequestParam(required = false) EntityType entityType,
             @RequestParam(required = false) LogSeverity severity,
@@ -139,12 +151,13 @@ public class ActivityLogController {
         Pageable pageable = PageRequest.of(page, size);
         Page<ActivityLogDto> logs = activityLogService.getActivitiesWithFilters(
                 activityType, entityType, severity, userId, startDate, endDate, pageable);
-        return ResponseEntity.ok(logs);
+        Page<SimpleActivityLogDto> simpleLogs = logs.map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto);
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Log Aktivitas berdasarkan Rentang Tanggal", description = "Menampilkan log aktivitas dalam rentang tanggal tertentu")
     @GetMapping("/date-range")
-    public ResponseEntity<Page<ActivityLogDto>> getActivitiesByDateRange(
+    public ResponseEntity<Page<SimpleActivityLogDto>> getActivitiesByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
             @RequestParam(defaultValue = "0") int page,
@@ -152,37 +165,50 @@ public class ActivityLogController {
 
         Pageable pageable = PageRequest.of(page, size);
         Page<ActivityLogDto> logs = activityLogService.getActivitiesByDateRange(start, end, pageable);
-        return ResponseEntity.ok(logs);
+        Page<SimpleActivityLogDto> simpleLogs = logs.map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto);
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Log Aktivitas berdasarkan Tipe Aktivitas", description = "Menampilkan log aktivitas berdasarkan tipe aktivitas")
     @GetMapping("/activity-type/{activityType}")
-    public ResponseEntity<List<ActivityLogDto>> getActivitiesByType(@PathVariable ActivityType activityType) {
+    public ResponseEntity<List<SimpleActivityLogDto>> getActivitiesByType(@PathVariable ActivityType activityType) {
         List<ActivityLogDto> logs = activityLogService.getActivitiesByType(activityType);
-        return ResponseEntity.ok(logs);
+        List<SimpleActivityLogDto> simpleLogs = logs.stream()
+                .map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto)
+                .toList();
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Log Aktivitas berdasarkan Tipe Entity", description = "Menampilkan log aktivitas berdasarkan tipe entity")
     @GetMapping("/entity-type/{entityType}")
-    public ResponseEntity<List<ActivityLogDto>> getActivitiesByEntityType(@PathVariable EntityType entityType) {
+    public ResponseEntity<List<SimpleActivityLogDto>> getActivitiesByEntityType(@PathVariable EntityType entityType) {
         List<ActivityLogDto> logs = activityLogService.getActivitiesByEntityType(entityType);
-        return ResponseEntity.ok(logs);
+        List<SimpleActivityLogDto> simpleLogs = logs.stream()
+                .map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto)
+                .toList();
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Log Aktivitas berdasarkan Tingkat Keparahan", description = "Menampilkan log aktivitas berdasarkan tingkat keparahan")
     @GetMapping("/severity/{severity}")
-    public ResponseEntity<List<ActivityLogDto>> getActivitiesBySeverity(@PathVariable LogSeverity severity) {
+    public ResponseEntity<List<SimpleActivityLogDto>> getActivitiesBySeverity(@PathVariable LogSeverity severity) {
         List<ActivityLogDto> logs = activityLogService.getActivitiesBySeverity(severity);
-        return ResponseEntity.ok(logs);
+        List<SimpleActivityLogDto> simpleLogs = logs.stream()
+                .map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto)
+                .toList();
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Log Aktivitas untuk Entity Tertentu", description = "Menampilkan log aktivitas untuk entity tertentu")
     @GetMapping("/entity/{entityType}/{entityId}")
-    public ResponseEntity<List<ActivityLogDto>> getActivitiesByEntity(
+    public ResponseEntity<List<SimpleActivityLogDto>> getActivitiesByEntity(
             @PathVariable EntityType entityType,
             @PathVariable Long entityId) {
         List<ActivityLogDto> logs = activityLogService.getActivitiesByEntity(entityType, entityId);
-        return ResponseEntity.ok(logs);
+        List<SimpleActivityLogDto> simpleLogs = logs.stream()
+                .map(ActivityLogMapper::mapActivityLogDtoToSimpleActivityLogDto)
+                .toList();
+        return ResponseEntity.ok(simpleLogs);
     }
 
     @Operation(summary = "Tandai sebagai Telah Dibaca", description = "Menandai log aktivitas sebagai telah dibaca")
@@ -295,7 +321,7 @@ public class ActivityLogController {
 
     @Operation(summary = "Log Manual", description = "Membuat log aktivitas secara manual")
     @PostMapping("/manual")
-    public ResponseEntity<ActivityLogDto> createManualLog(@RequestBody Map<String, Object> logRequest) {
+    public ResponseEntity<SimpleActivityLogDto> createManualLog(@RequestBody Map<String, Object> logRequest) {
         String description = (String) logRequest.get("description");
         ActivityType activityType = ActivityType.valueOf((String) logRequest.get("activityType"));
         EntityType entityType = EntityType.valueOf((String) logRequest.get("entityType"));
@@ -306,6 +332,7 @@ public class ActivityLogController {
 
         ActivityLogDto log = activityLogService.logActivity(description, activityType,
                 entityType, entityId, entityName, severity);
-        return ResponseEntity.ok(log);
+        SimpleActivityLogDto simpleLog = ActivityLogMapper.mapActivityLogDtoToSimpleActivityLogDto(log);
+        return ResponseEntity.ok(simpleLog);
     }
 }
