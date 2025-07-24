@@ -806,8 +806,7 @@ public class UserServiceImpl implements UserService {
 
             case "ROLE_ADMIN_PUSAT":
                 // Admin pusat hanya bisa create di satker pusat (code starts with "00")
-                return satkerRepository.findAll().stream()
-                        .filter(satker -> satker.getCode() != null && satker.getCode().startsWith("00"))
+                return satkerRepository.findPusatSatkers().stream()
                         .map(Satker::getId)
                         .collect(Collectors.toList());
 
