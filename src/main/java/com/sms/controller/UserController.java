@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -30,11 +31,14 @@ import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
 import com.sms.entity.User;
 import com.sms.mapper.UserMapper;
+import com.sms.payload.ApiErrorResponse;
 import com.sms.repository.RoleRepository;
 import com.sms.service.SatkerService;
 import com.sms.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -368,6 +372,22 @@ public class UserController {
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                         .body(Arrays.asList());
                 }
+        }
+
+        @Operation(summary = "Update Sebagian Data User", description = "Memperbarui sebagian field user tanpa harus mengisi semua field")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Berhasil memperbarui sebagian data user", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDto.class))),
+                        @ApiResponse(responseCode = "404", description = "User tidak ditemukan", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class)))
+        })
+        @LogActivity(activityType = ActivityType.UPDATE, entityType = EntityType.USER, description = "Partially update user by ID", severity = LogSeverity.MEDIUM)
+        @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'ADMIN_PROVINSI', 'ADMIN_SATKER')")
+        @PatchMapping("/{id}")
+        public ResponseEntity<UserDto> patchUser(
+                        @PathVariable("id") Long id,
+                        @RequestBody Map<String, Object> updates) {
+
+                UserDto userDto = userService.patchUser(id, updates);
+                return ResponseEntity.ok(userDto);
         }
 
         // ====================================
