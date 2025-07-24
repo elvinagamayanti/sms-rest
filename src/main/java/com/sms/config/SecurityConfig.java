@@ -93,7 +93,7 @@ public class SecurityConfig {
                                 .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT")
                                 .requestMatchers("/api/kegiatans/*/assign-user")
                                 .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "ADMIN_PROVINSI", "ADMIN_SATKER")
-                                .requestMatchers("/api/kegiatans/statistics")
+                                .requestMatchers("/api/kegiatans/statistics/**")
                                 .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI",
                                                 "OPERATOR_PROVINSI",
                                                 "ADMIN_SATKER", "OPERATOR_SATKER")

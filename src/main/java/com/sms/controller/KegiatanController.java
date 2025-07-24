@@ -536,7 +536,7 @@ public class KegiatanController {
     @LogActivity(description = "Retrieved monthly statistics", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Statistik Bulanan", description = "Menampilkan statistik kegiatan bulanan")
     @GetMapping("/statistics/monthly")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<?> getMonthlyStatistics(
             @RequestParam("year") int year,
             @RequestParam(value = "direktoratId", required = false) Long direktoratId) {
@@ -561,7 +561,7 @@ public class KegiatanController {
     @LogActivity(description = "Retrieved kegiatan by direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Kegiatan berdasarkan Direktorat PJ", description = "Menampilkan kegiatan berdasarkan direktorat penanggung jawab")
     @GetMapping("/direktorat/{direktoratId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<?> getKegiatanByDirektoratPJ(@PathVariable("direktoratId") Long direktoratId) {
         try {
             List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJ(direktoratId);
@@ -590,7 +590,7 @@ public class KegiatanController {
     @LogActivity(description = "Retrieved kegiatan by direktorat PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Kegiatan berdasarkan Kode Direktorat PJ", description = "Menampilkan kegiatan berdasarkan kode direktorat penanggung jawab")
     @GetMapping("/direktorat/code/{direktoratCode}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<?> getKegiatanByDirektoratPJCode(@PathVariable("direktoratCode") String direktoratCode) {
         try {
             List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDirektoratPJCode(direktoratCode);
@@ -619,7 +619,7 @@ public class KegiatanController {
     @LogActivity(description = "Retrieved kegiatan by deputi PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Kegiatan berdasarkan Deputi PJ", description = "Menampilkan kegiatan berdasarkan deputi penanggung jawab")
     @GetMapping("/deputi/{deputiId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<?> getKegiatanByDeputiPJ(@PathVariable("deputiId") Long deputiId) {
         try {
             List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJ(deputiId);
@@ -642,7 +642,7 @@ public class KegiatanController {
     @LogActivity(description = "Retrieved kegiatan by deputi PJ code", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Kegiatan berdasarkan Kode Deputi PJ", description = "Menampilkan kegiatan berdasarkan kode deputi penanggung jawab")
     @GetMapping("/deputi/code/{deputiCode}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<?> getKegiatanByDeputiPJCode(@PathVariable("deputiCode") String deputiCode) {
         try {
             List<KegiatanDto> kegiatanDtos = kegiatanService.getKegiatanByDeputiPJCode(deputiCode);
@@ -665,7 +665,7 @@ public class KegiatanController {
     @LogActivity(description = "Retrieved kegiatan by year and direktorat PJ", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Kegiatan berdasarkan Tahun dan Direktorat PJ", description = "Menampilkan kegiatan berdasarkan tahun dan direktorat penanggung jawab")
     @GetMapping("/year/{year}/direktorat/{direktoratId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<?> getKegiatanByYearAndDirektoratPJ(
             @PathVariable("year") int year,
             @PathVariable("direktoratId") Long direktoratId) {
@@ -693,7 +693,7 @@ public class KegiatanController {
 
     @LogActivity(description = "Retrieved kegiatan by Direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Statistik Kegiatan per Direktorat", description = "Menampilkan statistik jumlah kegiatan per direktorat")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     @GetMapping("/statistics/direktorat")
     public ResponseEntity<Map<String, Object>> getStatisticsByDirektorat() {
         Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsByDirektorat();
@@ -702,7 +702,7 @@ public class KegiatanController {
 
     @LogActivity(description = "Retrieved kegiatan by Deputi", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @Operation(summary = "Statistik Kegiatan per Deputi", description = "Menampilkan statistik jumlah kegiatan per deputi")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     @GetMapping("/statistics/deputi")
     public ResponseEntity<Map<String, Object>> getStatisticsByDeputi() {
         Map<String, Object> statistics = kegiatanService.getKegiatanStatisticsByDeputi();
@@ -712,7 +712,7 @@ public class KegiatanController {
     @Operation(summary = "Statistik Anggaran per Direktorat", description = "Menampilkan statistik total anggaran per direktorat")
     @LogActivity(description = "Retrieved budget statistics by direktorat", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
     @GetMapping("/budget/direktorat")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<Map<String, Object>> getBudgetByDirektorat() {
         Map<String, Object> budgetStats = kegiatanService.getBudgetStatisticsByDirektorat();
         return ResponseEntity.ok(budgetStats);
@@ -721,7 +721,7 @@ public class KegiatanController {
     @Operation(summary = "Statistik Anggaran per Deputi", description = "Menampilkan statistik total anggaran per deputi")
     @GetMapping("/budget/deputi")
     @LogActivity(description = "Retrieved budget statistics by deputi", activityType = ActivityType.VIEW, entityType = EntityType.KEGIATAN, severity = LogSeverity.LOW)
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN_PUSAT', 'OPERATOR_PUSAT', 'ADMIN_PROVINSI', 'OPERATOR_PROVINSI', 'ADMIN_SATKER', 'OPERATOR_SATKER')")
     public ResponseEntity<Map<String, Object>> getBudgetByDeputi() {
         Map<String, Object> budgetStats = kegiatanService.getBudgetStatisticsByDeputi();
         return ResponseEntity.ok(budgetStats);
