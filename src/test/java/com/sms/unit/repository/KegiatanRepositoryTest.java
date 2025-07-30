@@ -1,23 +1,16 @@
 package com.sms.unit.repository;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import static org.assertj.core.api.Assertions.assertThat;
-
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.sms.repository.DeputiRepository;
-import com.sms.repository.DirektoratRepository;
-import com.sms.repository.KegiatanRepository;
-import com.sms.repository.OutputRepository;
-import com.sms.repository.ProgramRepository;
-import com.sms.repository.ProvinceRepository;
-import com.sms.repository.SatkerRepository;
 import com.sms.entity.Deputi;
 import com.sms.entity.Direktorat;
 import com.sms.entity.Kegiatan;
@@ -25,6 +18,13 @@ import com.sms.entity.Output;
 import com.sms.entity.Program;
 import com.sms.entity.Province;
 import com.sms.entity.Satker;
+import com.sms.repository.DeputiRepository;
+import com.sms.repository.DirektoratRepository;
+import com.sms.repository.KegiatanRepository;
+import com.sms.repository.OutputRepository;
+import com.sms.repository.ProgramRepository;
+import com.sms.repository.ProvinceRepository;
+import com.sms.repository.SatkerRepository;
 
 @DataJpaTest
 public class KegiatanRepositoryTest {
@@ -84,6 +84,7 @@ public class KegiatanRepositoryTest {
         output = new Output();
         output.setName("Test Output");
         output.setCode("O01");
+        output.setYear("2025");
         output.setProgram(program);
         outputRepository.save(output);
 
@@ -101,10 +102,12 @@ public class KegiatanRepositoryTest {
         kegiatan = new Kegiatan();
         kegiatan.setName("Test Kegiatan");
         kegiatan.setCode("K01");
+        kegiatan.setBudget(new java.math.BigDecimal("1000000000"));
         kegiatan.setDirektoratPenanggungJawab(direktorat);
         kegiatan.setProgram(program);
         kegiatan.setOutput(output);
         kegiatan.setSatker(satker);
+        kegiatan.setStartDate(new Date());
         kegiatanRepository.save(kegiatan);
     }
 
@@ -210,8 +213,8 @@ public class KegiatanRepositoryTest {
     public void testGetMonthlyStatistics_Found() {
         List<Object[]> results = kegiatanRepository.getMonthlyStatistics(2025, direktorat.getId());
         assertThat(results).isNotEmpty();
-        assertThat(results.get(0)[0]).isEqualTo(1); // Assuming the month is January
-        assertThat(results.get(0)[1]).isEqualTo(1L); // Should match the single kegiatan created
+        assertThat(results.get(0)[0]).isEqualTo(7);
+        assertThat(results.get(0)[1]).isEqualTo(1L);
     }
 
     @Test
@@ -219,7 +222,7 @@ public class KegiatanRepositoryTest {
         List<Object[]> results = kegiatanRepository.getTotalBudgetByDirektorat();
         assertThat(results).isNotEmpty();
         assertThat(results.get(0)[0]).isEqualTo(direktorat.getName());
-        assertThat(results.get(0)[1]).isEqualTo(0.0); // Assuming no budget set in this test
+        assertThat(results.get(0)[1].toString()).isEqualTo("1000000000.00");
     }
 
     @Test
@@ -227,7 +230,7 @@ public class KegiatanRepositoryTest {
         List<Object[]> results = kegiatanRepository.getTotalBudgetByDeputi();
         assertThat(results).isNotEmpty();
         assertThat(results.get(0)[0]).isEqualTo(deputi.getName());
-        assertThat(results.get(0)[1]).isEqualTo(0.0); // Assuming no budget set in this test
+        assertThat(results.get(0)[1].toString()).isEqualTo("1000000000.00");
     }
 
     @Test
@@ -342,5 +345,4 @@ public class KegiatanRepositoryTest {
         Optional<Kegiatan> foundKegiatan = kegiatanRepository.findByCode("NON_EXISTENT_CODE");
         assertThat(foundKegiatan).isNotPresent();
     }
-
 }

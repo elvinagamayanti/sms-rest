@@ -42,21 +42,26 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public void hapusDataRole(Long roleId) {
+    public String hapusDataRole(Long roleId) {
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new RuntimeException("Role not found with id: " + roleId));
         roleRepository.deleteById(roleId);
+        return "Success";
     }
 
     @Override
-    public void perbaruiDataRole(RoleDto roleDto) {
+    public String perbaruiDataRole(RoleDto roleDto) {
         Role role = RoleMapper.mapToRole(roleDto);
         System.out.println(roleDto);
         roleRepository.save(role);
+        return "Success";
     }
 
     @Override
-    public void simpanDataRole(RoleDto roleDto) {
+    public String simpanDataRole(RoleDto roleDto) {
         Role role = RoleMapper.mapToRole(roleDto);
         roleRepository.save(role);
+        return "Success";
     }
 
     @Override

@@ -17,11 +17,11 @@ import com.sms.entity.User;
 public interface RoleService {
     List<RoleDto> ambilDaftarRole();
 
-    void perbaruiDataRole(RoleDto roleDto);
+    String perbaruiDataRole(RoleDto roleDto);
 
-    void hapusDataRole(Long roleId);
+    String hapusDataRole(Long roleId);
 
-    void simpanDataRole(RoleDto roleDto);
+    String simpanDataRole(RoleDto roleDto);
 
     RoleDto cariRoleById(Long id);
 

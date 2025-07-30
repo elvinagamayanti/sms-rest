@@ -70,8 +70,8 @@ public class SatkerRepositoryTest {
         province = null;
         satkerPusat = null;
         provincePusat = null;
-        provinceRepository.deleteAll();
         satkerRepository.deleteAll();
+        provinceRepository.deleteAll();
     }
 
     // Test Case Success
