@@ -109,7 +109,12 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLog, Long> 
         @Query("SELECT al.severity, COUNT(al) FROM ActivityLog al GROUP BY al.severity")
         List<Object[]> getSeverityStatistics();
 
-        @Query("SELECT DATE(al.createdAt), COUNT(al) FROM ActivityLog al WHERE al.createdAt >= :since GROUP BY DATE(al.createdAt) ORDER BY DATE(al.createdAt)")
+        // @Query("SELECT DATE(al.createdAt), COUNT(al) FROM ActivityLog al WHERE
+        // al.createdAt >= :since GROUP BY DATE(al.createdAt) ORDER BY
+        // DATE(al.createdAt)")
+        // List<Object[]> getDailyActivityCount(@Param("since") LocalDateTime since);
+
+        @Query("SELECT FUNCTION('DATE', al.createdAt), COUNT(al) FROM ActivityLog al WHERE al.createdAt >= :since GROUP BY FUNCTION('DATE', al.createdAt) ORDER BY FUNCTION('DATE', al.createdAt)")
         List<Object[]> getDailyActivityCount(@Param("since") LocalDateTime since);
 
         // Notification queries
