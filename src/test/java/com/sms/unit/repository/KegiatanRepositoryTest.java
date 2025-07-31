@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.sms.entity.Deputi;
 import com.sms.entity.Direktorat;
@@ -27,6 +28,7 @@ import com.sms.repository.ProvinceRepository;
 import com.sms.repository.SatkerRepository;
 
 @DataJpaTest
+@ActiveProfiles("test")
 public class KegiatanRepositoryTest {
 
     @Autowired
