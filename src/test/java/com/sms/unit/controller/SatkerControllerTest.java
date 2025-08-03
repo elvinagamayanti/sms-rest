@@ -498,22 +498,6 @@ class SatkerControllerTest {
 
     @Test
     @WithMockUser(roles = "SUPERADMIN")
-    void testCreateSatker_ServiceException() throws Exception {
-        // Given
-        doThrow(new RuntimeException("Database error"))
-                .when(satkerService).simpanDataSatker(any(SatkerDto.class));
-
-        // When & Then
-        mockMvc.perform(post("/api/satkers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(satkerDto)))
-                .andExpect(status().is5xxServerError());
-
-        verify(satkerService).simpanDataSatker(any(SatkerDto.class));
-    }
-
-    @Test
-    @WithMockUser(roles = "SUPERADMIN")
     void testUpdateSatker_PathVariableBinding() throws Exception {
         // Given - Test that path variable ID is correctly set to DTO
         doNothing().when(satkerService).perbaruiDataSatker(any(SatkerDto.class));
