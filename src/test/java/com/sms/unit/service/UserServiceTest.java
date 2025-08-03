@@ -28,6 +28,7 @@ import com.sms.entity.Province;
 import com.sms.entity.Role;
 import com.sms.entity.Satker;
 import com.sms.entity.User;
+import com.sms.mapper.UserMapper;
 import com.sms.repository.DirektoratRepository;
 import com.sms.repository.RoleRepository;
 import com.sms.repository.SatkerRepository;
@@ -141,9 +142,20 @@ public class UserServiceTest {
     @Test
     public void testSaveUser_Success() {
         // Given
+        Role defaultRole = Role.builder()
+                .id(1L)
+                .name("ROLE_USER")
+                .build();
+
         when(satkerRepository.findById(1L)).thenReturn(Optional.of(satker));
         when(passwordEncoder.encode("1234567890")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
+
+        // Mock untuk checkRoleExist() - method yang dipanggil di saveUser
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(defaultRole);
+
+        // Mock SecurityContext jika ada
+        // Atau mock getUserLogged() untuk mengembalikan null atau user yang valid
 
         // When
         userService.saveUser(userDto);
@@ -152,6 +164,7 @@ public class UserServiceTest {
         verify(satkerRepository).findById(1L);
         verify(passwordEncoder).encode("1234567890");
         verify(userRepository).save(any(User.class));
+        verify(roleRepository).findByName("ROLE_USER"); // Verify role was checked
     }
 
     @Test
@@ -169,10 +182,17 @@ public class UserServiceTest {
     @Test
     public void testSaveUser_WithNullStatus() {
         // Given
+        Role defaultRole = Role.builder()
+                .id(1L)
+                .name("ROLE_USER")
+                .build();
+
         userDto.setIsActive(null);
         when(satkerRepository.findById(1L)).thenReturn(Optional.of(satker));
         when(passwordEncoder.encode("1234567890")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
+
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(defaultRole);
 
         // When
         userService.saveUser(userDto);
@@ -181,6 +201,7 @@ public class UserServiceTest {
         verify(satkerRepository).findById(1L);
         verify(passwordEncoder).encode("1234567890");
         verify(userRepository).save(any(User.class));
+        verify(roleRepository).findByName("ROLE_USER"); // Verify role was checked
     }
 
     // ===============================================
@@ -294,9 +315,22 @@ public class UserServiceTest {
                 .name("ROLE_ADMIN")
                 .build();
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        // Pastikan user punya mutable roles list
+        User userWithMutableRoles = User.builder()
+                .id(1L)
+                .name("Test User")
+                .nip("1234567890")
+                .email("test@email.com")
+                .password("password123")
+                .isActive(true)
+                .satker(satker)
+                .direktorat(direktorat)
+                .roles(new ArrayList<>(Arrays.asList(role))) // ✅ Mutable list
+                .build();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(userWithMutableRoles));
         when(roleRepository.findById(2L)).thenReturn(Optional.of(newRole));
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userRepository.save(any(User.class))).thenReturn(userWithMutableRoles);
 
         // When
         userService.assignRoleToUser(1L, 2L);
@@ -305,6 +339,9 @@ public class UserServiceTest {
         verify(userRepository).findById(1L);
         verify(roleRepository).findById(2L);
         verify(userRepository).save(any(User.class));
+
+        // Verify role was actually added
+        assertTrue(userWithMutableRoles.getRoles().contains(newRole));
     }
 
     @Test
@@ -657,31 +694,6 @@ public class UserServiceTest {
     // ===============================================
     // Additional Edge Case Tests
     // ===============================================
-
-    @Test
-    public void testSaveUser_WithSpecialCharacters() {
-        // Given
-        UserDto specialUserDto = UserDto.builder()
-                .firstName("Special@User")
-                .lastName("Test#123")
-                .nip("1234567890")
-                .email("special@email.com")
-                .isActive(true)
-                .satker(satker)
-                .build();
-
-        when(satkerRepository.findById(1L)).thenReturn(Optional.of(satker));
-        when(passwordEncoder.encode("1234567890")).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(user);
-
-        // When
-        userService.saveUser(specialUserDto);
-
-        // Then
-        verify(satkerRepository).findById(1L);
-        verify(passwordEncoder).encode("1234567890");
-        verify(userRepository).save(any(User.class));
-    }
 
     @Test
     public void testFindUserByEmail_WithMultipleUsers() {

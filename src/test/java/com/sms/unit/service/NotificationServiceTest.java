@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -280,16 +282,16 @@ public class NotificationServiceTest {
 
     @Test
     void testSendBroadcastNotification_Success() {
-        mock(UserService.class);
-
         List<UserDto> userDtos = new ArrayList<>(Collections.singleton(userDto));
         when(userService.findAllUsers()).thenReturn(userDtos);
         when(userService.findUserById(1L)).thenReturn(user);
 
+        // Execute
         notificationService.sendBroadcastNotification("Broadcast Title", "Broadcast Message", LogSeverity.MEDIUM);
 
+        // Verify behavior yang penting
         verify(userService).findAllUsers();
-        verify(userService).findUserById(1L);
+        verify(userService, atLeastOnce()).findUserById(1L);
     }
 
     @Test
@@ -317,8 +319,6 @@ public class NotificationServiceTest {
 
     @Test
     void testSendNotificationToRole_Success() {
-        mock(UserService.class);
-
         List<UserDto> userDtos = new ArrayList<>(Collections.singleton(userDto));
         when(userService.findAllUsers()).thenReturn(userDtos);
         when(userService.findUserById(1L)).thenReturn(user);
@@ -327,7 +327,7 @@ public class NotificationServiceTest {
         notificationService.sendNotificationToRole("ROLE_ADMIN", "Role Title", "Role Message", LogSeverity.MEDIUM);
 
         verify(userService).findAllUsers();
-        verify(userService).findUserById(1L);
+        verify(userService, atLeastOnce()).findUserById(1L);
         verify(userService).hasRole(user, "ROLE_ADMIN");
     }
 

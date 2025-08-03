@@ -3,6 +3,7 @@ package com.sms.unit.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.sql.Date;
 import java.util.List;
@@ -15,8 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
@@ -165,7 +168,7 @@ public class KegiatanServiceTest {
 
         kegiatanDto = KegiatanMapper.mapToKegiatanDto(kegiatan);
 
-        kegiatanRepository.save(kegiatan);
+        // kegiatanRepository.save(kegiatan);
     }
 
     @AfterEach
@@ -175,26 +178,81 @@ public class KegiatanServiceTest {
 
     @Test
     void testAmbilDaftarKegiatan() {
-        mock(Kegiatan.class);
-        mock(KegiatanRepository.class);
+        User mockUser = User.builder()
+                .id(1L)
+                .name("Test User")
+                .email("test@email.com")
+                .build();
 
-        when(kegiatanRepository.findAll()).thenReturn(new ArrayList<Kegiatan>(Collections.singleton(kegiatan)));
-        assertThat(kegiatanService.ambilDaftarKegiatan().get(0).getName()).isEqualTo(kegiatan.getName());
+        // Setup role untuk user (SUPERADMIN untuk akses penuh)
+        Role superAdminRole = Role.builder()
+                .id(1L)
+                .name("ROLE_SUPERADMIN")
+                .build();
+
+        mockUser.setRoles(new ArrayList<>(Arrays.asList(superAdminRole)));
+
+        // Mock user authentication
+        when(userService.getUserLogged()).thenReturn(mockUser);
+        when(userService.getCurrentUserHighestRole()).thenReturn("ROLE_SUPERADMIN");
+
+        // Mock repository
+        when(kegiatanRepository.findAll()).thenReturn(new ArrayList<>(Collections.singleton(kegiatan)));
+
+        // Execute
+        List<KegiatanDto> result = kegiatanService.ambilDaftarKegiatan();
+
+        // Assert
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getName()).isEqualTo(kegiatan.getName());
+
+        // Verify
+        verify(userService).getUserLogged();
+        verify(userService).getCurrentUserHighestRole();
+        verify(kegiatanRepository).findAll();
     }
 
     @Test
     void testSimpanDataKegiatan() {
-        mock(Kegiatan.class);
-        mock(KegiatanRepository.class);
-        mock(UserService.class);
-        mock(UserRepository.class);
+        Program program = Program.builder()
+                .id(1L)
+                .name("Test Program")
+                .code("P001")
+                .build();
+
+        Output output = Output.builder()
+                .id(1L)
+                .name("Test Output")
+                .code("O001")
+                .program(program) // Output harus punya program
+                .build();
+
+        kegiatanDto.getOutput().setId(1L); // Pastikan output ID ada
+        if (kegiatanDto.getSatker() != null) {
+            kegiatanDto.getSatker().setId(1L); // Pastikan satker ID ada
+        }
+        if (kegiatanDto.getUser() != null) {
+            kegiatanDto.getUser().setId(1L); // Pastikan user ID ada
+        }
 
         when(userService.getUserLogged()).thenReturn(user);
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(kegiatanRepository.save(Mockito.any(Kegiatan.class))).thenReturn(kegiatan);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(outputRepository.findById(1L)).thenReturn(Optional.of(output));
+        when(programRepository.findById(1L)).thenReturn(Optional.of(program));
+        when(satkerRepository.findById(1L)).thenReturn(Optional.of(satker));
+        when(kegiatanRepository.save(any(Kegiatan.class))).thenReturn(kegiatan);
 
+        // Execute
         KegiatanDto result = kegiatanService.simpanDataKegiatan(kegiatanDto);
+
+        // Assert
         assertThat(result.getName()).isEqualTo(kegiatanDto.getName());
+
+        // Verify
+        verify(userService).getUserLogged();
+        verify(outputRepository).findById(1L);
+        verify(programRepository).findById(1L);
+        verify(kegiatanRepository).save(any(Kegiatan.class));
     }
 
     @Test

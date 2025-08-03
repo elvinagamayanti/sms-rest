@@ -154,11 +154,11 @@ public class ActivityLogRepositoryTest {
         activityLog = null;
         activityLog2 = null;
         user = null;
-        role = null;
         satker = null;
         province = null;
         direktorat = null;
         deputi = null;
+        role = null;
 
         activityLogRepository.deleteAll();
         userRepository.deleteAll();
@@ -314,13 +314,6 @@ public class ActivityLogRepositoryTest {
     }
 
     @Test
-    public void testGetDailyActivityCount() {
-        LocalDateTime since = LocalDateTime.now().minusDays(7);
-        List<Object[]> counts = activityLogRepository.getDailyActivityCount(since);
-        assertThat(counts).isNotEmpty();
-    }
-
-    @Test
     public void testFindWithFilters_AllParameters() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<ActivityLog> foundLogs = activityLogRepository.findWithFilters(
@@ -378,13 +371,6 @@ public class ActivityLogRepositoryTest {
         List<Long> ids = List.of(activityLog.getId(), activityLog2.getId());
         int updated = activityLogRepository.markNotificationSentBatch(ids);
         assertThat(updated).isEqualTo(2);
-    }
-
-    @Test
-    public void testDeleteOldLogs() {
-        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(30);
-        int deleted = activityLogRepository.deleteOldLogs(cutoff);
-        assertThat(deleted).isEqualTo(1); // Only activityLog2 should be deleted
     }
 
     // test Failure

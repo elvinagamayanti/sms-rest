@@ -363,11 +363,10 @@ public class ActivityLogServiceTest {
 
     @Test
     void testMarkAsRead() {
-        mock(ActivityLogRepository.class);
-
-        doNothing().when(activityLogRepository).markAsRead(1L);
+        when(activityLogRepository.markAsRead(1L)).thenReturn(1);
 
         activityLogService.markAsRead(1L);
+
         verify(activityLogRepository).markAsRead(1L);
     }
 

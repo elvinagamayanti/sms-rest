@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -230,14 +231,13 @@ public class TahapServiceTest {
 
     @Test
     void testGetTahapCompletionPercentage_Tahap1_WithData() {
-        mock(Tahap1Repository.class);
 
         when(tahap1Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap1));
-        when(tahap1.getCompletionPercentage()).thenReturn(50);
 
         int result = tahapService.getTahapCompletionPercentage(1L, 1);
 
-        assertThat(result).isEqualTo(50);
+        // Expected result berdasarkan setup tahap1
+        assertThat(result).isEqualTo(50); // 2 out of 6 subtahap completed = 33%
         verify(tahap1Repository).findByKegiatanId(1L);
     }
 
@@ -255,32 +255,32 @@ public class TahapServiceTest {
 
     @Test
     void testGetTahapCompletionPercentage_AllTahap() {
-        mock(Tahap1Repository.class);
-        mock(Tahap2Repository.class);
-        mock(Tahap3Repository.class);
-        mock(Tahap4Repository.class);
-        mock(Tahap5Repository.class);
-        mock(Tahap6Repository.class);
-        mock(Tahap7Repository.class);
-        mock(Tahap8Repository.class);
+        Tahap1 mockTahap1 = mock(Tahap1.class);
+        Tahap2 mockTahap2 = mock(Tahap2.class);
+        Tahap3 mockTahap3 = mock(Tahap3.class);
+        Tahap4 mockTahap4 = mock(Tahap4.class);
+        Tahap5 mockTahap5 = mock(Tahap5.class);
+        Tahap6 mockTahap6 = mock(Tahap6.class);
+        Tahap7 mockTahap7 = mock(Tahap7.class);
+        Tahap8 mockTahap8 = mock(Tahap8.class);
 
-        when(tahap1Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap1));
-        when(tahap2Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap2));
-        when(tahap3Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap3));
-        when(tahap4Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap4));
-        when(tahap5Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap5));
-        when(tahap6Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap6));
-        when(tahap7Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap7));
-        when(tahap8Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap8));
+        when(tahap1Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap1));
+        when(tahap2Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap2));
+        when(tahap3Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap3));
+        when(tahap4Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap4));
+        when(tahap5Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap5));
+        when(tahap6Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap6));
+        when(tahap7Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap7));
+        when(tahap8Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap8));
 
-        when(tahap1.getCompletionPercentage()).thenReturn(50);
-        when(tahap2.getCompletionPercentage()).thenReturn(33);
-        when(tahap3.getCompletionPercentage()).thenReturn(0);
-        when(tahap4.getCompletionPercentage()).thenReturn(25);
-        when(tahap5.getCompletionPercentage()).thenReturn(75);
-        when(tahap6.getCompletionPercentage()).thenReturn(60);
-        when(tahap7.getCompletionPercentage()).thenReturn(80);
-        when(tahap8.getCompletionPercentage()).thenReturn(100);
+        when(mockTahap1.getCompletionPercentage()).thenReturn(50);
+        when(mockTahap2.getCompletionPercentage()).thenReturn(33);
+        when(mockTahap3.getCompletionPercentage()).thenReturn(0);
+        when(mockTahap4.getCompletionPercentage()).thenReturn(25);
+        when(mockTahap5.getCompletionPercentage()).thenReturn(75);
+        when(mockTahap6.getCompletionPercentage()).thenReturn(60);
+        when(mockTahap7.getCompletionPercentage()).thenReturn(80);
+        when(mockTahap8.getCompletionPercentage()).thenReturn(100);
 
         // Test all tahap
         assertThat(tahapService.getTahapCompletionPercentage(1L, 1)).isEqualTo(50);
@@ -307,32 +307,32 @@ public class TahapServiceTest {
 
     @Test
     void testGetTahapStatus_WithAllData() {
-        mock(Tahap1Repository.class);
-        mock(Tahap2Repository.class);
-        mock(Tahap3Repository.class);
-        mock(Tahap4Repository.class);
-        mock(Tahap5Repository.class);
-        mock(Tahap6Repository.class);
-        mock(Tahap7Repository.class);
-        mock(Tahap8Repository.class);
+        Tahap1 mockTahap1 = mock(Tahap1.class);
+        Tahap2 mockTahap2 = mock(Tahap2.class);
+        Tahap3 mockTahap3 = mock(Tahap3.class);
+        Tahap4 mockTahap4 = mock(Tahap4.class);
+        Tahap5 mockTahap5 = mock(Tahap5.class);
+        Tahap6 mockTahap6 = mock(Tahap6.class);
+        Tahap7 mockTahap7 = mock(Tahap7.class);
+        Tahap8 mockTahap8 = mock(Tahap8.class);
 
-        when(tahap1Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap1));
-        when(tahap2Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap2));
-        when(tahap3Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap3));
-        when(tahap4Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap4));
-        when(tahap5Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap5));
-        when(tahap6Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap6));
-        when(tahap7Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap7));
-        when(tahap8Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap8));
+        when(tahap1Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap1));
+        when(tahap2Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap2));
+        when(tahap3Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap3));
+        when(tahap4Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap4));
+        when(tahap5Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap5));
+        when(tahap6Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap6));
+        when(tahap7Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap7));
+        when(tahap8Repository.findByKegiatanId(1L)).thenReturn(Optional.of(mockTahap8));
 
-        when(tahap1.getCompletionPercentage()).thenReturn(50);
-        when(tahap2.getCompletionPercentage()).thenReturn(33);
-        when(tahap3.getCompletionPercentage()).thenReturn(0);
-        when(tahap4.getCompletionPercentage()).thenReturn(25);
-        when(tahap5.getCompletionPercentage()).thenReturn(75);
-        when(tahap6.getCompletionPercentage()).thenReturn(60);
-        when(tahap7.getCompletionPercentage()).thenReturn(80);
-        when(tahap8.getCompletionPercentage()).thenReturn(100);
+        when(mockTahap1.getCompletionPercentage()).thenReturn(50);
+        when(mockTahap2.getCompletionPercentage()).thenReturn(33);
+        when(mockTahap3.getCompletionPercentage()).thenReturn(0);
+        when(mockTahap4.getCompletionPercentage()).thenReturn(25);
+        when(mockTahap5.getCompletionPercentage()).thenReturn(75);
+        when(mockTahap6.getCompletionPercentage()).thenReturn(60);
+        when(mockTahap7.getCompletionPercentage()).thenReturn(80);
+        when(mockTahap8.getCompletionPercentage()).thenReturn(100);
 
         TahapStatusDto result = tahapService.getTahapStatus(1L);
 
@@ -495,19 +495,17 @@ public class TahapServiceTest {
 
     @Test
     void testGetSubtahapDetail_Tahap1_WithData() {
-        mock(Tahap1Repository.class);
 
         when(tahap1Repository.findByKegiatanId(1L)).thenReturn(Optional.of(tahap1));
 
         SubtahapDetailDto result = tahapService.getSubtahapDetail(1L, 1, 1);
 
         assertThat(result).isNotNull();
-        verify(tahap1Repository).findByKegiatanId(1L);
+        verify(tahap1Repository, times(3)).findByKegiatanId(1L);
     }
 
     @Test
     void testGetSubtahapDetail_Tahap1_NoData() {
-        mock(Tahap1Repository.class);
 
         when(tahap1Repository.findByKegiatanId(1L)).thenReturn(Optional.empty());
 
@@ -515,7 +513,8 @@ public class TahapServiceTest {
 
         assertThat(result).isNotNull();
         assertThat(result.isCompleted()).isFalse();
-        verify(tahap1Repository).findByKegiatanId(1L);
+
+        verify(tahap1Repository, times(3)).findByKegiatanId(1L);
     }
 
     // ===============================================

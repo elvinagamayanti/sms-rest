@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+
+import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -233,9 +236,6 @@ public class RoleInitializationServiceTest {
 
     @Test
     void testInitializeRoles_RepositoryExceptionHandling() {
-        mock(RoleRepository.class);
-
-        // Mock repository exception on save
         when(roleRepository.existsByName("ROLE_SUPERADMIN")).thenReturn(false);
         when(roleRepository.existsByName("ROLE_ADMIN_PUSAT")).thenReturn(true);
         when(roleRepository.existsByName("ROLE_OPERATOR_PUSAT")).thenReturn(true);
@@ -247,8 +247,9 @@ public class RoleInitializationServiceTest {
 
         when(roleRepository.save(Mockito.any(Role.class))).thenThrow(new RuntimeException("Database error"));
 
-        // Should not throw exception, just log error
-        roleInitializationService.initializeRoles();
+        assertThrows(RuntimeException.class, () -> {
+            roleInitializationService.initializeRoles();
+        });
 
         verify(roleRepository).existsByName("ROLE_SUPERADMIN");
         verify(roleRepository, times(1)).save(Mockito.any(Role.class));
@@ -256,17 +257,16 @@ public class RoleInitializationServiceTest {
 
     @Test
     void testInitializeRoles_CheckRoleExistenceExceptionHandling() {
-        mock(RoleRepository.class);
-
-        // Mock repository exception on existsByName
         when(roleRepository.existsByName("ROLE_SUPERADMIN")).thenThrow(new RuntimeException("Database error"));
 
-        // Should handle exception gracefully and continue with other roles
-        roleInitializationService.initializeRoles();
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            roleInitializationService.initializeRoles();
+        });
 
         verify(roleRepository).existsByName("ROLE_SUPERADMIN");
-        // Should still check other roles despite first one failing
-        verify(roleRepository).existsByName("ROLE_ADMIN_PUSAT");
+
+        verify(roleRepository, never()).existsByName("ROLE_ADMIN_PUSAT");
+        verify(roleRepository, never()).existsByName("ROLE_OPERATOR_PUSAT");
     }
 
     @Test

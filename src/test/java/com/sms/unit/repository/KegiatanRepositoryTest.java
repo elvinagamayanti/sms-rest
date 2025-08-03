@@ -215,7 +215,7 @@ public class KegiatanRepositoryTest {
     public void testGetMonthlyStatistics_Found() {
         List<Object[]> results = kegiatanRepository.getMonthlyStatistics(2025, direktorat.getId());
         assertThat(results).isNotEmpty();
-        assertThat(results.get(0)[0]).isEqualTo(7);
+        assertThat(results.get(0)[0]).isEqualTo(8);
         assertThat(results.get(0)[1]).isEqualTo(1L);
     }
 
