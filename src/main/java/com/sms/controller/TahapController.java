@@ -1,6 +1,7 @@
 package com.sms.controller;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
@@ -24,6 +25,7 @@ import com.sms.dto.TahapStatusDto;
 import com.sms.entity.ActivityLog.ActivityType;
 import com.sms.entity.ActivityLog.EntityType;
 import com.sms.entity.ActivityLog.LogSeverity;
+import com.sms.exception.FileSizeExceededException;
 import com.sms.service.FileUploadService;
 import com.sms.service.TahapService;
 
@@ -38,6 +40,24 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 public class TahapController {
     private final TahapService tahapService;
     private final FileUploadService fileUploadService;
+
+    // Konstanta untuk validasi file
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB in bytes
+
+    // Daftar format file yang diizinkan
+    private static final List<String> ALLOWED_FILE_TYPES = Arrays.asList(
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-excel",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "image/jpeg",
+            "image/png",
+            "image/jpg");
+
+    // Daftar ekstensi file yang diizinkan
+    private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList(
+            ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png");
 
     public TahapController(TahapService tahapService, FileUploadService fileUploadService) {
         this.tahapService = tahapService;
@@ -225,8 +245,56 @@ public class TahapController {
             @RequestParam("file") MultipartFile file) {
 
         try {
+            // Validasi apakah tahap mendukung upload file
+            if (tahapId != 7 && tahapId != 8) {
+                throw new IllegalArgumentException("File upload hanya diizinkan untuk tahap 7 dan 8");
+            }
+
+            // Validasi file tidak kosong
+            if (file.isEmpty()) {
+                throw new IllegalArgumentException("File tidak boleh kosong");
+            }
+
+            // Validasi ukuran file (maksimal 5MB)
+            if (file.getSize() > MAX_FILE_SIZE) {
+                throw new FileSizeExceededException(
+                        String.format("Ukuran file melebihi batas maksimal 5MB. Ukuran file saat ini: %s",
+                                formatFileSize(file.getSize())));
+            }
+
+            // Validasi nama file
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null || originalFilename.trim().isEmpty()) {
+                throw new IllegalArgumentException("Nama file tidak valid");
+            }
+
+            // Validasi ekstensi file
+            String fileExtension = getFileExtension(originalFilename).toLowerCase();
+            if (!ALLOWED_EXTENSIONS.contains(fileExtension)) {
+                throw new IllegalArgumentException(
+                        "Ekstensi file tidak diizinkan. Format yang didukung: " +
+                                String.join(", ", ALLOWED_EXTENSIONS));
+            }
+
+            // Validasi tipe file (content type)
+            String contentType = file.getContentType();
+            if (contentType == null || !ALLOWED_FILE_TYPES.contains(contentType)) {
+                throw new IllegalArgumentException(
+                        "Tipe file tidak diizinkan. Format yang didukung: PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG");
+            }
+
+            // Proses upload file
             tahapService.uploadFileForTahap(kegiatanId, tahapId, file);
-            return ResponseEntity.ok("File uploaded successfully");
+
+            return ResponseEntity.ok(String.format(
+                    "✅ File berhasil diupload untuk tahap %d\n" +
+                            "📄 Nama file: %s\n" +
+                            "📊 Ukuran file: %s\n" +
+                            "📁 Tipe file: %s",
+                    tahapId,
+                    originalFilename,
+                    formatFileSize(file.getSize()),
+                    contentType));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to upload file: " + e.getMessage());
@@ -284,6 +352,29 @@ public class TahapController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * Helper method untuk format ukuran file menjadi readable format
+     */
+    private String formatFileSize(long sizeInBytes) {
+        if (sizeInBytes < 1024) {
+            return sizeInBytes + " bytes";
+        } else if (sizeInBytes < 1024 * 1024) {
+            return String.format("%.2f KB", sizeInBytes / 1024.0);
+        } else {
+            return String.format("%.2f MB", sizeInBytes / (1024.0 * 1024.0));
+        }
+    }
+
+    /**
+     * Helper method untuk mendapatkan ekstensi file
+     */
+    private String getFileExtension(String filename) {
+        if (filename == null || !filename.contains(".")) {
+            return "";
+        }
+        return filename.substring(filename.lastIndexOf("."));
     }
 
     /**

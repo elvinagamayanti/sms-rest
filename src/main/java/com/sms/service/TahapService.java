@@ -21,6 +21,7 @@ import com.sms.entity.Tahap5;
 import com.sms.entity.Tahap6;
 import com.sms.entity.Tahap7;
 import com.sms.entity.Tahap8;
+import com.sms.exception.FileSizeExceededException;
 import com.sms.repository.Tahap1Repository;
 import com.sms.repository.Tahap2Repository;
 import com.sms.repository.Tahap3Repository;
@@ -41,6 +42,8 @@ public class TahapService {
     private final Tahap7Repository tahap7Repository;
     private final Tahap8Repository tahap8Repository;
     private final FileUploadService fileUploadService;
+    // Konstanta untuk validasi
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
     public TahapService(Tahap1Repository tahap1Repository, Tahap2Repository tahap2Repository,
             Tahap3Repository tahap3Repository, Tahap4Repository tahap4Repository,
@@ -1013,28 +1016,60 @@ public class TahapService {
             throw new IllegalArgumentException("File upload is only allowed for tahap 7 and 8");
         }
 
-        // Store the file
-        String storedFilename = fileUploadService.storeFile(file, kegiatanId, tahapId);
+        // Validasi ukuran file
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new FileSizeExceededException(
+                    String.format("File terlalu besar: %s. Maksimal yang diizinkan: 5MB",
+                            formatFileSize(file.getSize())));
+        }
 
-        // Update the tahap entity with file reference if needed
-        if (tahapId == 7) {
-            Tahap7 tahap7 = tahap7Repository.findByKegiatanId(kegiatanId)
-                    .orElseGet(() -> createDefaultTahap7(kegiatanId));
+        // Validasi file tidak kosong
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File tidak boleh kosong");
+        }
 
-            tahap7.setUploadFileName(file.getOriginalFilename());
-            tahap7.setUploadFilePath("/uploads/kegiatan/" + kegiatanId + "/tahap/" + tahapId + "/" + storedFilename);
-            tahap7.setUploadTimestamp(LocalDateTime.now());
+        try {
+            // Store the file
+            String storedFilename = fileUploadService.storeFile(file, kegiatanId, tahapId);
 
-            tahap7Repository.save(tahap7);
-        } else if (tahapId == 8) {
-            Tahap8 tahap8 = tahap8Repository.findByKegiatanId(kegiatanId)
-                    .orElseGet(() -> createDefaultTahap8(kegiatanId));
+            // Update the tahap entity with file reference if needed
+            if (tahapId == 7) {
+                Tahap7 tahap7 = tahap7Repository.findByKegiatanId(kegiatanId)
+                        .orElseGet(() -> createDefaultTahap7(kegiatanId));
 
-            tahap8.setUploadFileName(file.getOriginalFilename());
-            tahap8.setUploadFilePath("/uploads/kegiatan/" + kegiatanId + "/tahap/" + tahapId + "/" + storedFilename);
-            tahap8.setUploadTimestamp(LocalDateTime.now());
+                tahap7.setUploadFileName(file.getOriginalFilename());
+                tahap7.setUploadFilePath(
+                        "/uploads/kegiatan/" + kegiatanId + "/tahap/" + tahapId + "/" + storedFilename);
+                tahap7.setUploadTimestamp(LocalDateTime.now());
 
-            tahap8Repository.save(tahap8);
+                tahap7Repository.save(tahap7);
+            } else if (tahapId == 8) {
+                Tahap8 tahap8 = tahap8Repository.findByKegiatanId(kegiatanId)
+                        .orElseGet(() -> createDefaultTahap8(kegiatanId));
+
+                tahap8.setUploadFileName(file.getOriginalFilename());
+                tahap8.setUploadFilePath(
+                        "/uploads/kegiatan/" + kegiatanId + "/tahap/" + tahapId + "/" + storedFilename);
+                tahap8.setUploadTimestamp(LocalDateTime.now());
+
+                tahap8Repository.save(tahap8);
+            }
+        } catch (IOException e) {
+            throw new IOException("Gagal menyimpan file: " + e.getMessage(), e);
+        }
+
+    }
+
+    /**
+     * Helper method untuk format ukuran file yang readable
+     */
+    private String formatFileSize(long sizeInBytes) {
+        if (sizeInBytes < 1024) {
+            return sizeInBytes + " bytes";
+        } else if (sizeInBytes < 1024 * 1024) {
+            return String.format("%.2f KB", sizeInBytes / 1024.0);
+        } else {
+            return String.format("%.2f MB", sizeInBytes / (1024.0 * 1024.0));
         }
     }
 

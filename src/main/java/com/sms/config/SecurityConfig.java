@@ -126,7 +126,15 @@ public class SecurityConfig {
                                                 "OPERATOR_PROVINSI",
                                                 "ADMIN_SATKER", "OPERATOR_SATKER")
                                 .requestMatchers("/api/direktorats/**").hasAnyRole("ADMIN_PUSAT", "SUPERADMIN")
+                                .requestMatchers("/api/direktorats/")
+                                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI",
+                                                "OPERATOR_PROVINSI",
+                                                "ADMIN_SATKER", "OPERATOR_SATKER")
                                 .requestMatchers("/api/deputis/**").hasAnyRole("ADMIN_PUSAT", "SUPERADMIN")
+                                .requestMatchers("/api/deputis/")
+                                .hasAnyRole("SUPERADMIN", "ADMIN_PUSAT", "OPERATOR_PUSAT", "ADMIN_PROVINSI",
+                                                "OPERATOR_PROVINSI",
+                                                "ADMIN_SATKER", "OPERATOR_SATKER")
 
                                 // Notifications and Logs
                                 .requestMatchers("/api/notifications/**")
